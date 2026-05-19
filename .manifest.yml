@@ -13,36 +13,254 @@ github_project:
   owner: "RisoTron"
   board_url: "https://github.com/orgs/RisoTron/projects/1"
 
-backlog: []
+backlog:
   # Ordered by priority — first item = next to develop
-  # - issue: 12
-  #   type: "us"
-  #   title: "[US] As a user, I want to ..."
-  #   epic: "epic-slug"
-  #   feature: "feat-slug"
-  #   status: "ready"  # backlog | ready | in-progress | review | done
+  # Epic 1: Electron Shell (P0)
+  - issue: 21
+    type: "us"
+    title: "[US] Launch app and see main window"
+    epic: "electron-shell"
+    feature: "app-bootstrap"
+    status: "backlog"
+  - issue: 23
+    type: "us"
+    title: "[US] Secure IPC channels between renderer and main"
+    epic: "electron-shell"
+    feature: "ipc-bridge"
+    status: "backlog"
+  - issue: 24
+    type: "us"
+    title: "[US] Native OS menus with keyboard shortcuts"
+    epic: "electron-shell"
+    feature: "app-lifecycle"
+    status: "backlog"
+  - issue: 22
+    type: "us"
+    title: "[US] Persist window size and position"
+    epic: "electron-shell"
+    feature: "app-bootstrap"
+    status: "backlog"
+  - issue: 25
+    type: "us"
+    title: "[US] Single-instance enforcement"
+    epic: "electron-shell"
+    feature: "app-lifecycle"
+    status: "backlog"
+  # Epic 2: Data Layer (P0)
+  - issue: 26
+    type: "us"
+    title: "[US] Project data persisted in SQLite"
+    epic: "data-layer"
+    feature: "sqlite-storage"
+    status: "backlog"
+  - issue: 27
+    type: "us"
+    title: "[US] Migration system for schema changes"
+    epic: "data-layer"
+    feature: "sqlite-storage"
+    status: "backlog"
+  - issue: 28
+    type: "us"
+    title: "[US] CRUD operations for projects"
+    epic: "data-layer"
+    feature: "project-crud"
+    status: "backlog"
+  - issue: 29
+    type: "us"
+    title: "[US] Store and retrieve app settings"
+    epic: "data-layer"
+    feature: "config-manager"
+    status: "backlog"
+  # Epic 3: Dashboard UI (P1)
+  - issue: 30
+    type: "us"
+    title: "[US] See all projects in dashboard"
+    epic: "dashboard-ui"
+    feature: "project-list"
+    status: "backlog"
+  - issue: 32
+    type: "us"
+    title: "[US] Step-by-step wizard to create projects"
+    epic: "dashboard-ui"
+    feature: "create-wizard"
+    status: "backlog"
+  - issue: 33
+    type: "us"
+    title: "[US] Preview project configuration before creating"
+    epic: "dashboard-ui"
+    feature: "create-wizard"
+    status: "backlog"
+  - issue: 34
+    type: "us"
+    title: "[US] View project details and status"
+    epic: "dashboard-ui"
+    feature: "project-detail"
+    status: "backlog"
+  - issue: 31
+    type: "us"
+    title: "[US] Search and filter projects"
+    epic: "dashboard-ui"
+    feature: "project-list"
+    status: "backlog"
+  # Epic 4: Project Scaffolding Core (P1)
+  - issue: 35
+    type: "us"
+    title: "[US] Pipeline executes 3 stages sequentially"
+    epic: "project-scaffold"
+    feature: "pipeline-engine"
+    status: "backlog"
+  - issue: 37
+    type: "us"
+    title: "[US] Scaffold from Electron Forge with auto-update"
+    epic: "project-scaffold"
+    feature: "template-provider"
+    status: "backlog"
+  - issue: 39
+    type: "us"
+    title: "[US] Configure GitHub Releases as update server"
+    epic: "project-scaffold"
+    feature: "release-provider"
+    status: "backlog"
+  - issue: 41
+    type: "us"
+    title: "[US] GitHub Actions workflows with build+sign+publish"
+    epic: "project-scaffold"
+    feature: "cicd-provider"
+    status: "backlog"
+  - issue: 36
+    type: "us"
+    title: "[US] Progress feedback during scaffolding"
+    epic: "project-scaffold"
+    feature: "pipeline-engine"
+    status: "backlog"
+  - issue: 38
+    type: "us"
+    title: "[US] Scaffold from RisoTron template"
+    epic: "project-scaffold"
+    feature: "template-provider"
+    status: "backlog"
+  - issue: 40
+    type: "us"
+    title: "[US] Configure S3/R2 as release server"
+    epic: "project-scaffold"
+    feature: "release-provider"
+    status: "backlog"
+  - issue: 42
+    type: "us"
+    title: "[US] Code signing in CD pipeline"
+    epic: "project-scaffold"
+    feature: "cicd-provider"
+    status: "backlog"
+  # Epic 5: Template Registry (P2)
+  - issue: 43
+    type: "us"
+    title: "[US] Pre-installed templates available"
+    epic: "template-registry"
+    feature: "builtin-templates"
+    status: "backlog"
+  - issue: 44
+    type: "us"
+    title: "[US] Browse community templates"
+    epic: "template-registry"
+    feature: "community-registry"
+    status: "backlog"
+  - issue: 45
+    type: "us"
+    title: "[US] Install and manage community templates"
+    epic: "template-registry"
+    feature: "community-registry"
+    status: "backlog"
 
 current_work: null
-  # issue: 12
-  # branch: "feat/epic-slug/short-desc"
-  # tasks: [20, 21, 22]
 
-epics: []
-  # - id: "auth"
-  #   title: "User Authentication"
-  #   issue: 10
-  #   status: "planned"  # planned | in-progress | done
-  #   features:
-  #     - id: "oauth-google"
-  #       title: "OAuth2 Google Login"
-  #       issue: 11
-  #       status: "planned"
+epics:
+  - id: "electron-shell"
+    title: "Electron Shell"
+    issue: 1
+    status: "planned"
+    features:
+      - id: "app-bootstrap"
+        title: "App Bootstrap"
+        issue: 6
+        status: "planned"
+      - id: "ipc-bridge"
+        title: "IPC Bridge"
+        issue: 7
+        status: "planned"
+      - id: "app-lifecycle"
+        title: "App Lifecycle"
+        issue: 8
+        status: "planned"
+  - id: "data-layer"
+    title: "Data Layer"
+    issue: 2
+    status: "planned"
+    features:
+      - id: "sqlite-storage"
+        title: "SQLite Storage"
+        issue: 9
+        status: "planned"
+      - id: "project-crud"
+        title: "Project CRUD"
+        issue: 10
+        status: "planned"
+      - id: "config-manager"
+        title: "Config Manager"
+        issue: 11
+        status: "planned"
+  - id: "dashboard-ui"
+    title: "Dashboard UI"
+    issue: 3
+    status: "planned"
+    features:
+      - id: "project-list"
+        title: "Project List"
+        issue: 12
+        status: "planned"
+      - id: "create-wizard"
+        title: "Create Wizard"
+        issue: 13
+        status: "planned"
+      - id: "project-detail"
+        title: "Project Detail View"
+        issue: 14
+        status: "planned"
+  - id: "project-scaffold"
+    title: "Project Scaffolding Core"
+    issue: 4
+    status: "planned"
+    features:
+      - id: "pipeline-engine"
+        title: "Pipeline Engine"
+        issue: 15
+        status: "planned"
+      - id: "template-provider"
+        title: "Template Provider"
+        issue: 16
+        status: "planned"
+      - id: "release-provider"
+        title: "Release Provider"
+        issue: 17
+        status: "planned"
+      - id: "cicd-provider"
+        title: "CICD Provider"
+        issue: 18
+        status: "planned"
+  - id: "template-registry"
+    title: "Template Registry"
+    issue: 5
+    status: "planned"
+    features:
+      - id: "builtin-templates"
+        title: "Built-in Templates"
+        issue: 19
+        status: "planned"
+      - id: "community-registry"
+        title: "Community Registry"
+        issue: 20
+        status: "planned"
 
 completed: []
-  # - issue: 5
-  #   title: "[US] As a user, I want to ..."
-  #   completed_at: "2026-05-18"
-  #   epic: "epic-slug"
 
 labels_created:
   types:
@@ -56,5 +274,25 @@ labels_created:
     - "priority:high"
     - "priority:medium"
     - "priority:low"
-  epics: []
-  features: []
+  epics:
+    - "epic:electron-shell"
+    - "epic:data-layer"
+    - "epic:dashboard-ui"
+    - "epic:project-scaffold"
+    - "epic:template-registry"
+  features:
+    - "feat:app-bootstrap"
+    - "feat:ipc-bridge"
+    - "feat:app-lifecycle"
+    - "feat:sqlite-storage"
+    - "feat:project-crud"
+    - "feat:config-manager"
+    - "feat:project-list"
+    - "feat:create-wizard"
+    - "feat:project-detail"
+    - "feat:pipeline-engine"
+    - "feat:template-provider"
+    - "feat:release-provider"
+    - "feat:cicd-provider"
+    - "feat:builtin-templates"
+    - "feat:community-registry"
