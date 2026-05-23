@@ -171,7 +171,9 @@ backlog:
     feature: "community-registry"
     status: "backlog"
 
-current_work: null
+current_work:
+  issue: 21
+  branch: "feat/electron-shell/launch-main-window"
 
 epics:
   - id: "electron-shell"
