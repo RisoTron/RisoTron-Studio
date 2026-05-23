@@ -21,7 +21,7 @@ backlog:
     title: "[US] Launch app and see main window"
     epic: "electron-shell"
     feature: "app-bootstrap"
-    status: "backlog"
+    status: "ready"
   - issue: 23
     type: "us"
     title: "[US] Secure IPC channels between renderer and main"
