@@ -72,3 +72,6 @@ typings/
 
 # Electron-Forge
 out/
+
+# Antigravity CLI
+.antigravitycli/

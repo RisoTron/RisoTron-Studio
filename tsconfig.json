@@ -11,8 +11,7 @@
     "baseUrl": ".",
     "outDir": "dist",
     "resolveJsonModule": true,
-    "strict": true,
-    "types": ["svelte"]
+    "strict": true
   },
   "include": [
     "src/**/*.ts",
