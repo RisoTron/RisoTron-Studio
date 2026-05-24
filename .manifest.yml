@@ -16,12 +16,6 @@ github_project:
 backlog:
   # Ordered by priority — first item = next to develop
   # Epic 1: Electron Shell (P0)
-  - issue: 21
-    type: "us"
-    title: "[US] Launch app and see main window"
-    epic: "electron-shell"
-    feature: "app-bootstrap"
-    status: "review"
   - issue: 23
     type: "us"
     title: "[US] Secure IPC channels between renderer and main"
@@ -171,9 +165,7 @@ backlog:
     feature: "community-registry"
     status: "backlog"
 
-current_work:
-  issue: 21
-  branch: "feat/electron-shell/launch-main-window"
+current_work: null
 
 epics:
   - id: "electron-shell"
@@ -262,7 +254,13 @@ epics:
         issue: 20
         status: "planned"
 
-completed: []
+completed:
+  - issue: 21
+    type: "us"
+    title: "[US] Launch app and see main window"
+    epic: "electron-shell"
+    feature: "app-bootstrap"
+    status: "done"
 
 labels_created:
   types:
