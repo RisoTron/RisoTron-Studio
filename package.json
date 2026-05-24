@@ -6,6 +6,9 @@
   "main": ".vite/build/main.js",
   "type": "module",
   "private": true,
+  "engines": {
+    "node": ">=22 <23"
+  },
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",
