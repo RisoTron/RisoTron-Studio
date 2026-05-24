@@ -5,7 +5,7 @@ export default defineConfig({
     lib: {
       entry: 'src/main/index.ts',
       formats: ['es'],
-      fileName: () => '[name].js'
+      fileName: () => 'main.js',
     },
     rollupOptions: {
       output: {

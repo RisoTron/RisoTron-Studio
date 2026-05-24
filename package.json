@@ -3,7 +3,7 @@
   "productName": "RisoTron Studio",
   "version": "1.0.0",
   "description": "AI-powered creative studio platform",
-  "main": ".vite/build/index.js",
+  "main": ".vite/build/main.js",
   "type": "module",
   "private": true,
   "scripts": {
@@ -31,7 +31,7 @@
     "@types/electron-squirrel-startup": "^1.0.2",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
-    "electron": "^42.2.0",
+    "electron": "42.2.0",
     "eslint": "^8.57.1",
     "eslint-plugin-import": "^2.32.0",
     "svelte-check": "^4.4.8",
