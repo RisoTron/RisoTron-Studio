@@ -1,9 +1,15 @@
 export {};
 
 declare global {
+  interface AppInfo {
+    version: string;
+    state: Record<string, any>;
+  }
+
   interface Window {
     api: {
-      getAppInfo: () => Promise<any>;
+      getAppInfo: () => Promise<AppInfo>;
+      ping: () => Promise<string>;
     };
   }
 }

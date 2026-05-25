@@ -1,13 +1,37 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
-  let appInfo: any = null;
+  let appInfo: AppInfo | null = null;
+  let pinging = false;
+  let pingResult: string | null = null;
+  let pingError = false;
 
   onMount(async () => {
     if (window.api && window.api.getAppInfo) {
       appInfo = await window.api.getAppInfo();
     }
   });
+
+  async function handlePing() {
+    if (!window.api || !window.api.ping) {
+      pingResult = 'Error: IPC API not available';
+      pingError = true;
+      return;
+    }
+    if (pinging) return;
+    pinging = true;
+    pingResult = null;
+    pingError = false;
+    try {
+      const response = await window.api.ping();
+      pingResult = response;
+    } catch (err: unknown) {
+      pingResult = `Error: ${err instanceof Error ? err.message : String(err)}`;
+      pingError = true;
+    } finally {
+      pinging = false;
+    }
+  }
 </script>
 
 <main>
@@ -21,6 +45,16 @@
         <pre>{JSON.stringify(appInfo.state, null, 2)}</pre>
       </div>
     {/if}
+    <div class="ping-section">
+      <button id="ping-btn" on:click={handlePing} disabled={pinging}>
+        {pinging ? 'Pinging…' : '🏓 Ping'}
+      </button>
+      {#if pingResult !== null}
+        <p class="ping-result" class:ping-error={pingError}>
+          {pingResult}
+        </p>
+      {/if}
+    </div>
   </div>
 </main>
 
@@ -58,5 +92,39 @@
     padding: 1rem;
     border-radius: 4px;
     overflow-x: auto;
+  }
+
+  .ping-section {
+    margin-top: 2rem;
+  }
+
+  .ping-section button {
+    padding: 0.6rem 1.4rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 6px;
+    background: #4f8cff;
+    color: #fff;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+
+  .ping-section button:hover:not(:disabled) {
+    opacity: 0.85;
+  }
+
+  .ping-section button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .ping-result {
+    margin-top: 0.75rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+
+  .ping-error {
+    color: #ff5555;
   }
 </style>

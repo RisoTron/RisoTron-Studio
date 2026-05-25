@@ -65,14 +65,18 @@ const createWindow = () => {
   }
 };
 
-ipcMain.handle('get-app-info', () => {
-  return {
-    version: app.getVersion(),
-    state: loadWindowState()
-  };
+app.whenReady().then(() => {
+  ipcMain.handle('get-app-info', () => {
+    return {
+      version: app.getVersion(),
+      state: loadWindowState()
+    };
+  });
+  
+  ipcMain.handle('ping', (): string => 'pong');
+  
+  createWindow();
 });
-
-app.whenReady().then(createWindow);
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
