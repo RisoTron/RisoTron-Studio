@@ -1,15 +1,41 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
 
   let appInfo: AppInfo | null = null;
   let pinging = false;
   let pingResult: string | null = null;
   let pingError = false;
 
+  let cleanupNewProject: (() => void) | undefined;
+  let cleanupPreferences: (() => void) | undefined;
+
   onMount(async () => {
-    if (window.api && window.api.getAppInfo) {
-      appInfo = await window.api.getAppInfo();
+    if (window.api) {
+      if (window.api.onMenuNewProject) {
+        cleanupNewProject = window.api.onMenuNewProject(() => {
+          console.log('[STUB] "New Project" menu item clicked');
+        });
+      }
+      
+      if (window.api.onMenuPreferences) {
+        cleanupPreferences = window.api.onMenuPreferences(() => {
+          console.log('[STUB] "Preferences" menu item clicked');
+        });
+      }
+
+      if (window.api.getAppInfo) {
+        try {
+          appInfo = await window.api.getAppInfo();
+        } catch (e) {
+          console.error("Failed to get app info", e);
+        }
+      }
     }
+  });
+
+  onDestroy(() => {
+    if (cleanupNewProject) cleanupNewProject();
+    if (cleanupPreferences) cleanupPreferences();
   });
 
   async function handlePing() {

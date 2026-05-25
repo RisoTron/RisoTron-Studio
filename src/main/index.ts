@@ -1,4 +1,5 @@
-import { app, BrowserWindow, nativeTheme, ipcMain } from 'electron';
+import { app, BrowserWindow, nativeTheme, ipcMain, Menu } from 'electron';
+import { buildMenu } from './menu';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -101,6 +102,10 @@ app.whenReady().then(() => {
     return 'pong';
   });
   
+  const isMac = process.platform === 'darwin';
+  const menu = buildMenu(isMac);
+  Menu.setApplicationMenu(menu);
+
   createWindow();
 });
 
