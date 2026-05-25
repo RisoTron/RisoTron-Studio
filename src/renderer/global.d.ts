@@ -1,9 +1,11 @@
 export {};
 
+import type { WindowState } from '../main/utils/window-state';
+
 declare global {
   interface AppInfo {
     version: string;
-    state: Record<string, any>;
+    state: WindowState;
   }
 
   interface Window {

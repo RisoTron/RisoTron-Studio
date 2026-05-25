@@ -13,11 +13,6 @@
   });
 
   async function handlePing() {
-    if (!window.api || !window.api.ping) {
-      pingResult = 'Error: IPC API not available';
-      pingError = true;
-      return;
-    }
     if (pinging) return;
     pinging = true;
     pingResult = null;
@@ -111,6 +106,11 @@
 
   .ping-section button:hover:not(:disabled) {
     opacity: 0.85;
+  }
+
+  .ping-section button:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
   }
 
   .ping-section button:disabled {

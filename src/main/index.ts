@@ -56,6 +56,18 @@ const createWindow = () => {
 
   trackWindowState(mainWindow);
 
+  // Navigation blocks for security
+  mainWindow.webContents.on('will-navigate', (event, url) => {
+    const devUrl = typeof MAIN_WINDOW_VITE_DEV_SERVER_URL !== 'undefined' ? MAIN_WINDOW_VITE_DEV_SERVER_URL : null;
+    if (url !== devUrl && !url.startsWith('file://')) {
+      event.preventDefault();
+    }
+  });
+
+  mainWindow.webContents.setWindowOpenHandler(() => {
+    return { action: 'deny' };
+  });
+
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
   } else {
@@ -66,14 +78,28 @@ const createWindow = () => {
 };
 
 app.whenReady().then(() => {
-  ipcMain.handle('get-app-info', () => {
+  const cachedState = loadWindowState();
+
+  const validateSender = (event: Electron.IpcMainInvokeEvent) => {
+    const url = event.senderFrame?.url;
+    const devUrl = typeof MAIN_WINDOW_VITE_DEV_SERVER_URL !== 'undefined' ? MAIN_WINDOW_VITE_DEV_SERVER_URL : null;
+    if (url !== devUrl && !url?.startsWith('file://')) {
+      throw new Error('Unauthorized IPC sender');
+    }
+  };
+
+  ipcMain.handle('app:get-info', (event) => {
+    validateSender(event);
     return {
       version: app.getVersion(),
-      state: loadWindowState()
+      state: cachedState
     };
   });
   
-  ipcMain.handle('ping', (): string => 'pong');
+  ipcMain.handle('app:ping', (event): string => {
+    validateSender(event);
+    return 'pong';
+  });
   
   createWindow();
 });
