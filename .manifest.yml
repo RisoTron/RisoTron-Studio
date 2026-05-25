@@ -21,7 +21,7 @@ backlog:
     title: "[US] Native OS menus with keyboard shortcuts"
     epic: "electron-shell"
     feature: "app-lifecycle"
-    status: "backlog"
+    status: "ready"
 
   - issue: 25
     type: "us"
