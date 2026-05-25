@@ -56,6 +56,18 @@ const createWindow = () => {
 
   trackWindowState(mainWindow);
 
+  // Navigation blocks for security
+  mainWindow.webContents.on('will-navigate', (event, url) => {
+    const devUrl = typeof MAIN_WINDOW_VITE_DEV_SERVER_URL !== 'undefined' ? MAIN_WINDOW_VITE_DEV_SERVER_URL : null;
+    if (devUrl && url.startsWith(devUrl)) return;
+    if (url.startsWith('file://')) return;
+    event.preventDefault();
+  });
+
+  mainWindow.webContents.setWindowOpenHandler(() => {
+    return { action: 'deny' };
+  });
+
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
   } else {
@@ -65,14 +77,32 @@ const createWindow = () => {
   }
 };
 
-ipcMain.handle('get-app-info', () => {
-  return {
-    version: app.getVersion(),
-    state: loadWindowState()
-  };
-});
+app.whenReady().then(() => {
+  const cachedState = loadWindowState();
 
-app.whenReady().then(createWindow);
+  const validateSender = (event: Electron.IpcMainInvokeEvent) => {
+    const url = event.senderFrame?.url;
+    const devUrl = typeof MAIN_WINDOW_VITE_DEV_SERVER_URL !== 'undefined' ? MAIN_WINDOW_VITE_DEV_SERVER_URL : null;
+    if (devUrl && url?.startsWith(devUrl)) return;
+    if (url?.startsWith('file://')) return;
+    throw new Error(`Unauthorized IPC sender: ${url}`);
+  };
+
+  ipcMain.handle('app:get-info', (event) => {
+    validateSender(event);
+    return {
+      version: app.getVersion(),
+      state: cachedState
+    };
+  });
+  
+  ipcMain.handle('app:ping', (event): string => {
+    validateSender(event);
+    return 'pong';
+  });
+  
+  createWindow();
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {

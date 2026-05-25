@@ -1,9 +1,17 @@
 export {};
 
+import type { WindowState } from '../main/utils/window-state';
+
 declare global {
+  interface AppInfo {
+    version: string;
+    state: WindowState;
+  }
+
   interface Window {
     api: {
-      getAppInfo: () => Promise<any>;
+      getAppInfo: () => Promise<AppInfo>;
+      ping: () => Promise<string>;
     };
   }
 }

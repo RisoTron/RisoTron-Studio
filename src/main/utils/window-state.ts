@@ -5,14 +5,14 @@ import { Store } from './risotron-store';
 // Types
 // ---------------------------------------------------------------------------
 
-interface WindowBounds {
+export interface WindowBounds {
   x: number;
   y: number;
   width: number;
   height: number;
 }
 
-interface WindowState {
+export interface WindowState {
   bounds: WindowBounds | Omit<WindowBounds, 'x' | 'y'>;
   isMaximized: boolean;
 }

@@ -16,12 +16,6 @@ github_project:
 backlog:
   # Ordered by priority — first item = next to develop
   # Epic 1: Electron Shell (P0)
-  - issue: 23
-    type: "us"
-    title: "[US] Secure IPC channels between renderer and main"
-    epic: "electron-shell"
-    feature: "ipc-bridge"
-    status: "backlog"
   - issue: 24
     type: "us"
     title: "[US] Native OS menus with keyboard shortcuts"
@@ -250,6 +244,12 @@ epics:
         status: "planned"
 
 completed:
+  - issue: 23
+    type: "us"
+    title: "[US] Secure IPC channels with ping/pong demonstration"
+    epic: "electron-shell"
+    feature: "ipc-bridge"
+    status: "done"
   - issue: 21
     type: "us"
     title: "[US] Launch app and see main window"
