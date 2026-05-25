@@ -33,7 +33,7 @@ backlog:
     title: "[US] Persist window size and position"
     epic: "electron-shell"
     feature: "app-bootstrap"
-    status: "in-progress"
+    status: "review"
   - issue: 25
     type: "us"
     title: "[US] Single-instance enforcement"

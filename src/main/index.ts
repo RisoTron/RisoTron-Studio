@@ -1,4 +1,4 @@
-import { app, BrowserWindow, nativeTheme } from 'electron';
+import { app, BrowserWindow, nativeTheme, ipcMain } from 'electron';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -64,6 +64,13 @@ const createWindow = () => {
     );
   }
 };
+
+ipcMain.handle('get-app-info', () => {
+  return {
+    version: app.getVersion(),
+    state: loadWindowState()
+  };
+});
 
 app.whenReady().then(createWindow);
 
