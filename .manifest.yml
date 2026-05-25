@@ -16,13 +16,6 @@ github_project:
 backlog:
   # Ordered by priority — first item = next to develop
   # Epic 1: Electron Shell (P0)
-  - issue: 24
-    type: "us"
-    title: "[US] Native OS menus with keyboard shortcuts"
-    epic: "electron-shell"
-    feature: "app-lifecycle"
-    status: "review"
-
   - issue: 25
     type: "us"
     title: "[US] Single-instance enforcement"
@@ -154,7 +147,7 @@ backlog:
     feature: "community-registry"
     status: "backlog"
 
-current_work: 24
+current_work: null
 
 epics:
   - id: "electron-shell"
@@ -244,6 +237,12 @@ epics:
         status: "planned"
 
 completed:
+  - issue: 24
+    type: "us"
+    title: "[US] Native OS menus with keyboard shortcuts"
+    epic: "electron-shell"
+    feature: "app-lifecycle"
+    status: "done"
   - issue: 23
     type: "us"
     title: "[US] Secure IPC channels with ping/pong demonstration"
