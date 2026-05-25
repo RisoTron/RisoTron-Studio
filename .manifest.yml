@@ -146,6 +146,13 @@ backlog:
     epic: "template-registry"
     feature: "community-registry"
     status: "backlog"
+  # Epic 6: DevOps & Infrastructure (P1)
+  - issue: 52
+    type: "us"
+    title: "[US] Setup GitHub Actions CI/CD with Release Please for RisoTron Studio"
+    epic: "devops"
+    feature: "cicd-pipeline"
+    status: "backlog"
 
 current_work: null
 
@@ -235,6 +242,15 @@ epics:
         title: "Community Registry"
         issue: 20
         status: "planned"
+  - id: "devops"
+    title: "DevOps & Infrastructure"
+    issue: 50
+    status: "planned"
+    features:
+      - id: "cicd-pipeline"
+        title: "CI/CD Pipeline"
+        issue: 51
+        status: "planned"
 
 completed:
   - issue: 24
@@ -280,6 +296,7 @@ labels_created:
     - "epic:dashboard-ui"
     - "epic:project-scaffold"
     - "epic:template-registry"
+    - "epic:devops"
   features:
     - "feat:app-bootstrap"
     - "feat:ipc-bridge"
@@ -296,3 +313,4 @@ labels_created:
     - "feat:cicd-provider"
     - "feat:builtin-templates"
     - "feat:community-registry"
+    - "feat:cicd-pipeline"
