@@ -12,6 +12,8 @@ declare global {
     api: {
       getAppInfo: () => Promise<AppInfo>;
       ping: () => Promise<string>;
+      onMenuNewProject: (callback: () => void) => void;
+      onMenuPreferences: (callback: () => void) => void;
     };
   }
 }

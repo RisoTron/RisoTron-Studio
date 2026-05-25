@@ -9,6 +9,18 @@
   onMount(async () => {
     if (window.api && window.api.getAppInfo) {
       appInfo = await window.api.getAppInfo();
+      
+      if (window.api.onMenuNewProject) {
+        window.api.onMenuNewProject(() => {
+          console.log('[STUB] "New Project" menu item clicked');
+        });
+      }
+      
+      if (window.api.onMenuPreferences) {
+        window.api.onMenuPreferences(() => {
+          console.log('[STUB] "Preferences" menu item clicked');
+        });
+      }
     }
   });
 

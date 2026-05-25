@@ -4,4 +4,10 @@ import { contextBridge, ipcRenderer } from 'electron';
 contextBridge.exposeInMainWorld('api', {
   getAppInfo: () => ipcRenderer.invoke('app:get-info'),
   ping: () => ipcRenderer.invoke('app:ping'),
+  onMenuNewProject: (callback: () => void) => {
+    ipcRenderer.on('menu:new-project', () => callback());
+  },
+  onMenuPreferences: (callback: () => void) => {
+    ipcRenderer.on('menu:preferences', () => callback());
+  }
 });
