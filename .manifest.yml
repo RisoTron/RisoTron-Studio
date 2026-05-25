@@ -28,12 +28,7 @@ backlog:
     epic: "electron-shell"
     feature: "app-lifecycle"
     status: "backlog"
-  - issue: 22
-    type: "us"
-    title: "[US] Persist window size and position"
-    epic: "electron-shell"
-    feature: "app-bootstrap"
-    status: "review"
+
   - issue: 25
     type: "us"
     title: "[US] Single-instance enforcement"
@@ -165,9 +160,7 @@ backlog:
     feature: "community-registry"
     status: "backlog"
 
-current_work:
-  issue: 22
-  branch: "feat/electron-shell/persist-window-state"
+current_work: null
 
 epics:
   - id: "electron-shell"
@@ -260,6 +253,12 @@ completed:
   - issue: 21
     type: "us"
     title: "[US] Launch app and see main window"
+    epic: "electron-shell"
+    feature: "app-bootstrap"
+    status: "done"
+  - issue: 22
+    type: "us"
+    title: "[US] Persist window size and position"
     epic: "electron-shell"
     feature: "app-bootstrap"
     status: "done"
