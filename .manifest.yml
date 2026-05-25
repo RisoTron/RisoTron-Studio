@@ -33,7 +33,7 @@ backlog:
     title: "[US] Persist window size and position"
     epic: "electron-shell"
     feature: "app-bootstrap"
-    status: "backlog"
+    status: "review"
   - issue: 25
     type: "us"
     title: "[US] Single-instance enforcement"
@@ -165,7 +165,9 @@ backlog:
     feature: "community-registry"
     status: "backlog"
 
-current_work: null
+current_work:
+  issue: 22
+  branch: "feat/electron-shell/persist-window-state"
 
 epics:
   - id: "electron-shell"

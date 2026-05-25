@@ -1,8 +1,9 @@
-import { app, BrowserWindow, nativeTheme } from 'electron';
+import { app, BrowserWindow, nativeTheme, ipcMain } from 'electron';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import started from 'electron-squirrel-startup';
+import { loadWindowState, trackWindowState, MIN_WIDTH, MIN_HEIGHT } from './utils/window-state';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -13,12 +14,17 @@ if (started) {
 nativeTheme.themeSource = 'system';
 
 const createWindow = () => {
+  const state = loadWindowState();
+
   const mainWindow = new BrowserWindow({
     title: 'RisoTron Studio',
-    width: 1200,
-    height: 800,
-    minWidth: 800,
-    minHeight: 600,
+    ...('x' in state.bounds ? { x: state.bounds.x } : {}),
+    ...('y' in state.bounds ? { y: state.bounds.y } : {}),
+    width: state.bounds.width,
+    height: state.bounds.height,
+    minWidth: MIN_WIDTH,
+    minHeight: MIN_HEIGHT,
+    show: false, // prevent visual jump — show after ready-to-show
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -26,6 +32,29 @@ const createWindow = () => {
       sandbox: true,
     },
   });
+
+  let hasShown = false;
+
+  mainWindow.once('ready-to-show', () => {
+    if (hasShown) return;
+    hasShown = true;
+    if (state.isMaximized) {
+      mainWindow.maximize(); // maximize after show-ready to avoid geometry bugs
+    }
+    mainWindow.show();
+  });
+
+  // Fallback: force show the window after 5s if ready-to-show hangs
+  setTimeout(() => {
+    if (!hasShown && !mainWindow.isDestroyed()) {
+      hasShown = true;
+      console.warn('Fallback triggered: ready-to-show did not fire in 5s');
+      if (state.isMaximized) mainWindow.maximize();
+      mainWindow.show();
+    }
+  }, 5000);
+
+  trackWindowState(mainWindow);
 
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
@@ -35,6 +64,13 @@ const createWindow = () => {
     );
   }
 };
+
+ipcMain.handle('get-app-info', () => {
+  return {
+    version: app.getVersion(),
+    state: loadWindowState()
+  };
+});
 
 app.whenReady().then(createWindow);
 
