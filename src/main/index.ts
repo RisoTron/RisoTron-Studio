@@ -59,9 +59,9 @@ const createWindow = () => {
   // Navigation blocks for security
   mainWindow.webContents.on('will-navigate', (event, url) => {
     const devUrl = typeof MAIN_WINDOW_VITE_DEV_SERVER_URL !== 'undefined' ? MAIN_WINDOW_VITE_DEV_SERVER_URL : null;
-    if (url !== devUrl && !url.startsWith('file://')) {
-      event.preventDefault();
-    }
+    if (devUrl && url.startsWith(devUrl)) return;
+    if (url.startsWith('file://')) return;
+    event.preventDefault();
   });
 
   mainWindow.webContents.setWindowOpenHandler(() => {
@@ -83,9 +83,9 @@ app.whenReady().then(() => {
   const validateSender = (event: Electron.IpcMainInvokeEvent) => {
     const url = event.senderFrame?.url;
     const devUrl = typeof MAIN_WINDOW_VITE_DEV_SERVER_URL !== 'undefined' ? MAIN_WINDOW_VITE_DEV_SERVER_URL : null;
-    if (url !== devUrl && !url?.startsWith('file://')) {
-      throw new Error('Unauthorized IPC sender');
-    }
+    if (devUrl && url?.startsWith(devUrl)) return;
+    if (url?.startsWith('file://')) return;
+    throw new Error(`Unauthorized IPC sender: ${url}`);
   };
 
   ipcMain.handle('app:get-info', (event) => {
