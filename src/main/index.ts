@@ -79,6 +79,7 @@ const createWindow = () => {
 };
 
 app.whenReady().then(() => {
+  console.log('RisoTron Studio is starting... (First Release)');
   const cachedState = loadWindowState();
 
   const validateSender = (event: Electron.IpcMainInvokeEvent) => {
