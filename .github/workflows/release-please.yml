@@ -1,8 +1,9 @@
 name: Release Please
-run-name: "Release Please: ${{ github.event.head_commit.message }}"
+run-name: "Release: ${{ github.event.pull_request.title }}"
 
 on:
-  push:
+  pull_request:
+    types: [closed]
     branches:
       - main
 
@@ -13,6 +14,7 @@ permissions:
 
 jobs:
   release-please:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       - name: Run Release Please
