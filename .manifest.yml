@@ -147,9 +147,9 @@ backlog:
     feature: "community-registry"
     status: "backlog"
   # Epic 6: DevOps & Infrastructure (P1)
-  - issue: 52
+  - issue: 58
     type: "us"
-    title: "[US] Setup GitHub Actions CI/CD with Release Please for RisoTron Studio"
+    title: "[US] Setup GitHub Actions CI/CD workflows sequentially"
     epic: "devops"
     feature: "cicd-pipeline"
     status: "backlog"
