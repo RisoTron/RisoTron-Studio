@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.1.0...risotron-studio-v1.1.1) (2026-05-26)
+
+
+### Bug Fixes
+
+* **devops:** upgrade github actions to node 24 compatible versions ([#77](https://github.com/RisoTron/RisoTron-Studio/issues/77)) ([ee9c557](https://github.com/RisoTron/RisoTron-Studio/commit/ee9c5579f6ba72fad8b58c044047ebc2c69d9c85))
+
 ## [1.1.0](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.0.0...risotron-studio-v1.1.0) (2026-05-26)
 
 
