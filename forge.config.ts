@@ -14,7 +14,6 @@ const config: ForgeConfig = {
     asar: true,
     appId: 'com.risotron.studio',
     name: 'RisoTron Studio',
-    executableName: 'risotron-studio',
     osxSign: {},
     osxNotarize: process.env.APPLE_API_KEY ? {
       tool: 'notarytool',
@@ -27,8 +26,16 @@ const config: ForgeConfig = {
   makers: [
     new MakerSquirrel({}),
     new MakerZIP({}, ['darwin']),
-    new MakerRpm({}),
-    new MakerDeb({}),
+    new MakerRpm({
+      options: {
+        bin: 'RisoTron Studio'
+      }
+    }),
+    new MakerDeb({
+      options: {
+        bin: 'RisoTron Studio'
+      }
+    }),
     new MakerDMG({ format: 'ULFO' }),
   ],
   publishers: [
