@@ -1,5 +1,6 @@
 name: Release Please
-run-name: Release Please by @${{ github.actor }} on ${{ github.ref_name }}
+run-name: >-
+  ${{ format('Release Please · {0} — "{1}" by @{2} (run #{3})', github.ref_name, github.event.head_commit.message, github.actor, github.run_number) }}
 
 on:
   push:
