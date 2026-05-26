@@ -147,12 +147,7 @@ backlog:
     feature: "community-registry"
     status: "backlog"
   # Epic 6: DevOps & Infrastructure (P1)
-  - issue: 58
-    type: "us"
-    title: "[US] Setup GitHub Actions CI/CD workflows sequentially"
-    epic: "devops"
-    feature: "cicd-pipeline"
-    status: "backlog"
+
 
 current_work: null
 
@@ -253,6 +248,12 @@ epics:
         status: "planned"
 
 completed:
+  - issue: 58
+    type: "us"
+    title: "[US] Setup GitHub Actions CI/CD workflows sequentially"
+    epic: "devops"
+    feature: "cicd-pipeline"
+    status: "done"
   - issue: 24
     type: "us"
     title: "[US] Native OS menus with keyboard shortcuts"
