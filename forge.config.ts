@@ -3,13 +3,25 @@ import { MakerSquirrel } from '@electron-forge/maker-squirrel';
 import { MakerZIP } from '@electron-forge/maker-zip';
 import { MakerDeb } from '@electron-forge/maker-deb';
 import { MakerRpm } from '@electron-forge/maker-rpm';
+import { MakerDMG } from '@electron-forge/maker-dmg';
 import { VitePlugin } from '@electron-forge/plugin-vite';
 import { FusesPlugin } from '@electron-forge/plugin-fuses';
 import { FuseV1Options, FuseVersion } from '@electron/fuses';
+import { PublisherGithub } from '@electron-forge/publisher-github';
 
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
+    appId: 'com.risotron.studio',
+    name: 'RisoTron Studio',
+    executableName: 'risotron-studio',
+    osxSign: {},
+    osxNotarize: process.env.APPLE_API_KEY ? {
+      tool: 'notarytool',
+      appleApiKey: process.env.APPLE_API_KEY,
+      appleApiKeyId: process.env.APPLE_API_KEY_ID as string,
+      appleApiIssuer: process.env.APPLE_API_ISSUER as string,
+    } : undefined,
   },
   rebuildConfig: {},
   makers: [
@@ -17,6 +29,15 @@ const config: ForgeConfig = {
     new MakerZIP({}, ['darwin']),
     new MakerRpm({}),
     new MakerDeb({}),
+    new MakerDMG({ format: 'ULFO' }),
+  ],
+  publishers: [
+    new PublisherGithub({
+      repository: {
+        owner: 'RisoTron',
+        name: 'RisoTron-Studio',
+      },
+    }),
   ],
   plugins: [
     new VitePlugin({
