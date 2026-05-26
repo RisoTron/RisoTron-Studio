@@ -1,0 +1,37 @@
+# ──────────────────────────────────────────────────
+# CI Validate — Lint & Typecheck on every PR / push
+# ──────────────────────────────────────────────────
+name: CI Validate
+run-name: Validating ${{ github.event_name == 'workflow_dispatch' && '(Manual)' || '' }} "${{ github.event.pull_request.title }}"
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Lint & Typecheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🛠 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🔍 Run Linter
+        run: npm run lint
+
+      - name: 🛡️ Run Typecheck
+        run: npm run typecheck
