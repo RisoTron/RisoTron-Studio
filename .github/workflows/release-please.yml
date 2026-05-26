@@ -1,5 +1,5 @@
 name: Release Please
-run-name: "Release Please triggered by @${{ github.actor }}"
+run-name: "Release Please: ${{ github.event.head_commit.message }}"
 
 on:
   push:
