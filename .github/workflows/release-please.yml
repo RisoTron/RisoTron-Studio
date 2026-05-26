@@ -1,6 +1,6 @@
 name: Release Please
 run-name: >-
-  ${{ format('Release Please · {0} — "{1}" by @{2} (run #{3})', github.ref_name, github.event.head_commit.message, github.actor, github.run_number) }}
+  ${{ format('Release Please · {0} by @{1} (run #{2})', github.ref_name, github.actor, github.run_number) }}
 
 on:
   push:
@@ -20,4 +20,4 @@ jobs:
       - uses: googleapis/release-please-action@v5
         with:
           release-type: node
-          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
