@@ -5,8 +5,6 @@ name: CI Validate
 run-name: Validating ${{ github.event_name == 'workflow_dispatch' && '(Manual)' || '' }} "${{ github.event.pull_request.title }}"
 
 on:
-  push:
-    branches: [main]
   pull_request:
   workflow_dispatch:
 
