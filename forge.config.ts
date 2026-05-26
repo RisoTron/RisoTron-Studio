@@ -14,6 +14,7 @@ const config: ForgeConfig = {
     asar: true,
     appId: 'com.risotron.studio',
     name: 'RisoTron Studio',
+    executableName: 'risotron-studio',
     osxSign: {},
     osxNotarize: process.env.APPLE_API_KEY ? {
       tool: 'notarytool',
