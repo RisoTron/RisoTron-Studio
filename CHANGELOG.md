@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.2](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.1.1...risotron-studio-v1.1.2) (2026-05-26)
+
+
+### Bug Fixes
+
+* **devops:** add executableName to packagerConfig to fix linux builds ([#73](https://github.com/RisoTron/RisoTron-Studio/issues/73)) ([c0056a2](https://github.com/RisoTron/RisoTron-Studio/commit/c0056a2d0d164ef994589ff7472a44c4b18a7b9e))
+
 ## [1.1.1](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.1.0...risotron-studio-v1.1.1) (2026-05-26)
 
 
