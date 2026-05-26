@@ -6,6 +6,7 @@ import { MakerRpm } from '@electron-forge/maker-rpm';
 import { VitePlugin } from '@electron-forge/plugin-vite';
 import { FusesPlugin } from '@electron-forge/plugin-fuses';
 import { FuseV1Options, FuseVersion } from '@electron/fuses';
+import { PublisherGithub } from '@electron-forge/publisher-github';
 
 const config: ForgeConfig = {
   packagerConfig: {
@@ -47,6 +48,16 @@ const config: ForgeConfig = {
       [FuseV1Options.EnableNodeCliInspectArguments]: false,
       [FuseV1Options.EnableEmbeddedAsarIntegrityValidation]: true,
       [FuseV1Options.OnlyLoadAppFromAsar]: true,
+    }),
+  ],
+  publishers: [
+    new PublisherGithub({
+      repository: {
+        owner: 'RisoTron',
+        name: 'RisoTron-Studio',
+      },
+      prerelease: false,
+      draft: false,
     }),
   ],
 };
