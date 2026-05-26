@@ -152,9 +152,9 @@ backlog:
     title: "[US] Setup GitHub Actions CI/CD with Release Please for RisoTron Studio"
     epic: "devops"
     feature: "cicd-pipeline"
-    status: "backlog"
+    status: "review"
 
-current_work: null
+current_work: 52
 
 epics:
   - id: "electron-shell"
