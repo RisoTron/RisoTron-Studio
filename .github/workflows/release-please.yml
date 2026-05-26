@@ -28,7 +28,7 @@ jobs:
 
   build-and-publish:
     needs: release-please
-    if: ${{ needs.release-please.outputs.release_created }}
+    if: ${{ needs.release-please.outputs.release_created == 'true' }}
     name: Build (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     
