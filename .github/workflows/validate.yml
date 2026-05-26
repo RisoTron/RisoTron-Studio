@@ -1,0 +1,37 @@
+name: Validate
+run-name: >-
+  ${{ github.event_name == 'pull_request' && format('Validate PR #{0} · {1} [{2} → {3}] by @{4}', github.event.pull_request.number, github.event.pull_request.title, github.event.pull_request.head.ref, github.event.pull_request.base.ref, github.actor) || format('Validate (manual) · {0} run #{1} by @{2}', github.ref_name, github.run_number, github.actor) }}
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run lint
+
+      - run: npm run typecheck
+
+      - run: npm run make

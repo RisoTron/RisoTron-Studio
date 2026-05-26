@@ -1,0 +1,23 @@
+name: Release Please
+run-name: >-
+  ${{ format('Release Please · {0} — "{1}" by @{2} (run #{3})', github.ref_name, github.event.head_commit.message, github.actor, github.run_number) }}
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: googleapis/release-please-action@v5
+        with:
+          release-type: node
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
