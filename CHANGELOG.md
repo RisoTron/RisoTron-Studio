@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.1.0...risotron-studio-v1.1.1) (2026-05-26)
+
+
+### Bug Fixes
+
+* **devops:** chain build jobs to release-please to bypass GITHUB_TOKEN trigger limits ([#69](https://github.com/RisoTron/RisoTron-Studio/issues/69)) ([6b6d5c4](https://github.com/RisoTron/RisoTron-Studio/commit/6b6d5c405decb52870518d80d0cd7aa66e1e5379))
+
 ## [1.1.0](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.0.0...risotron-studio-v1.1.0) (2026-05-26)
 
 
