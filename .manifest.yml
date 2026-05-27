@@ -41,7 +41,7 @@ backlog:
     title: "[US] Store and retrieve app settings"
     epic: "data-layer"
     feature: "config-manager"
-    status: "backlog"
+    status: "in-progress"
   # Epic 3: Dashboard UI (P1)
   - issue: 30
     type: "us"
@@ -149,7 +149,7 @@ backlog:
     feature: "cicd-pipeline"
     status: "backlog"
 
-current_work: 26
+current_work: 29
 
 epics:
   - id: "electron-shell"

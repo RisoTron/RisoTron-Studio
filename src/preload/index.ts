@@ -4,7 +4,6 @@ import { contextBridge, ipcRenderer } from 'electron';
 contextBridge.exposeInMainWorld('api', {
   getAppInfo: () => ipcRenderer.invoke('app:get-info'),
   ping: () => ipcRenderer.invoke('app:ping'),
-  testDb: () => ipcRenderer.invoke('app:test-db'),
   onMenuNewProject: (callback: () => void) => {
     if (typeof callback !== 'function') return () => { /* noop */ };
     const handler = () => callback();
@@ -16,5 +15,10 @@ contextBridge.exposeInMainWorld('api', {
     const handler = () => callback();
     ipcRenderer.on('menu:preferences', handler);
     return () => ipcRenderer.removeListener('menu:preferences', handler);
-  }
+  },
+  settings: {
+    getAll: () => ipcRenderer.invoke('app:get-settings'),
+    get: (key: string) => ipcRenderer.invoke('app:get-setting', key),
+    set: (key: string, value: unknown) => ipcRenderer.invoke('app:set-setting', key, value),
+  },
 });
