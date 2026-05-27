@@ -78,6 +78,27 @@ const createWindow = () => {
   }
 };
 
+// ── Single-instance lock ────────────────────────────────────────────────
+// Acquire the lock BEFORE app.whenReady(). If another instance already
+// holds the lock, quit this one immediately.
+const gotTheLock = app.requestSingleInstanceLock();
+
+if (!gotTheLock) {
+  app.quit();
+} else {
+  // A second instance was launched — focus the existing window instead.
+  app.on('second-instance', () => {
+    const win = BrowserWindow.getAllWindows()[0];
+    if (win) {
+      if (win.isMinimized()) {
+        win.restore();
+      }
+      win.focus();
+    }
+  });
+}
+// ─────────────────────────────────────────────────────────────────────────
+
 app.whenReady().then(() => {
   const cachedState = loadWindowState();
 
