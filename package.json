@@ -1,7 +1,7 @@
 {
   "name": "risotron-studio",
   "productName": "RisoTron Studio",
-  "version": "1.2.0",
+  "version": "1.2.0-dev.1",
   "description": "AI-powered creative studio platform",
   "main": ".vite/build/main.js",
   "type": "module",
@@ -26,7 +26,6 @@
     "@electron-forge/maker-rpm": "^7.11.2",
     "@electron-forge/maker-squirrel": "^7.11.2",
     "@electron-forge/maker-zip": "^7.11.2",
-    "@electron-forge/plugin-auto-unpack-natives": "^7.11.2",
     "@electron-forge/plugin-fuses": "^7.11.2",
     "@electron-forge/plugin-vite": "^7.11.2",
     "@electron-forge/publisher-github": "^7.11.2",

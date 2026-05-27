@@ -4,6 +4,7 @@ import { contextBridge, ipcRenderer } from 'electron';
 contextBridge.exposeInMainWorld('api', {
   getAppInfo: () => ipcRenderer.invoke('app:get-info'),
   ping: () => ipcRenderer.invoke('app:ping'),
+  testDb: () => ipcRenderer.invoke('app:test-db'),
   onMenuNewProject: (callback: () => void) => {
     if (typeof callback !== 'function') return () => { /* noop */ };
     const handler = () => callback();

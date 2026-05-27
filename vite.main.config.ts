@@ -8,6 +8,7 @@ export default defineConfig({
       fileName: () => 'main.js',
     },
     rollupOptions: {
+      external: ['node:sqlite'],
       output: {
         format: 'es'
       }

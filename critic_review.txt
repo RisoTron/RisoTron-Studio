@@ -1,0 +1,51 @@
+## Review Result: Not Approved
+
+🔴 **CRITICAL 1 — Native addon load failures bypass the required fatal-error handling**  
+[src/main/db/adapters/SqliteAdapter.ts:10](/Volumes/Data/app-factory/risotron-studio/active/src/main/db/adapters/SqliteAdapter.ts:10), [src/main/db/index.ts:2](/Volumes/Data/app-factory/risotron-studio/active/src/main/db/index.ts:2), [src/main/index.ts:8](/Volumes/Data/app-factory/risotron-studio/active/src/main/index.ts:8), [src/main/index.ts:100](/Volumes/Data/app-factory/risotron-studio/active/src/main/index.ts:100)
+
+`require('better-sqlite3')` runs during module evaluation, before the `try/catch` around `db.initialize()`. A missing/incompatible native binary, ASAR/native loading failure, or ABI mismatch crashes startup without calling `dialog.showErrorBox()` or `app.quit()`, violating the specified failure path.
+
+Fix: load `better-sqlite3` lazily inside `initialize()` or otherwise place native module loading within the guarded startup path.
+
+🟡 **WARNING 2 — Schema creation is claimed atomic but is not transactional**  
+[src/main/db/adapters/SqliteAdapter.ts:39](/Volumes/Data/app-factory/risotron-studio/active/src/main/db/adapters/SqliteAdapter.ts:39)
+
+The comment states tables are created “within a transaction,” but the code only calls `db.exec()` with multiple statements and no `BEGIN`/`COMMIT` or `db.transaction(...)`. A failing later statement leaves earlier schema changes committed. Direct verification reproduced this: a successful first `CREATE TABLE` remained after a subsequent invalid statement failed.
+
+Fix: execute bootstrap/migrations in an explicit transaction and update `user_version` only after successful completion.
+
+🟡 **WARNING 3 — `user_version` is overwritten unconditionally, with no migration contract**  
+[src/main/db/adapters/SqliteAdapter.ts:39](/Volumes/Data/app-factory/risotron-studio/active/src/main/db/adapters/SqliteAdapter.ts:39)
+
+Every startup sets `PRAGMA user_version = 1` before schema creation completes. This can mislabel a partially initialized database and will downgrade migration metadata if a newer database is ever opened by an older build.
+
+Fix: read the current version, reject unsupported newer versions, apply versioned migrations transactionally, then set the resulting version.
+
+🟡 **WARNING 4 — Single-instance behavior regresses macOS reopen handling**  
+[src/main/index.ts:21](/Volumes/Data/app-factory/risotron-studio/active/src/main/index.ts:21)
+
+The previous implementation recreated a window when a second launch occurred while the existing macOS process had zero windows, and called `show()` for hidden windows. The branch now only focuses an existing window; with zero windows it does nothing. This is a regression in the concurrency guard/lifecycle code modified by this story.
+
+Fix: restore the zero-window `createWindow()` path and hidden-window `show()` behavior.
+
+🟡 **WARNING 5 — Native packaging configuration is incomplete for the introduced dependency**  
+[forge.config.ts:12](/Volumes/Data/app-factory/risotron-studio/active/forge.config.ts:12), [package.json:29](/Volumes/Data/app-factory/risotron-studio/active/package.json:29), [vite.main.config.ts:10](/Volumes/Data/app-factory/risotron-studio/active/vite.main.config.ts:10)
+
+`better-sqlite3` is correctly externalized from Vite, and `@electron-forge/plugin-auto-unpack-natives` is installed, but the plugin is not configured while `asar: true` is enabled. This leaves native-addon packaging/runtime behavior insufficiently covered and can impose runtime extraction/loading issues.
+
+Fix: activate `AutoUnpackNativesPlugin` in Forge configuration and perform a packaged-app database startup smoke test.
+
+🟡 **WARNING 6 — No automated coverage exists for the adapter lifecycle or persistence guarantees**  
+[src/main/db/adapters/SqliteAdapter.ts](/Volumes/Data/app-factory/risotron-studio/active/src/main/db/adapters/SqliteAdapter.ts)
+
+No tests were found for initialization, persistence across reopen, failed bootstrap rollback, cascade deletion, repeated `close()`, or fatal startup handling. These are the primary acceptance behaviors of US 26.
+
+## Validated
+
+- `app.on('before-quit')` calls `db.close()` at [src/main/index.ts:96](/Volumes/Data/app-factory/risotron-studio/active/src/main/index.ts:96).
+- Errors thrown by `db.initialize()` are shown using `dialog.showErrorBox()` followed by `app.quit()` at [src/main/index.ts:100](/Volumes/Data/app-factory/risotron-studio/active/src/main/index.ts:100).
+- `better-sqlite3` enforces foreign keys by default in the installed version; an orphan `project_settings` insert failed with `SQLITE_CONSTRAINT_FOREIGNKEY`.
+- `npm run typecheck` passed.
+- `npm run lint` completes with three new adapter warnings for non-null assertions at lines 80, 90, and 96.
+
+**Estimated tokens used: 760**
