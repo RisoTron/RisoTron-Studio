@@ -87,14 +87,20 @@ if (!gotTheLock) {
   app.quit();
 } else {
   // A second instance was launched — focus the existing window instead.
+  // On macOS the app may still be running with zero windows (dock-quit);
+  // in that case we need to recreate the window rather than just focusing.
   app.on('second-instance', () => {
-    const win = BrowserWindow.getAllWindows()[0];
-    if (win) {
-      if (win.isMinimized()) {
-        win.restore();
-      }
-      win.focus();
+    const windows = BrowserWindow.getAllWindows();
+    if (windows.length === 0) {
+      createWindow();
+      return;
     }
+    const win = windows[0];
+    if (win.isMinimized()) {
+      win.restore();
+    }
+    win.show();  // handles macOS hidden state
+    win.focus();
   });
 }
 // ─────────────────────────────────────────────────────────────────────────
