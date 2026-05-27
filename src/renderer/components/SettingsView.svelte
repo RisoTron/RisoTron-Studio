@@ -88,39 +88,27 @@
   </div>
 {:else}
   <div class="settings-root">
-    <!-- Header -->
-    <div class="settings-header">
-      <div class="settings-header-icon">⚙</div>
-      <h1 class="settings-title">Settings</h1>
-      <p class="settings-subtitle">Configure your RisoTron Studio preferences</p>
-    </div>
-
-    <!-- Search bar (decorative for now — foundation for future filtering) -->
+    <!-- Search bar -->
     <div class="settings-search">
-      <span class="search-icon">🔍</span>
       <input
         id="settings-search-input"
         type="text"
-        placeholder="Search settings…"
+        placeholder="Search Settings"
         disabled
-        aria-label="Search settings (coming soon)"
       />
     </div>
 
-    <!-- Settings groups -->
+    <!-- Settings content -->
     <div class="settings-body">
       <!-- Project Defaults group -->
       <section class="settings-group" aria-labelledby="group-project-defaults">
         <h2 id="group-project-defaults" class="group-title">Project Defaults</h2>
-        <p class="group-description">
-          Default values used when creating new projects.
-        </p>
 
         <!-- Default Template -->
         <div class="setting-row">
           <div class="setting-label-area">
             <label for="setting-defaultTemplate" class="setting-label">
-              Default Template
+              Project: <strong>Default Template</strong>
             </label>
             <p class="setting-description">
               The project template to use by default (e.g. <code>electron-forge-vite</code>).
@@ -137,9 +125,9 @@
               {#if saveStatus.defaultTemplate === 'saving'}
                 Saving…
               {:else if saveStatus.defaultTemplate === 'saved'}
-                ✓ Saved
+                ✓
               {:else if saveStatus.defaultTemplate === 'error'}
-                ✗ Error
+                ✗
               {/if}
             </span>
           </div>
@@ -149,7 +137,7 @@
         <div class="setting-row">
           <div class="setting-label-area">
             <label for="setting-defaultPath" class="setting-label">
-              Default Path
+              Project: <strong>Default Path</strong>
             </label>
             <p class="setting-description">
               Filesystem path where new projects are created.
@@ -166,9 +154,9 @@
               {#if saveStatus.defaultPath === 'saving'}
                 Saving…
               {:else if saveStatus.defaultPath === 'saved'}
-                ✓ Saved
+                ✓
               {:else if saveStatus.defaultPath === 'error'}
-                ✗ Error
+                ✗
               {/if}
             </span>
           </div>
@@ -181,9 +169,10 @@
 <style>
   /* ── Layout ── */
   .settings-root {
-    max-width: 720px;
-    margin: 0 auto;
-    padding: 32px 24px 64px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
     color: var(--vscode-fg);
   }
 
@@ -193,7 +182,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 60vh;
+    height: 100%;
     color: var(--vscode-fg-muted);
     gap: 16px;
   }
@@ -211,60 +200,30 @@
     to { transform: rotate(360deg); }
   }
 
-  /* ── Header ── */
-  .settings-header {
-    margin-bottom: 24px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid var(--vscode-border);
-  }
-
-  .settings-header-icon {
-    font-size: 28px;
-    margin-bottom: 8px;
-    opacity: 0.8;
-  }
-
-  .settings-title {
-    font-size: 22px;
-    font-weight: 600;
-    color: var(--vscode-active);
-    margin: 0 0 4px;
-    letter-spacing: -0.3px;
-  }
-
-  .settings-subtitle {
-    font-size: 13px;
-    color: var(--vscode-fg-muted);
-    margin: 0;
-  }
-
-  /* ── Search (decorative) ── */
+  /* ── Search ── */
   .settings-search {
-    position: relative;
-    margin-bottom: 28px;
-  }
-
-  .search-icon {
-    position: absolute;
-    left: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 14px;
-    opacity: 0.5;
-    pointer-events: none;
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--vscode-border);
+    background: var(--vscode-editor);
   }
 
   .settings-search input {
     width: 100%;
-    padding: 8px 12px 8px 32px;
+    max-width: 600px;
+    padding: 6px 10px;
     background: var(--vscode-input-bg);
-    border: 1px solid var(--vscode-border);
-    border-radius: 4px;
-    color: var(--vscode-fg-muted);
+    border: 1px solid var(--vscode-input-border);
+    border-radius: 2px;
+    color: var(--vscode-fg);
     font-size: 13px;
     outline: none;
-    cursor: not-allowed;
     opacity: 0.6;
+  }
+
+  .settings-body {
+    padding: 20px;
+    overflow-y: auto;
+    flex-grow: 1;
   }
 
   /* ── Settings Group ── */
@@ -273,48 +232,41 @@
   }
 
   .group-title {
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--vscode-fg-muted);
-    margin: 0 0 4px;
-  }
-
-  .group-description {
-    font-size: 13px;
-    color: var(--vscode-fg-muted);
-    margin: 0 0 20px;
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--vscode-active);
+    margin: 0 0 16px;
   }
 
   /* ── Setting Row ── */
   .setting-row {
-    padding: 16px 0;
-    border-bottom: 1px solid var(--vscode-border);
-  }
-
-  .setting-row:last-child {
-    border-bottom: none;
+    margin-bottom: 24px;
+    display: flex;
+    flex-direction: column;
   }
 
   .setting-label {
     display: block;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 400;
     color: var(--vscode-active);
-    margin-bottom: 2px;
+    margin-bottom: 4px;
+  }
+
+  .setting-label strong {
+    font-weight: 600;
   }
 
   .setting-description {
     font-size: 13px;
     color: var(--vscode-fg-muted);
-    margin: 0 0 10px;
+    margin: 0 0 8px;
     line-height: 1.4;
   }
 
   .setting-description code {
     background: var(--vscode-input-bg);
-    padding: 1px 5px;
+    padding: 1px 4px;
     border-radius: 3px;
     font-size: 12px;
     color: var(--vscode-link);
@@ -323,17 +275,19 @@
   /* ── Input ── */
   .setting-control {
     position: relative;
+    display: flex;
+    align-items: center;
   }
 
   .setting-control input {
-    width: 100%;
-    padding: 7px 10px;
+    width: 300px;
+    padding: 4px 6px;
     background: var(--vscode-input-bg);
     border: 1px solid var(--vscode-input-border);
-    border-radius: 3px;
+    border-radius: 2px;
     color: var(--vscode-input-fg);
     font-size: 13px;
-    font-family: 'Menlo', 'Consolas', 'Courier New', monospace;
+    font-family: inherit;
     outline: none;
     transition: border-color 0.15s;
   }
@@ -349,9 +303,8 @@
   /* ── Save indicator ── */
   .save-indicator {
     display: inline-block;
-    margin-top: 6px;
-    font-size: 12px;
-    min-height: 16px;
+    margin-left: 8px;
+    font-size: 14px;
     transition: opacity 0.2s;
   }
 

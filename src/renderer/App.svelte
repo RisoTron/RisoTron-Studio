@@ -3,10 +3,7 @@
   import SettingsView from './components/SettingsView.svelte';
 
   let appInfo: AppInfo | null = null;
-  let pinging = false;
-  let pingResult: string | null = null;
-  let pingError = false;
-  let showSettings = false;
+  let currentView: 'home' | 'settings' = 'home';
 
   let cleanupNewProject: (() => void) | undefined;
   let cleanupPreferences: (() => void) | undefined;
@@ -21,7 +18,7 @@
       
       if (window.api.onMenuPreferences) {
         cleanupPreferences = window.api.onMenuPreferences(() => {
-          showSettings = !showSettings;
+          currentView = currentView === 'settings' ? 'home' : 'settings';
         });
       }
 
@@ -39,183 +36,227 @@
     if (cleanupNewProject) cleanupNewProject();
     if (cleanupPreferences) cleanupPreferences();
   });
-
-  async function handlePing() {
-    if (pinging) return;
-    pinging = true;
-    pingResult = null;
-    pingError = false;
-    try {
-      const response = await window.api.ping();
-      pingResult = response;
-    } catch (err: unknown) {
-      pingResult = `Error: ${err instanceof Error ? err.message : String(err)}`;
-      pingError = true;
-    } finally {
-      pinging = false;
-    }
-  }
 </script>
 
-<main class:settings-bg={showSettings}>
-  {#if showSettings}
-    <div class="settings-container">
-      <button class="settings-back" on:click={() => showSettings = false}>
-        ← Back to Home
-      </button>
-      <SettingsView />
+<div class="vscode-layout">
+  <!-- Activity Bar -->
+  <aside class="activity-bar">
+    <button class="activity-icon {currentView === 'home' ? 'active' : ''}" on:click={() => currentView = 'home'} title="Explorer">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14.5 18H21v-2h-6.5v2zm0-12v2H21V6h-6.5zm-11 0v12h9V6h-9zm1.5 2h6v8h-6V8z" /></svg>
+    </button>
+    <div class="activity-spacer"></div>
+    <button class="activity-icon {currentView === 'settings' ? 'active' : ''}" on:click={() => currentView = 'settings'} title="Settings">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.43-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>
+    </button>
+  </aside>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2>{currentView === 'home' ? 'EXPLORER' : 'SETTINGS'}</h2>
     </div>
-  {:else}
-    <div class="welcome">
-      <h1>Welcome to RisoTron Studio</h1>
-      <p>AI-powered creative studio platform</p>
-      {#if appInfo}
-        <div class="info">
-          <p><strong>Version:</strong> {appInfo.version}</p>
-          <p><strong>Window State:</strong></p>
-          <pre>{JSON.stringify(appInfo.state, null, 2)}</pre>
-        </div>
+    <div class="sidebar-content">
+      {#if currentView === 'home'}
+        <div class="sidebar-item">Open Editors</div>
+        <div class="sidebar-item active">RisoTron-Studio</div>
+      {:else}
+        <div class="sidebar-item active">User Settings</div>
+        <div class="sidebar-item">Workspace Settings</div>
       {/if}
-      <div class="ping-section">
-        <button id="ping-btn" on:click={handlePing} disabled={pinging}>
-          {pinging ? 'Pinging…' : '🏓 Ping'}
-        </button>
-        {#if pingResult !== null}
-          <p class="ping-result" class:ping-error={pingError}>
-            {pingResult}
-          </p>
+    </div>
+  </aside>
+
+  <!-- Editor Area -->
+  <main class="editor-area">
+    {#if currentView === 'settings'}
+      <SettingsView />
+    {:else}
+      <div class="welcome">
+        <h1>Welcome to RisoTron Studio</h1>
+        <p>AI-powered creative studio platform</p>
+        {#if appInfo}
+          <div class="info">
+            <p><strong>Version:</strong> {appInfo.version}</p>
+          </div>
         {/if}
       </div>
-      <div class="settings-link">
-        <button id="open-settings-btn" class="link-button" on:click={() => showSettings = true}>
-          ⚙ Open Settings
-        </button>
-      </div>
-    </div>
-  {/if}
-</main>
+    {/if}
+  </main>
+
+  <!-- Status Bar -->
+  <footer class="status-bar">
+    <div class="status-item">RisoTron Studio</div>
+    <div class="status-spacer"></div>
+    <div class="status-item">Node 22</div>
+  </footer>
+</div>
 
 <style>
-  main {
+  /* Base Layout */
+  :global(body) {
+    margin: 0;
+    padding: 0;
+    background-color: var(--vscode-editor);
+    color: var(--vscode-fg);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .vscode-layout {
+    display: grid;
+    grid-template-areas:
+      "activity sidebar editor"
+      "status   status  status";
+    grid-template-columns: 48px 250px 1fr;
+    grid-template-rows: 1fr 22px;
+    height: 100vh;
+  }
+
+  /* Activity Bar */
+  .activity-bar {
+    grid-area: activity;
+    background-color: var(--vscode-activity-bar);
     display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 10px;
+  }
+
+  .activity-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--vscode-fg-muted);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    border-left: 2px solid transparent;
+  }
+
+  .activity-icon:hover {
+    color: var(--vscode-fg);
+  }
+
+  .activity-icon.active {
+    color: var(--vscode-active);
+    border-left-color: var(--vscode-active);
+  }
+
+  .activity-icon svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .activity-spacer {
+    flex-grow: 1;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    grid-area: sidebar;
+    background-color: var(--vscode-sidebar);
+    border-right: 1px solid var(--vscode-border);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar-header {
+    padding: 10px 20px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--vscode-fg-muted);
+    text-transform: uppercase;
+  }
+
+  .sidebar-header h2 {
+    margin: 0;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .sidebar-content {
+    flex-grow: 1;
+    overflow-y: auto;
+  }
+
+  .sidebar-item {
+    padding: 4px 20px;
+    font-size: 13px;
+    color: var(--vscode-fg);
+    cursor: pointer;
+  }
+
+  .sidebar-item:hover {
+    background-color: var(--vscode-list-hover);
+  }
+
+  .sidebar-item.active {
+    background-color: var(--vscode-list-active);
+    color: var(--vscode-active);
+  }
+
+  /* Editor Area */
+  .editor-area {
+    grid-area: editor;
+    background-color: var(--vscode-editor);
+    overflow-y: auto;
+    position: relative;
+  }
+
+  .welcome {
+    display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh;
+    height: 100%;
     text-align: center;
-  }
-
-  main.settings-bg {
-    background: var(--vscode-editor);
-    align-items: flex-start;
-    justify-content: stretch;
-  }
-
-  .settings-container {
-    width: 100%;
-    min-height: 100vh;
-    padding-top: 8px;
-  }
-
-  .settings-back {
-    display: inline-block;
-    margin: 8px 24px;
-    padding: 5px 12px;
-    background: transparent;
-    border: 1px solid var(--vscode-border);
-    border-radius: 3px;
-    color: var(--vscode-link);
-    font-size: 12px;
-    cursor: pointer;
-    transition: background 0.15s;
-  }
-
-  .settings-back:hover {
-    background: var(--vscode-list-hover);
   }
 
   .welcome h1 {
     font-size: 2rem;
+    font-weight: 400;
+    color: var(--vscode-active);
     margin-bottom: 0.5rem;
   }
 
   .welcome p {
     font-size: 1.1rem;
-    opacity: 0.7;
+    color: var(--vscode-fg-muted);
   }
 
   .info {
     margin-top: 2rem;
-    padding: 1.5rem;
-    background: rgba(128, 128, 128, 0.1);
-    border-radius: 8px;
-    text-align: left;
+    color: var(--vscode-fg-muted);
     font-size: 0.9rem;
   }
 
-  .info pre {
-    margin-top: 0.5rem;
-    background: rgba(0, 0, 0, 0.2);
-    padding: 1rem;
-    border-radius: 4px;
-    overflow-x: auto;
+  /* Status Bar */
+  .status-bar {
+    grid-area: status;
+    background-color: var(--vscode-status-bar);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    font-size: 12px;
   }
 
-  .ping-section {
-    margin-top: 2rem;
-  }
-
-  .ping-section button {
-    padding: 0.6rem 1.4rem;
-    font-size: 1rem;
-    border: none;
-    border-radius: 6px;
-    background: #4f8cff;
-    color: #fff;
+  .status-item {
+    padding: 0 8px;
     cursor: pointer;
-    transition: opacity 0.15s;
+    display: flex;
+    align-items: center;
+    height: 100%;
   }
 
-  .ping-section button:hover:not(:disabled) {
-    opacity: 0.85;
+  .status-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
   }
 
-  .ping-section button:focus-visible {
-    outline: 2px solid #fff;
-    outline-offset: 2px;
-  }
-
-  .ping-section button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  .ping-result {
-    margin-top: 0.75rem;
-    font-weight: 600;
-    font-size: 1.1rem;
-  }
-
-  .ping-error {
-    color: #ff5555;
-  }
-
-  .settings-link {
-    margin-top: 1.5rem;
-  }
-
-  .link-button {
-    background: transparent;
-    border: 1px solid rgba(128, 128, 128, 0.3);
-    border-radius: 6px;
-    color: var(--fg-muted, #6e6e73);
-    font-size: 0.9rem;
-    padding: 0.5rem 1.2rem;
-    cursor: pointer;
-    transition: color 0.15s, border-color 0.15s;
-  }
-
-  .link-button:hover {
-    color: var(--fg, #f5f5f7);
-    border-color: rgba(128, 128, 128, 0.6);
+  .status-spacer {
+    flex-grow: 1;
   }
 </style>
