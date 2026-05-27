@@ -21,7 +21,7 @@ backlog:
     title: "[US] Single-instance enforcement"
     epic: "electron-shell"
     feature: "app-lifecycle"
-    status: "ready"
+    status: "in_progress"
   # Epic 2: Data Layer (P0)
   - issue: 26
     type: "us"
@@ -154,7 +154,9 @@ backlog:
     feature: "cicd-pipeline"
     status: "backlog"
 
-current_work: null
+current_work:
+  issue: 25
+  branch: "feat/electron-shell/single-instance"
 
 epics:
   - id: "electron-shell"
