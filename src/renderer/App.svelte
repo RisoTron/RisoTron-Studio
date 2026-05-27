@@ -50,22 +50,6 @@
     </button>
   </aside>
 
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <div class="sidebar-header">
-      <h2>{currentView === 'home' ? 'EXPLORER' : 'SETTINGS'}</h2>
-    </div>
-    <div class="sidebar-content">
-      {#if currentView === 'home'}
-        <div class="sidebar-item">Open Editors</div>
-        <div class="sidebar-item active">RisoTron-Studio</div>
-      {:else}
-        <div class="sidebar-item active">User Settings</div>
-        <div class="sidebar-item">Workspace Settings</div>
-      {/if}
-    </div>
-  </aside>
-
   <!-- Editor Area -->
   <main class="editor-area">
     {#if currentView === 'settings'}
@@ -74,11 +58,6 @@
       <div class="welcome">
         <h1>Welcome to RisoTron Studio</h1>
         <p>AI-powered creative studio platform</p>
-        {#if appInfo}
-          <div class="info">
-            <p><strong>Version:</strong> {appInfo.version}</p>
-          </div>
-        {/if}
       </div>
     {/if}
   </main>
@@ -86,6 +65,9 @@
   <!-- Status Bar -->
   <footer class="status-bar">
     <div class="status-item">RisoTron Studio</div>
+    {#if appInfo}
+      <div class="status-item">v{appInfo.version}</div>
+    {/if}
     <div class="status-spacer"></div>
     <div class="status-item">Node 22</div>
   </footer>
@@ -106,9 +88,9 @@
   .vscode-layout {
     display: grid;
     grid-template-areas:
-      "activity sidebar editor"
-      "status   status  status";
-    grid-template-columns: 48px 250px 1fr;
+      "activity editor"
+      "status   status";
+    grid-template-columns: 48px 1fr;
     grid-template-rows: 1fr 22px;
     height: 100vh;
   }
@@ -152,50 +134,6 @@
 
   .activity-spacer {
     flex-grow: 1;
-  }
-
-  /* Sidebar */
-  .sidebar {
-    grid-area: sidebar;
-    background-color: var(--vscode-sidebar);
-    border-right: 1px solid var(--vscode-border);
-    display: flex;
-    flex-direction: column;
-  }
-
-  .sidebar-header {
-    padding: 10px 20px;
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--vscode-fg-muted);
-    text-transform: uppercase;
-  }
-
-  .sidebar-header h2 {
-    margin: 0;
-    font-size: 11px;
-    font-weight: 600;
-  }
-
-  .sidebar-content {
-    flex-grow: 1;
-    overflow-y: auto;
-  }
-
-  .sidebar-item {
-    padding: 4px 20px;
-    font-size: 13px;
-    color: var(--vscode-fg);
-    cursor: pointer;
-  }
-
-  .sidebar-item:hover {
-    background-color: var(--vscode-list-hover);
-  }
-
-  .sidebar-item.active {
-    background-color: var(--vscode-list-active);
-    color: var(--vscode-active);
   }
 
   /* Editor Area */

@@ -94,7 +94,7 @@
         id="settings-search-input"
         type="text"
         placeholder="Search Settings"
-        disabled
+        on:input={(e) => {}}
       />
     </div>
 
@@ -118,8 +118,8 @@
             <input
               id="setting-defaultTemplate"
               type="text"
-              value={defaultTemplate}
-              on:input={(e) => handleChange('defaultTemplate', e.currentTarget.value)}
+              bind:value={defaultTemplate}
+              on:input={() => handleChange('defaultTemplate', defaultTemplate)}
             />
             <span class="save-indicator {saveStatus.defaultTemplate}">
               {#if saveStatus.defaultTemplate === 'saving'}
@@ -147,8 +147,8 @@
             <input
               id="setting-defaultPath"
               type="text"
-              value={defaultPath}
-              on:input={(e) => handleChange('defaultPath', e.currentTarget.value)}
+              bind:value={defaultPath}
+              on:input={() => handleChange('defaultPath', defaultPath)}
             />
             <span class="save-indicator {saveStatus.defaultPath}">
               {#if saveStatus.defaultPath === 'saving'}
@@ -217,7 +217,10 @@
     color: var(--vscode-fg);
     font-size: 13px;
     outline: none;
-    opacity: 0.6;
+  }
+
+  .settings-search input:focus {
+    border-color: var(--vscode-input-focus-border);
   }
 
   .settings-body {
