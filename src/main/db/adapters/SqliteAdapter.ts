@@ -4,11 +4,11 @@ import fs from 'node:fs';
 import { app } from 'electron';
 import type { DatabasePort } from '../ports/DatabasePort';
 
-// Use createRequire to load the native better-sqlite3 module.
+// Use createRequire to load the native better-sqlite3 module lazily.
 // This is necessary because better-sqlite3 is a native Node addon
 // that cannot be bundled by Vite/Rollup.
 const require = createRequire(import.meta.url);
-const Database = require('better-sqlite3') as typeof import('better-sqlite3');
+let Database: typeof import('better-sqlite3') | null = null;
 
 type BetterSqlite3Database = import('better-sqlite3').Database;
 
@@ -31,6 +31,11 @@ export class SqliteAdapter implements DatabasePort {
     const dbDir = path.dirname(dbPath);
     if (!fs.existsSync(dbDir)) {
       fs.mkdirSync(dbDir, { recursive: true });
+    }
+
+    // Load native module here so load failures throw inside the try-catch block
+    if (!Database) {
+      Database = require('better-sqlite3') as typeof import('better-sqlite3');
     }
 
     this.db = new Database(dbPath);

@@ -23,6 +23,8 @@ if (!gotTheLock) {
     if (win) {
       if (win.isMinimized()) win.restore();
       win.focus();
+    } else {
+      createWindow();
     }
   });
 
