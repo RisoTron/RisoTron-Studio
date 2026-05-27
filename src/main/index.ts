@@ -6,6 +6,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import started from 'electron-squirrel-startup';
 import { loadWindowState, trackWindowState, MIN_WIDTH, MIN_HEIGHT } from './utils/window-state';
 import { db } from './db';
+import { ConfigService } from './services/ConfigService';
+import { VALID_SETTING_KEYS } from '../shared/types/settings';
+import type { AppSettings } from '../shared/types/settings';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -23,8 +26,6 @@ if (!gotTheLock) {
     if (win) {
       if (win.isMinimized()) win.restore();
       win.focus();
-    } else {
-      createWindow();
     }
   });
 
@@ -132,23 +133,28 @@ if (!gotTheLock) {
       return 'pong';
     });
 
-    ipcMain.handle('app:test-db', (event) => {
+    // ── Settings IPC ─────────────────────────────────────────────
+    const configService = new ConfigService(db);
+
+    ipcMain.handle('app:get-settings', (event) => {
       validateSender(event);
-      try {
-        // Test DB insert
-        const testId = `test-${Date.now()}`;
-        db.execute(
-          'INSERT INTO projects (id, name, path) VALUES (?, ?, ?)',
-          [testId, 'Test Project', '/tmp/test']
-        );
-        
-        // Test DB query
-        const projects = db.queryAll<{id: string, name: string}>('SELECT id, name FROM projects');
-        return { success: true, count: projects.length, latest: projects[projects.length - 1] };
-      } catch (error) {
-        console.error('DB Test Error:', error);
-        return { success: false, error: String(error) };
+      return configService.getAllSettings();
+    });
+
+    ipcMain.handle('app:get-setting', (event, key: string) => {
+      validateSender(event);
+      if (!VALID_SETTING_KEYS.includes(key as keyof AppSettings)) {
+        throw new Error(`Invalid setting key: ${key}`);
       }
+      return configService.getSetting(key as keyof AppSettings);
+    });
+
+    ipcMain.handle('app:set-setting', (event, key: string, value: unknown) => {
+      validateSender(event);
+      if (!VALID_SETTING_KEYS.includes(key as keyof AppSettings)) {
+        throw new Error(`Invalid setting key: ${key}`);
+      }
+      configService.setSetting(key as keyof AppSettings, value as AppSettings[keyof AppSettings]);
     });
     
     const isMac = process.platform === 'darwin';

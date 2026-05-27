@@ -1,0 +1,30 @@
+/* ── VSCode Dark Theme Variables ──
+ * Accurate reproduction of Visual Studio Code's default dark colour palette.
+ * Used by settings and editor-chrome UI components.
+ */
+:root {
+  --vscode-activity-bar: #333333;
+  --vscode-sidebar: #252526;
+  --vscode-editor: #1e1e1e;
+  --vscode-status-bar: #007acc;
+  --vscode-fg: #cccccc;
+  --vscode-fg-muted: #969696;
+  --vscode-active: #ffffff;
+  --vscode-border: #3c3c3c;
+  --vscode-input-bg: #3c3c3c;
+  --vscode-input-border: #5a5a5a;
+  --vscode-input-fg: #cccccc;
+  --vscode-input-focus-border: #007acc;
+  --vscode-button-bg: #0e639c;
+  --vscode-button-hover-bg: #1177bb;
+  --vscode-button-fg: #ffffff;
+  --vscode-list-hover: #2a2d2e;
+  --vscode-list-active: #094771;
+  --vscode-badge-bg: #4d4d4d;
+  --vscode-badge-fg: #ffffff;
+  --vscode-success: #89d185;
+  --vscode-error: #f48771;
+  --vscode-warning: #cca700;
+  --vscode-link: #3794ff;
+  --vscode-scrollbar: rgba(121, 121, 121, 0.4);
+}

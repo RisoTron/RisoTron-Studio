@@ -1,10 +1,12 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
+  import SettingsView from './components/SettingsView.svelte';
 
   let appInfo: AppInfo | null = null;
   let pinging = false;
   let pingResult: string | null = null;
   let pingError = false;
+  let showSettings = false;
 
   let cleanupNewProject: (() => void) | undefined;
   let cleanupPreferences: (() => void) | undefined;
@@ -19,7 +21,7 @@
       
       if (window.api.onMenuPreferences) {
         cleanupPreferences = window.api.onMenuPreferences(() => {
-          console.log('[STUB] "Preferences" menu item clicked');
+          showSettings = !showSettings;
         });
       }
 
@@ -55,44 +57,42 @@
   }
 </script>
 
-<main>
-  <div class="welcome">
-    <h1>Welcome to RisoTron Studio</h1>
-    <p>AI-powered creative studio platform</p>
-    {#if appInfo}
-      <div class="info">
-        <p><strong>Version:</strong> {appInfo.version}</p>
-        <p><strong>Window State:</strong></p>
-        <pre>{JSON.stringify(appInfo.state, null, 2)}</pre>
-      </div>
-    {/if}
-    <div class="ping-section">
-      <button id="ping-btn" on:click={handlePing} disabled={pinging}>
-        {pinging ? 'Pinging…' : '🏓 Ping'}
+<main class:settings-bg={showSettings}>
+  {#if showSettings}
+    <div class="settings-container">
+      <button class="settings-back" on:click={() => showSettings = false}>
+        ← Back to Home
       </button>
-      {#if pingResult !== null}
-        <p class="ping-result" class:ping-error={pingError}>
-          {pingResult}
-        </p>
+      <SettingsView />
+    </div>
+  {:else}
+    <div class="welcome">
+      <h1>Welcome to RisoTron Studio</h1>
+      <p>AI-powered creative studio platform</p>
+      {#if appInfo}
+        <div class="info">
+          <p><strong>Version:</strong> {appInfo.version}</p>
+          <p><strong>Window State:</strong></p>
+          <pre>{JSON.stringify(appInfo.state, null, 2)}</pre>
+        </div>
       {/if}
-      
-      <div style="margin-top: 1rem;">
-        <button on:click={async () => {
-          pingResult = 'Testing DB...';
-          try {
-            const res = await window.api.testDb();
-            pingResult = JSON.stringify(res, null, 2);
-            pingError = !res.success;
-          } catch(e) {
-            pingResult = String(e);
-            pingError = true;
-          }
-        }}>
-          🧪 Test SQLite DB
+      <div class="ping-section">
+        <button id="ping-btn" on:click={handlePing} disabled={pinging}>
+          {pinging ? 'Pinging…' : '🏓 Ping'}
+        </button>
+        {#if pingResult !== null}
+          <p class="ping-result" class:ping-error={pingError}>
+            {pingResult}
+          </p>
+        {/if}
+      </div>
+      <div class="settings-link">
+        <button id="open-settings-btn" class="link-button" on:click={() => showSettings = true}>
+          ⚙ Open Settings
         </button>
       </div>
     </div>
-  </div>
+  {/if}
 </main>
 
 <style>
@@ -102,6 +102,35 @@
     justify-content: center;
     height: 100vh;
     text-align: center;
+  }
+
+  main.settings-bg {
+    background: var(--vscode-editor);
+    align-items: flex-start;
+    justify-content: stretch;
+  }
+
+  .settings-container {
+    width: 100%;
+    min-height: 100vh;
+    padding-top: 8px;
+  }
+
+  .settings-back {
+    display: inline-block;
+    margin: 8px 24px;
+    padding: 5px 12px;
+    background: transparent;
+    border: 1px solid var(--vscode-border);
+    border-radius: 3px;
+    color: var(--vscode-link);
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .settings-back:hover {
+    background: var(--vscode-list-hover);
   }
 
   .welcome h1 {
@@ -168,5 +197,25 @@
 
   .ping-error {
     color: #ff5555;
+  }
+
+  .settings-link {
+    margin-top: 1.5rem;
+  }
+
+  .link-button {
+    background: transparent;
+    border: 1px solid rgba(128, 128, 128, 0.3);
+    border-radius: 6px;
+    color: var(--fg-muted, #6e6e73);
+    font-size: 0.9rem;
+    padding: 0.5rem 1.2rem;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s;
+  }
+
+  .link-button:hover {
+    color: var(--fg, #f5f5f7);
+    border-color: rgba(128, 128, 128, 0.6);
   }
 </style>
