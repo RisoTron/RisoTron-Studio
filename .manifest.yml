@@ -21,7 +21,7 @@ backlog:
     title: "[US] Single-instance enforcement"
     epic: "electron-shell"
     feature: "app-lifecycle"
-    status: "backlog"
+    status: "ready"
   # Epic 2: Data Layer (P0)
   - issue: 26
     type: "us"
