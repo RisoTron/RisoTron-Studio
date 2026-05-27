@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.3.0...risotron-studio-v1.4.0) (2026-05-27)
+
+
+### Features
+
+* **data-layer:** implement Config Manager & VSCode Settings UI (US 29) ([#83](https://github.com/RisoTron/RisoTron-Studio/issues/83)) ([002ff33](https://github.com/RisoTron/RisoTron-Studio/commit/002ff3374bac06e66483ced1b41e338c9bbc71fa))
+
 ## [1.3.0](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.2.0...risotron-studio-v1.3.0) (2026-05-27)
 
 
