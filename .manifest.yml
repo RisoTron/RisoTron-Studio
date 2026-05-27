@@ -16,12 +16,7 @@ github_project:
 backlog:
   # Ordered by priority — first item = next to develop
   # Epic 1: Electron Shell (P0)
-  - issue: 25
-    type: "us"
-    title: "[US] Single-instance enforcement"
-    epic: "electron-shell"
-    feature: "app-lifecycle"
-    status: "in_progress"
+
   # Epic 2: Data Layer (P0)
   - issue: 26
     type: "us"
@@ -154,9 +149,7 @@ backlog:
     feature: "cicd-pipeline"
     status: "backlog"
 
-current_work:
-  issue: 25
-  branch: "feat/electron-shell/single-instance"
+current_work: null
 
 epics:
   - id: "electron-shell"
@@ -255,6 +248,12 @@ epics:
         status: "planned"
 
 completed:
+  - issue: 25
+    type: "us"
+    title: "[US] Single-instance enforcement"
+    epic: "electron-shell"
+    feature: "app-lifecycle"
+    status: "done"
   - issue: 24
     type: "us"
     title: "[US] Native OS menus with keyboard shortcuts"
