@@ -25,3 +25,12 @@ export const VALID_SETTING_KEYS: ReadonlyArray<keyof AppSettings> = [
   'defaultTemplate',
   'defaultPath',
 ] as const;
+
+/**
+ * Runtime type map for AppSettings properties, used to validate deserialized
+ * DB values against corruption.
+ */
+export const SETTING_TYPES: Record<keyof AppSettings, 'string' | 'number' | 'boolean'> = {
+  defaultTemplate: 'string',
+  defaultPath: 'string',
+};

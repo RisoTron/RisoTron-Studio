@@ -1,5 +1,5 @@
 import type { DatabasePort } from '../db/ports/DatabasePort';
-import { DEFAULT_SETTINGS, VALID_SETTING_KEYS } from '../../shared/types/settings';
+import { DEFAULT_SETTINGS, VALID_SETTING_KEYS, SETTING_TYPES } from '../../shared/types/settings';
 import type { AppSettings } from '../../shared/types/settings';
 
 /** Row shape returned by `SELECT key, value FROM settings`. */
@@ -18,14 +18,22 @@ function safeJsonStringify(value: unknown): string {
   if (value === undefined) {
     throw new TypeError('Cannot serialise undefined to JSON for storage.');
   }
-  if (typeof value === 'bigint') {
-    throw new TypeError('Cannot serialise BigInt to JSON for storage.');
-  }
-  if (typeof value === 'number' && (!Number.isFinite(value))) {
-    throw new TypeError(`Cannot serialise ${value} to JSON for storage.`);
+
+  const serialised = JSON.stringify(value, (k, v) => {
+    if (typeof v === 'bigint') {
+      throw new TypeError('Cannot serialise BigInt to JSON for storage.');
+    }
+    if (typeof v === 'number' && !Number.isFinite(v)) {
+      throw new TypeError(`Cannot serialise ${v} to JSON for storage.`);
+    }
+    return v;
+  });
+
+  if (serialised === undefined) {
+    throw new TypeError('JSON.stringify produced undefined');
   }
 
-  return JSON.stringify(value);
+  return serialised;
 }
 
 /**
@@ -81,7 +89,7 @@ export class ConfigService {
 
     if (row) {
       const parsed = safeJsonParse(row.value);
-      if (parsed !== undefined) {
+      if (parsed !== undefined && typeof parsed === SETTING_TYPES[key]) {
         return parsed as AppSettings[K];
       }
     }
@@ -99,8 +107,9 @@ export class ConfigService {
     for (const row of rows) {
       if (VALID_SETTING_KEYS.includes(row.key as keyof AppSettings)) {
         const parsed = safeJsonParse(row.value);
-        if (parsed !== undefined) {
-          (persisted as Record<string, unknown>)[row.key] = parsed;
+        const validKey = row.key as keyof AppSettings;
+        if (parsed !== undefined && typeof parsed === SETTING_TYPES[validKey]) {
+          (persisted as Record<string, unknown>)[validKey] = parsed;
         }
       }
     }

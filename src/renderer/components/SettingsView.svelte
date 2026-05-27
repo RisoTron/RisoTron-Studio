@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
 
   /** Local reactive copies of each setting. */
   let defaultTemplate = '';
@@ -7,6 +7,8 @@
 
   /** UI state flags. */
   let loading = true;
+  let loaded = false;
+  let loadError = false;
   let saveStatus: Record<string, 'idle' | 'saving' | 'saved' | 'error'> = {
     defaultTemplate: 'idle',
     defaultPath: 'idle',
@@ -17,8 +19,11 @@
       const settings = await window.api.settings.getAll();
       defaultTemplate = settings.defaultTemplate;
       defaultPath = settings.defaultPath;
+      loaded = true;
+      loadError = false;
     } catch (err) {
       console.error('Failed to load settings', err);
+      loadError = true;
     } finally {
       loading = false;
     }
@@ -26,14 +31,19 @@
 
   /** Debounce timers keyed by setting name. */
   const timers: Record<string, ReturnType<typeof setTimeout>> = {};
+  const statusTimers: Record<string, ReturnType<typeof setTimeout>> = {};
 
   function handleChange(key: 'defaultTemplate' | 'defaultPath', value: string) {
+    if (!loaded || loadError) return;
+
     // Immediately update local state
     if (key === 'defaultTemplate') defaultTemplate = value;
     if (key === 'defaultPath') defaultPath = value;
 
     // Debounce the save
-    clearTimeout(timers[key]);
+    if (timers[key]) clearTimeout(timers[key]);
+    if (statusTimers[key]) clearTimeout(statusTimers[key]);
+
     saveStatus[key] = 'idle';
     saveStatus = { ...saveStatus }; // trigger reactivity
 
@@ -45,7 +55,7 @@
         saveStatus[key] = 'saved';
         saveStatus = { ...saveStatus };
         // Reset to idle after a beat
-        setTimeout(() => {
+        statusTimers[key] = setTimeout(() => {
           saveStatus[key] = 'idle';
           saveStatus = { ...saveStatus };
         }, 2000);
@@ -53,15 +63,28 @@
         console.error(`Failed to save setting "${key}"`, err);
         saveStatus[key] = 'error';
         saveStatus = { ...saveStatus };
+        statusTimers[key] = setTimeout(() => {
+          saveStatus[key] = 'idle';
+          saveStatus = { ...saveStatus };
+        }, 2000);
       }
     }, 400);
   }
+
+  onDestroy(() => {
+    Object.values(timers).forEach(clearTimeout);
+    Object.values(statusTimers).forEach(clearTimeout);
+  });
 </script>
 
 {#if loading}
   <div class="settings-loading">
     <div class="spinner"></div>
     <p>Loading settings…</p>
+  </div>
+{:else if loadError}
+  <div class="settings-loading">
+    <p>Failed to load settings. Please restart the app.</p>
   </div>
 {:else}
   <div class="settings-root">

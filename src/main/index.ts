@@ -154,6 +154,9 @@ if (!gotTheLock) {
       if (!VALID_SETTING_KEYS.includes(key as keyof AppSettings)) {
         throw new Error(`Invalid setting key: ${key}`);
       }
+      if (typeof value !== 'string') {
+        throw new Error(`Invalid value type for "${key}": expected string`);
+      }
       configService.setSetting(key as keyof AppSettings, value as AppSettings[keyof AppSettings]);
     });
     
