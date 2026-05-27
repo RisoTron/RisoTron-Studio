@@ -29,7 +29,7 @@ backlog:
     title: "[US] Migration system for schema changes"
     epic: "data-layer"
     feature: "sqlite-storage"
-    status: "backlog"
+    status: "in progress"
   - issue: 28
     type: "us"
     title: "[US] CRUD operations for projects"
@@ -144,7 +144,7 @@ backlog:
     feature: "cicd-pipeline"
     status: "backlog"
 
-current_work: null
+current_work: 27
 
 epics:
   - id: "electron-shell"
