@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.2.0](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.1.1...risotron-studio-v1.2.0) (2026-05-27)
+
+
+### Features
+
+* **electron-shell:** US-25 enforce single-instance ([8b4e357](https://github.com/RisoTron/RisoTron-Studio/commit/8b4e357b7d12bfece77f28f707750c7d952e966e))
+
+
+### Bug Fixes
+
+* **electron:** address review findings for single-instance lock ([601eafd](https://github.com/RisoTron/RisoTron-Studio/commit/601eafdfad5ea0ca2ecf79d37a9fb99a37e113a8))
+
 ## [1.1.1](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.1.0...risotron-studio-v1.1.1) (2026-05-26)
 
 
