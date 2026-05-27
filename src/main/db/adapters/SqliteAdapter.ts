@@ -1,23 +1,15 @@
-import { createRequire } from 'module';
 import path from 'node:path';
 import fs from 'node:fs';
 import { app } from 'electron';
+import { DatabaseSync } from 'node:sqlite';
 import type { DatabasePort } from '../ports/DatabasePort';
-
-// Use createRequire to load the native better-sqlite3 module.
-// This is necessary because better-sqlite3 is a native Node addon
-// that cannot be bundled by Vite/Rollup.
-const require = createRequire(import.meta.url);
-const Database = require('better-sqlite3') as typeof import('better-sqlite3');
-
-type BetterSqlite3Database = import('better-sqlite3').Database;
 
 /**
  * SQLite adapter implementing the DatabasePort interface.
- * Uses better-sqlite3 for synchronous, high-performance local storage.
+ * Uses built-in node:sqlite for synchronous, high-performance local storage.
  */
 export class SqliteAdapter implements DatabasePort {
-  private db: BetterSqlite3Database | null = null;
+  private db: DatabaseSync | null = null;
   private isInitialized = false;
 
   initialize(): void {
@@ -33,12 +25,12 @@ export class SqliteAdapter implements DatabasePort {
       fs.mkdirSync(dbDir, { recursive: true });
     }
 
-    this.db = new Database(dbPath);
+    this.db = new DatabaseSync(dbPath);
 
     // Enable WAL mode for better concurrent read performance.
-    this.db.pragma('journal_mode = WAL');
+    this.db.exec('PRAGMA journal_mode = WAL');
     // Set schema version for future migration tracking.
-    this.db.pragma('user_version = 1');
+    this.db.exec('PRAGMA user_version = 1');
 
     // Create tables within a transaction for atomicity.
     this.db.exec(`
@@ -94,7 +86,8 @@ export class SqliteAdapter implements DatabasePort {
   queryOne<T>(sql: string, params: unknown[] = []): T | undefined {
     this.ensureInitialized();
     const stmt = this.db!.prepare(sql);
-    return stmt.get(...params) as T | undefined;
+    const row = stmt.get(...params);
+    return row as T | undefined;
   }
 
   close(): void {
