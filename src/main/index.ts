@@ -131,6 +131,25 @@ if (!gotTheLock) {
       validateSender(event);
       return 'pong';
     });
+
+    ipcMain.handle('app:test-db', (event) => {
+      validateSender(event);
+      try {
+        // Test DB insert
+        const testId = `test-${Date.now()}`;
+        db.execute(
+          'INSERT INTO projects (id, name, path) VALUES (?, ?, ?)',
+          [testId, 'Test Project', '/tmp/test']
+        );
+        
+        // Test DB query
+        const projects = db.queryAll<{id: string, name: string}>('SELECT id, name FROM projects');
+        return { success: true, count: projects.length, latest: projects[projects.length - 1] };
+      } catch (error) {
+        console.error('DB Test Error:', error);
+        return { success: false, error: String(error) };
+      }
+    });
     
     const isMac = process.platform === 'darwin';
     const menu = buildMenu(isMac);

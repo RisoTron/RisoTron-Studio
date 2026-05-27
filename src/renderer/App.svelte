@@ -75,6 +75,22 @@
           {pingResult}
         </p>
       {/if}
+      
+      <div style="margin-top: 1rem;">
+        <button on:click={async () => {
+          pingResult = 'Testing DB...';
+          try {
+            const res = await window.api.testDb();
+            pingResult = JSON.stringify(res, null, 2);
+            pingError = !res.success;
+          } catch(e) {
+            pingResult = String(e);
+            pingError = true;
+          }
+        }}>
+          🧪 Test SQLite DB
+        </button>
+      </div>
     </div>
   </div>
 </main>
