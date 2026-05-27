@@ -70,23 +70,23 @@ export class SqliteAdapter implements DatabasePort {
   execute(sql: string, params: unknown[] = []): { lastInsertRowid: number; changes: number } {
     this.ensureInitialized();
     const stmt = this.db!.prepare(sql);
-    const result = stmt.run(...params);
+    const result = stmt.run(...(params as any[]));
     return {
       lastInsertRowid: Number(result.lastInsertRowid),
-      changes: result.changes,
+      changes: Number(result.changes),
     };
   }
 
   queryAll<T>(sql: string, params: unknown[] = []): T[] {
     this.ensureInitialized();
     const stmt = this.db!.prepare(sql);
-    return stmt.all(...params) as T[];
+    return stmt.all(...(params as any[])) as T[];
   }
 
   queryOne<T>(sql: string, params: unknown[] = []): T | undefined {
     this.ensureInitialized();
     const stmt = this.db!.prepare(sql);
-    const row = stmt.get(...params);
+    const row = stmt.get(...(params as any[]));
     return row as T | undefined;
   }
 
