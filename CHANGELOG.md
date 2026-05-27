@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.2.0...risotron-studio-v1.3.0) (2026-05-27)
+
+
+### Features
+
+* [US-26] Project data persisted in SQLite ([#81](https://github.com/RisoTron/RisoTron-Studio/issues/81)) ([a2a0c6b](https://github.com/RisoTron/RisoTron-Studio/commit/a2a0c6b3ec819ec5041347c7679bb751d7118ecc))
+
 ## [1.2.0](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.1.1...risotron-studio-v1.2.0) (2026-05-27)
 
 
