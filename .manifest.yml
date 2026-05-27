@@ -36,12 +36,7 @@ backlog:
     epic: "data-layer"
     feature: "project-crud"
     status: "backlog"
-  - issue: 29
-    type: "us"
-    title: "[US] Store and retrieve app settings"
-    epic: "data-layer"
-    feature: "config-manager"
-    status: "in-progress"
+
   # Epic 3: Dashboard UI (P1)
   - issue: 30
     type: "us"
@@ -149,7 +144,7 @@ backlog:
     feature: "cicd-pipeline"
     status: "backlog"
 
-current_work: 29
+current_work: null
 
 epics:
   - id: "electron-shell"
@@ -248,6 +243,12 @@ epics:
         status: "planned"
 
 completed:
+  - issue: 29
+    type: "us"
+    title: "[US] Store and retrieve app settings"
+    epic: "data-layer"
+    feature: "config-manager"
+    status: "done"
   - issue: 25
     type: "us"
     title: "[US] Single-instance enforcement"
