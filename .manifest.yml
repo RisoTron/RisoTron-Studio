@@ -23,7 +23,7 @@ backlog:
     title: "[US] Project data persisted in SQLite"
     epic: "data-layer"
     feature: "sqlite-storage"
-    status: "in-progress"
+    status: "review"
   - issue: 27
     type: "us"
     title: "[US] Migration system for schema changes"
