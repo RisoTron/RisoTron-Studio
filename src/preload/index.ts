@@ -23,7 +23,11 @@ contextBridge.exposeInMainWorld('api', {
   },
   project: {
     create: (payload: Record<string, unknown>) => ipcRenderer.invoke('app:create-project', payload),
-    list: (includeArchived?: boolean) => ipcRenderer.invoke('app:list-projects', includeArchived),
+    list: async (includeArchived?: boolean) => {
+      const result = await ipcRenderer.invoke('app:list-projects', includeArchived);
+      if (result?.success) return result.data;
+      throw new Error(result?.error ?? 'Failed to list projects');
+    },
     get: (id: string) => ipcRenderer.invoke('app:get-project', id),
     update: (id: string, payload: Record<string, unknown>) => ipcRenderer.invoke('app:update-project', id, payload),
     delete: (id: string) => ipcRenderer.invoke('app:delete-project', id),
