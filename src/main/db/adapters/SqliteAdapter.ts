@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import { app } from 'electron';
 import { DatabaseSync } from 'node:sqlite';
 import type { DatabasePort } from '../ports/DatabasePort';
+import { migrations } from '../migrations/index';
 
 /**
  * SQLite adapter implementing the DatabasePort interface.
@@ -29,42 +30,47 @@ export class SqliteAdapter implements DatabasePort {
 
     // Enable WAL mode for better concurrent read performance.
     this.db.exec('PRAGMA journal_mode = WAL');
-    // Set schema version for future migration tracking.
-    this.db.exec('PRAGMA user_version = 1');
-
-    // Create tables within a transaction for atomicity.
-    this.db.exec(`
-      CREATE TABLE IF NOT EXISTS projects (
-        id TEXT PRIMARY KEY,
-        name TEXT NOT NULL,
-        path TEXT NOT NULL,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      );
-
-      CREATE TABLE IF NOT EXISTS project_settings (
-        project_id TEXT,
-        key TEXT,
-        value TEXT,
-        PRIMARY KEY (project_id, key),
-        FOREIGN KEY (project_id) REFERENCES projects (id) ON DELETE CASCADE
-      );
-
-      CREATE TABLE IF NOT EXISTS templates (
-        id TEXT PRIMARY KEY,
-        name TEXT NOT NULL,
-        version TEXT NOT NULL,
-        installed_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      );
-
-      CREATE TABLE IF NOT EXISTS settings (
-        key TEXT PRIMARY KEY,
-        value TEXT NOT NULL,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      );
-    `);
+    // Enforce foreign key constraints
+    this.db.exec('PRAGMA foreign_keys = ON');
+    
+    this.runMigrations();
 
     this.isInitialized = true;
+  }
+
+  private runMigrations(): void {
+    // EXCLUSIVE lock: blocks all other writers and readers for the duration of this migration.
+    // We lock before reading the version to prevent race conditions.
+    this.db!.exec('BEGIN EXCLUSIVE');
+    
+    try {
+      const stmt = this.db!.prepare('PRAGMA user_version');
+      const { user_version: currentVersion } = stmt.get() as { user_version: number };
+      
+      const pendingMigrations = migrations
+        .filter((m) => m.version > currentVersion)
+        .sort((a, b) => a.version - b.version);
+
+      if (pendingMigrations.length > 0) {
+        console.group('Running DB Migrations');
+        for (const migration of pendingMigrations) {
+          console.group(`Migration v${migration.version}: ${migration.name}`);
+          this.db!.exec(migration.sql);
+          this.db!.exec(`PRAGMA user_version = ${migration.version}`);
+          console.groupEnd();
+        }
+        console.groupEnd();
+      }
+      this.db!.exec('COMMIT');
+    } catch (err) {
+      try {
+        this.db!.exec('ROLLBACK');
+      } catch (rollbackErr) {
+        console.error('Failed to rollback transaction:', rollbackErr);
+      }
+      console.error('Migration failed:', err);
+      throw err;
+    }
   }
 
   execute(sql: string, params: unknown[] = []): { lastInsertRowid: number; changes: number } {
