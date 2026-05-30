@@ -76,3 +76,8 @@ out/
 # Antigravity CLI
 .antigravitycli/
 test-asar*
+
+# Agent Task Files
+.agent-*.md
+.pr-body.md
+critic_review.txt
