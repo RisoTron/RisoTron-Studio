@@ -21,4 +21,11 @@ contextBridge.exposeInMainWorld('api', {
     get: (key: string) => ipcRenderer.invoke('app:get-setting', key),
     set: (key: string, value: unknown) => ipcRenderer.invoke('app:set-setting', key, value),
   },
+  project: {
+    create: (payload: Record<string, unknown>) => ipcRenderer.invoke('app:create-project', payload),
+    list: (includeArchived?: boolean) => ipcRenderer.invoke('app:list-projects', includeArchived),
+    get: (id: string) => ipcRenderer.invoke('app:get-project', id),
+    update: (id: string, payload: Record<string, unknown>) => ipcRenderer.invoke('app:update-project', id, payload),
+    delete: (id: string) => ipcRenderer.invoke('app:delete-project', id),
+  },
 });

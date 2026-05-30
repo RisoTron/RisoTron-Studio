@@ -1,3 +1,7 @@
+/**
+ * Database migration system for RisoTron Studio.
+ * Each migration is versioned and applied atomically.
+ */
 export interface Migration {
   version: number;
   name: string;
@@ -5,9 +9,11 @@ export interface Migration {
 }
 
 /**
- * Migration scripts.
- * Convention: v1 may use `IF NOT EXISTS` for initial schema.
- * v2+ must NOT rely on it, as they should only be run exactly once.
+ * Registry of all database migrations, ordered by version.
+ * To add a new migration:
+ * 1. Add a new entry with the next sequential version number
+ * 2. Include all SQL statements needed for the schema change
+ * 3. Use CREATE TABLE IF NOT EXISTS for idempotency in the initial migration
  */
 export const migrations: Migration[] = [
   {
@@ -42,6 +48,16 @@ export const migrations: Migration[] = [
         value TEXT NOT NULL,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
       );
+    `,
+  },
+  {
+    version: 2,
+    name: 'project_crud_fields',
+    sql: `
+      ALTER TABLE projects ADD COLUMN template_id TEXT;
+      ALTER TABLE projects ADD COLUMN providers TEXT;
+      ALTER TABLE projects ADD COLUMN is_archived INTEGER DEFAULT 0;
+      CREATE UNIQUE INDEX IF NOT EXISTS uq_projects_name ON projects(name) WHERE is_archived = 0;
     `,
   },
 ];

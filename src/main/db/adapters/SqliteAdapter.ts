@@ -13,12 +13,14 @@ export class SqliteAdapter implements DatabasePort {
   private db: DatabaseSync | null = null;
   private isInitialized = false;
 
+  constructor(private customPath?: string) {}
+
   initialize(): void {
     if (this.isInitialized) {
       return;
     }
 
-    const dbPath = path.join(app.getPath('userData'), 'risotron-studio.db');
+    const dbPath = this.customPath ?? path.join(app.getPath('userData'), 'risotron-studio.db');
 
     // Ensure the parent directory exists before opening the database.
     const dbDir = path.dirname(dbPath);

@@ -24,12 +24,7 @@ backlog:
     epic: "data-layer"
     feature: "sqlite-storage"
     status: "done"
-  - issue: 28
-    type: "us"
-    title: "[US] SQLite database stores, retrieves, updates, and soft-deletes project records via IPC"
-    epic: "data-layer"
-    feature: "project-crud"
-    status: "ready"
+
 
   # Epic 3: Dashboard UI (P1)
   - issue: 30
@@ -138,7 +133,9 @@ backlog:
     feature: "cicd-pipeline"
     status: "backlog"
 
-current_work: null
+current_work:
+  issue: 28
+  title: "[US] SQLite database stores, retrieves, updates, and soft-deletes project records via IPC"
 
 epics:
   - id: "electron-shell"

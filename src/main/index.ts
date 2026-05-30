@@ -7,8 +7,10 @@ import started from 'electron-squirrel-startup';
 import { loadWindowState, trackWindowState, MIN_WIDTH, MIN_HEIGHT } from './utils/window-state';
 import { db } from './db';
 import { ConfigService } from './services/ConfigService';
+import { ProjectRepository } from './services/ProjectRepository';
 import { VALID_SETTING_KEYS } from '../shared/types/settings';
 import type { AppSettings } from '../shared/types/settings';
+import type { CreateProjectPayload, UpdateProjectPayload } from '../shared/types/project';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -116,7 +118,7 @@ if (!gotTheLock) {
       const url = event.senderFrame?.url;
       const devUrl = typeof MAIN_WINDOW_VITE_DEV_SERVER_URL !== 'undefined' ? MAIN_WINDOW_VITE_DEV_SERVER_URL : null;
       if (devUrl && url?.startsWith(devUrl)) return;
-      if (url?.startsWith('file://')) return;
+      if (url?.startsWith('file://' + path.join(__dirname, '../renderer/'))) return;
       throw new Error(`Unauthorized IPC sender: ${url}`);
     };
 
@@ -154,10 +156,127 @@ if (!gotTheLock) {
       if (!VALID_SETTING_KEYS.includes(key as keyof AppSettings)) {
         throw new Error(`Invalid setting key: ${key}`);
       }
-      if (typeof value !== 'string') {
-        throw new Error(`Invalid value type for "${key}": expected string`);
-      }
       configService.setSetting(key as keyof AppSettings, value as AppSettings[keyof AppSettings]);
+    });
+
+    // ── Project IPC ──────────────────────────────────────────────
+    const projectRepo = new ProjectRepository(db);
+
+    ipcMain.handle('app:create-project', (event, payload: unknown) => {
+      validateSender(event);
+      try {
+        if (!payload || typeof payload !== 'object') {
+          return { success: false, error: 'Invalid payload: expected an object.' };
+        }
+        const p = payload as Record<string, unknown>;
+        if (typeof p.name !== 'string' || p.name.trim() === '' || p.name.length > 255) {
+          return { success: false, error: 'Invalid payload: "name" is required and must be a non-empty string under 255 chars.' };
+        }
+        if (typeof p.path !== 'string' || p.path.trim() === '') {
+          return { success: false, error: 'Invalid payload: "path" is required and must be a non-empty string.' };
+        }
+        if (p.template_id !== undefined && typeof p.template_id !== 'string') {
+          return { success: false, error: 'Invalid payload: "template_id" must be a string if provided.' };
+        }
+        if (p.providers !== undefined && (!Array.isArray(p.providers) || !p.providers.every(x => typeof x === 'string'))) {
+          return { success: false, error: 'Invalid payload: "providers" must be an array of strings if provided.' };
+        }
+        const createPayload: CreateProjectPayload = {
+          name: p.name,
+          path: p.path,
+          template_id: p.template_id as string | undefined,
+          providers: p.providers as string[] | undefined,
+        };
+        const project = projectRepo.create(createPayload);
+        return { success: true, data: project };
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
+        return { success: false, error: message };
+      }
+    });
+
+    ipcMain.handle('app:list-projects', (event, includeArchived?: unknown) => {
+      validateSender(event);
+      try {
+        const archived = typeof includeArchived === 'boolean' ? includeArchived : false;
+        const projects = projectRepo.list(archived);
+        return { success: true, data: projects };
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
+        return { success: false, error: message };
+      }
+    });
+
+    ipcMain.handle('app:get-project', (event, id: unknown) => {
+      validateSender(event);
+      try {
+        if (typeof id !== 'string' || id.trim() === '') {
+          return { success: false, error: 'Invalid argument: "id" must be a non-empty string.' };
+        }
+        const project = projectRepo.get(id);
+        if (!project) {
+          return { success: false, error: `Project not found: ${id}` };
+        }
+        return { success: true, data: project };
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
+        return { success: false, error: message };
+      }
+    });
+
+    ipcMain.handle('app:update-project', (event, id: unknown, payload: unknown) => {
+      validateSender(event);
+      try {
+        if (typeof id !== 'string' || id.trim() === '') {
+          return { success: false, error: 'Invalid argument: "id" must be a non-empty string.' };
+        }
+        if (!payload || typeof payload !== 'object') {
+          return { success: false, error: 'Invalid payload: expected an object.' };
+        }
+        const p = payload as Record<string, unknown>;
+        const updatePayload: UpdateProjectPayload = {};
+        if (p.name !== undefined) {
+          if (typeof p.name !== 'string' || p.name.trim() === '' || p.name.length > 255) return { success: false, error: 'Invalid name' };
+          updatePayload.name = p.name;
+        }
+        if (p.path !== undefined) {
+          if (typeof p.path !== 'string' || p.path.trim() === '') return { success: false, error: 'Invalid path' };
+          updatePayload.path = p.path;
+        }
+        if (p.template_id !== undefined) {
+          if (p.template_id !== null && typeof p.template_id !== 'string') return { success: false, error: 'Invalid template_id' };
+          updatePayload.template_id = p.template_id as string | null;
+        }
+        if (p.providers !== undefined) {
+          if (!Array.isArray(p.providers) || !p.providers.every(x => typeof x === 'string')) return { success: false, error: 'Invalid providers' };
+          updatePayload.providers = p.providers as string[];
+        }
+        const project = projectRepo.update(id, updatePayload);
+        if (!project) {
+          return { success: false, error: `Project not found: ${id}` };
+        }
+        return { success: true, data: project };
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
+        return { success: false, error: message };
+      }
+    });
+
+    ipcMain.handle('app:delete-project', (event, id: unknown) => {
+      validateSender(event);
+      try {
+        if (typeof id !== 'string' || id.trim() === '') {
+          return { success: false, error: 'Invalid argument: "id" must be a non-empty string.' };
+        }
+        const project = projectRepo.softDelete(id);
+        if (!project) {
+          return { success: false, error: `Project not found: ${id}` };
+        }
+        return { success: true, data: project };
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
+        return { success: false, error: message };
+      }
     });
     
     const isMac = process.platform === 'darwin';
