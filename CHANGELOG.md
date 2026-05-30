@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.5.0](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.4.0...risotron-studio-v1.5.0) (2026-05-30)
+
+
+### Features
+
+* implement database schema migration system ([0e83ce5](https://github.com/RisoTron/RisoTron-Studio/commit/0e83ce589e61b7c7d95cb3eef625d2bdfeaffcf5))
+* implement database schema migration system ([1e68e06](https://github.com/RisoTron/RisoTron-Studio/commit/1e68e06a0a103e2c5b8f68ee1cda3b0ddfa529a7))
+
+
+### Bug Fixes
+
+* regenerate lockfile with correct node engine to include esbuild optional deps ([2bb347a](https://github.com/RisoTron/RisoTron-Studio/commit/2bb347a40b76b5b813d1175a39020e0fd1dff87c))
+
 ## [1.4.0](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.3.0...risotron-studio-v1.4.0) (2026-05-27)
 
 
