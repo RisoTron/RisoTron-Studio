@@ -24,12 +24,6 @@ backlog:
     epic: "data-layer"
     feature: "sqlite-storage"
     status: "done"
-  - issue: 27
-    type: "us"
-    title: "[US] Migration system for schema changes"
-    epic: "data-layer"
-    feature: "sqlite-storage"
-    status: "in progress"
   - issue: 28
     type: "us"
     title: "[US] CRUD operations for projects"
@@ -144,7 +138,7 @@ backlog:
     feature: "cicd-pipeline"
     status: "backlog"
 
-current_work: 27
+current_work: null
 
 epics:
   - id: "electron-shell"
@@ -243,6 +237,12 @@ epics:
         status: "planned"
 
 completed:
+  - issue: 27
+    type: "us"
+    title: "[US] Migration system for schema changes"
+    epic: "data-layer"
+    feature: "sqlite-storage"
+    status: "done"
   - issue: 29
     type: "us"
     title: "[US] Store and retrieve app settings"
