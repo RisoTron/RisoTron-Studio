@@ -26,10 +26,10 @@ backlog:
     status: "done"
   - issue: 28
     type: "us"
-    title: "[US] CRUD operations for projects"
+    title: "[US] SQLite database stores, retrieves, updates, and soft-deletes project records via IPC"
     epic: "data-layer"
     feature: "project-crud"
-    status: "backlog"
+    status: "ready"
 
   # Epic 3: Dashboard UI (P1)
   - issue: 30
