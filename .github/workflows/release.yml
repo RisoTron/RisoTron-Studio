@@ -28,7 +28,7 @@ jobs:
 
   build-and-publish:
     needs: release-please
-    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    if: ${{ needs.release-please.outputs.release_created == 'true' && !contains(github.event.pull_request.title, '[skip-build]') }}
     name: Build (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     
