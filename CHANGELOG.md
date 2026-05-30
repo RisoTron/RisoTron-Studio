@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.6.0](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.5.0...risotron-studio-v1.6.0) (2026-05-30)
+
+
+### Features
+
+* **data-layer:** implement project CRUD via IPC ([df0522a](https://github.com/RisoTron/RisoTron-Studio/commit/df0522ab40b3449ac42f0423c4afc748e30a1a12))
+* implement project CRUD via IPC (US 28) ([be0abb1](https://github.com/RisoTron/RisoTron-Studio/commit/be0abb1921e78e5523d312250b5cd9c3385caffa))
+
 ## [1.5.0](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.4.0...risotron-studio-v1.5.0) (2026-05-30)
 
 
