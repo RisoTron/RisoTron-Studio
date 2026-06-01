@@ -2,6 +2,7 @@ export {};
 
 import type { WindowState } from '../main/utils/window-state';
 import type { AppSettings } from '../shared/types/settings';
+import type { Project } from '../shared/types/project';
 
 declare global {
   interface AppInfo {
@@ -19,6 +20,9 @@ declare global {
         getAll: () => Promise<AppSettings>;
         get: <K extends keyof AppSettings>(key: K) => Promise<AppSettings[K]>;
         set: <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => Promise<void>;
+      };
+      project: {
+        list: (includeArchived?: boolean) => Promise<Project[]>;
       };
     };
   }

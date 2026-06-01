@@ -2,6 +2,7 @@
   import { onMount, onDestroy } from 'svelte';
   import '@vscode/codicons/dist/codicon.css';
   import SettingsView from './components/SettingsView.svelte';
+  import ProjectDashboard from './components/ProjectDashboard.svelte';
 
   let appInfo: AppInfo | null = null;
   let currentView: 'home' | 'settings' = 'home';
@@ -56,10 +57,7 @@
     {#if currentView === 'settings'}
       <SettingsView />
     {:else}
-      <div class="welcome">
-        <h1>Welcome to RisoTron Studio</h1>
-        <p>AI-powered creative studio platform</p>
-      </div>
+      <ProjectDashboard />
     {/if}
   </main>
 
@@ -141,26 +139,7 @@
     position: relative;
   }
 
-  .welcome {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    text-align: center;
-  }
 
-  .welcome h1 {
-    font-size: 2rem;
-    font-weight: 400;
-    color: var(--vscode-active);
-    margin-bottom: 0.5rem;
-  }
-
-  .welcome p {
-    font-size: 1.1rem;
-    color: var(--vscode-fg-muted);
-  }
 
   /* Status Bar */
   .status-bar {
