@@ -38,7 +38,7 @@ backlog:
     title: "[US] Step-by-step wizard to create projects"
     epic: "dashboard-ui"
     feature: "create-wizard"
-    status: "backlog"
+    status: "ready"
   - issue: 33
     type: "us"
     title: "[US] Preview project configuration before creating"
