@@ -38,7 +38,7 @@ backlog:
     title: "[US] Step-by-step wizard to create projects"
     epic: "dashboard-ui"
     feature: "create-wizard"
-    status: "ready"
+    status: "in_progress"
   - issue: 33
     type: "us"
     title: "[US] Preview project configuration before creating"
@@ -133,8 +133,10 @@ backlog:
     feature: "cicd-pipeline"
     status: "backlog"
 
-current_work: {}
-
+current_work:
+  issue: 32
+  title: "[US] Step-by-step wizard to create projects"
+  branch: "feat/dashboard-ui/create-wizard"
 epics:
   - id: "electron-shell"
     title: "Electron Shell"
