@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.7.0](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.6.0...risotron-studio-v1.7.0) (2026-06-01)
+
+
+### Features
+
+* implement project list dashboard (US 30) ([419d9e1](https://github.com/RisoTron/RisoTron-Studio/commit/419d9e1c4746205c8af65cdb00f6da8d4344bb90))
+* project list dashboard (US 30) ([dc958ab](https://github.com/RisoTron/RisoTron-Studio/commit/dc958ab24b72b6a4c20ccfdc92459da993db76d3))
+
 ## [1.6.0](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.5.0...risotron-studio-v1.6.0) (2026-05-30)
 
 
