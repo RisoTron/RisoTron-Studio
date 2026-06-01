@@ -32,7 +32,7 @@ backlog:
     title: "[US] See all projects in dashboard"
     epic: "dashboard-ui"
     feature: "project-list"
-    status: "ready"
+    status: "done"
   - issue: 32
     type: "us"
     title: "[US] Step-by-step wizard to create projects"
@@ -133,11 +133,7 @@ backlog:
     feature: "cicd-pipeline"
     status: "backlog"
 
-current_work:
-  issue: 30
-  type: "us"
-  epic: "dashboard-ui"
-  feature: "project-list"
+current_work: {}
 
 epics:
   - id: "electron-shell"
