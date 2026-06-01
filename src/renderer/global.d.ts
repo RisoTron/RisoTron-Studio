@@ -23,6 +23,10 @@ declare global {
       };
       project: {
         list: (includeArchived?: boolean) => Promise<Project[]>;
+        create: (payload: Record<string, unknown>) => Promise<{ success: boolean; data?: Project; error?: string }>;
+        get: (id: string) => Promise<{ success: boolean; data?: Project; error?: string }>;
+        update: (id: string, payload: Record<string, unknown>) => Promise<{ success: boolean; data?: Project; error?: string }>;
+        delete: (id: string) => Promise<{ success: boolean; data?: Project; error?: string }>;
       };
     };
   }
