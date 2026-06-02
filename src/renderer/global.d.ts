@@ -28,6 +28,10 @@ declare global {
         update: (id: string, payload: Record<string, unknown>) => Promise<{ success: boolean; data?: Project; error?: string }>;
         delete: (id: string) => Promise<{ success: boolean; data?: Project; error?: string }>;
       };
+      os: {
+        showItemInFolder: (path: string) => Promise<void>;
+        openInIDE: (path: string) => Promise<void>;
+      };
     };
   }
 }

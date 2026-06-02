@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Project } from '../../shared/types/project';
 
-  let { project }: { project: Project } = $props();
+  let { project, onSelectProject }: { project: Project; onSelectProject?: (project: Project) => void } = $props();
 
   const PALETTE = [
     '#6366f1', '#8b5cf6', '#ec4899', '#f43f5e',
@@ -42,7 +42,7 @@
   const updatedFormatted = $derived(formatDate(project.updated_at));
 </script>
 
-<button class="card" type="button">
+<button class="card" type="button" onclick={() => onSelectProject?.(project)}>
   <div class="card-header">
     <div class="avatar" style:background={color}>
       <span class="avatar-text">{initials}</span>

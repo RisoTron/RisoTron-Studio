@@ -1,4 +1,4 @@
-import { app, BrowserWindow, nativeTheme, ipcMain, Menu, dialog } from 'electron';
+import { app, BrowserWindow, nativeTheme, ipcMain, Menu, dialog, shell } from 'electron';
 import { buildMenu } from './menu';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -291,7 +291,23 @@ if (!gotTheLock) {
         return { success: false, error: message };
       }
     });
-    
+
+    ipcMain.handle('os:show-item-in-folder', (event, itemPath: string) => {
+      validateSender(event);
+      if (typeof itemPath !== 'string' || itemPath.trim() === '') {
+        throw new Error('Invalid path');
+      }
+      shell.showItemInFolder(itemPath);
+    });
+
+    ipcMain.handle('os:open-in-ide', (event, itemPath: string) => {
+      validateSender(event);
+      if (typeof itemPath !== 'string' || itemPath.trim() === '') {
+        throw new Error('Invalid path');
+      }
+      shell.openExternal('vscode://file/' + itemPath);
+    });
+
     const isMac = process.platform === 'darwin';
     const menu = buildMenu(isMac);
     Menu.setApplicationMenu(menu);

@@ -32,4 +32,8 @@ contextBridge.exposeInMainWorld('api', {
     update: (id: string, payload: Record<string, unknown>) => ipcRenderer.invoke('app:update-project', id, payload),
     delete: (id: string) => ipcRenderer.invoke('app:delete-project', id),
   },
+  os: {
+    showItemInFolder: (path: string) => ipcRenderer.invoke('os:show-item-in-folder', path),
+    openInIDE: (path: string) => ipcRenderer.invoke('os:open-in-ide', path),
+  },
 });

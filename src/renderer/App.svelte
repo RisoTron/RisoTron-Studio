@@ -4,11 +4,14 @@
   import SettingsView from './components/SettingsView.svelte';
   import ProjectDashboard from './components/ProjectDashboard.svelte';
   import CreateProjectWizard from './components/wizard/CreateProjectWizard.svelte';
+  import ProjectDetail from './components/ProjectDetail.svelte';
+  import type { Project } from '../shared/types/project';
 
   let appInfo: AppInfo | null = $state(null);
-  let currentView: 'home' | 'settings' | 'wizard' = $state('home');
+  let currentView: 'home' | 'settings' | 'wizard' | 'project-detail' = $state('home');
+  let selectedProject: Project | null = $state(null);
 
-  function navigateToView(view: 'home' | 'settings' | 'wizard') {
+  function navigateToView(view: 'home' | 'settings' | 'wizard' | 'project-detail') {
     currentView = view;
   }
 
@@ -47,6 +50,8 @@
 
 {#if currentView === 'wizard'}
   <CreateProjectWizard onClose={() => navigateToView('home')} />
+{:else if currentView === 'project-detail' && selectedProject}
+  <ProjectDetail project={selectedProject} onBack={() => { selectedProject = null; navigateToView('home'); }} />
 {:else}
   <div class="vscode-layout">
     <!-- Activity Bar -->
@@ -65,7 +70,7 @@
       {#if currentView === 'settings'}
         <SettingsView />
       {:else}
-        <ProjectDashboard onNewProject={() => navigateToView('wizard')} />
+        <ProjectDashboard onNewProject={() => navigateToView('wizard')} onSelectProject={(p) => { selectedProject = p; navigateToView('project-detail'); }} />
       {/if}
     </main>
 
