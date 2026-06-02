@@ -34,12 +34,6 @@ backlog:
   epic: dashboard-ui
   feature: project-detail
   status: backlog
-- issue: 31
-  type: us
-  title: '[US] Search and filter projects'
-  epic: dashboard-ui
-  feature: project-list
-  status: in_progress
 - issue: 35
   type: us
   title: '[US] Pipeline executes 3 stages sequentially'
@@ -112,9 +106,6 @@ backlog:
   epic: devops
   feature: cicd-pipeline
   status: backlog
-current_work:
-  issue: 31
-  branch: feat/dashboard-ui/project-search
 epics:
 - id: electron-shell
   title: Electron Shell
@@ -211,6 +202,12 @@ epics:
     issue: 51
     status: planned
 completed:
+- issue: 31
+  type: us
+  title: '[US] Search and filter projects'
+  epic: dashboard-ui
+  feature: project-list
+  status: done
 - issue: 32
   type: us
   title: '[US] Step-by-step wizard to create projects'
