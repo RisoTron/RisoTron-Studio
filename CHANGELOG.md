@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.8.0](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.7.0...risotron-studio-v1.8.0) (2026-06-02)
+
+
+### Features
+
+* complete step-by-step project wizard UI and IPC (US 32) ([91c7c39](https://github.com/RisoTron/RisoTron-Studio/commit/91c7c39f6e444c6d648e6324dcc44287f8fa0c30))
+* Step-by-step project creation wizard (US 32) ([7a06d16](https://github.com/RisoTron/RisoTron-Studio/commit/7a06d16c1855e86b9ea4c7d0acca5179ae590dc5))
+* **wizard:** create physical project folder and config on submission ([9f41404](https://github.com/RisoTron/RisoTron-Studio/commit/9f41404ba95d810fc7d3e2067dc856e5a53f93e1))
+
 ## [1.7.0](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.6.0...risotron-studio-v1.7.0) (2026-06-01)
 
 
