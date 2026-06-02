@@ -4,6 +4,7 @@
   /** Local reactive copies of each setting. */
   let defaultTemplate = '';
   let defaultPath = '';
+  let preferredIDE = '';
 
   /** UI state flags. */
   let loading = true;
@@ -12,6 +13,7 @@
   let saveStatus: Record<string, 'idle' | 'saving' | 'saved' | 'error'> = {
     defaultTemplate: 'idle',
     defaultPath: 'idle',
+    preferredIDE: 'idle',
   };
 
   onMount(async () => {
@@ -19,6 +21,7 @@
       const settings = await window.api.settings.getAll();
       defaultTemplate = settings.defaultTemplate;
       defaultPath = settings.defaultPath;
+      preferredIDE = settings.preferredIDE || '';
       loaded = true;
       loadError = false;
     } catch (err) {
@@ -33,12 +36,13 @@
   const timers: Record<string, ReturnType<typeof setTimeout>> = {};
   const statusTimers: Record<string, ReturnType<typeof setTimeout>> = {};
 
-  function handleChange(key: 'defaultTemplate' | 'defaultPath', value: string) {
+  function handleChange(key: 'defaultTemplate' | 'defaultPath' | 'preferredIDE', value: string) {
     if (!loaded || loadError) return;
 
     // Immediately update local state
     if (key === 'defaultTemplate') defaultTemplate = value;
     if (key === 'defaultPath') defaultPath = value;
+    if (key === 'preferredIDE') preferredIDE = value;
 
     // Debounce the save
     if (timers[key]) clearTimeout(timers[key]);
@@ -156,6 +160,35 @@
               {:else if saveStatus.defaultPath === 'saved'}
                 ✓
               {:else if saveStatus.defaultPath === 'error'}
+                ✗
+              {/if}
+            </span>
+          </div>
+        </div>
+
+        <!-- Preferred IDE Command -->
+        <div class="setting-row">
+          <div class="setting-label-area">
+            <label for="setting-preferredIDE" class="setting-label">
+              Project: <strong>Preferred IDE Command</strong>
+            </label>
+            <p class="setting-description">
+              Command to open project in IDE (e.g. <code>code</code>, <code>cursor</code>, <code>open -a "Antigravity IDE"</code>).
+            </p>
+          </div>
+          <div class="setting-control">
+            <input
+              id="setting-preferredIDE"
+              type="text"
+              bind:value={preferredIDE}
+              on:input={() => handleChange('preferredIDE', preferredIDE)}
+            />
+            <span class="save-indicator {saveStatus.preferredIDE}">
+              {#if saveStatus.preferredIDE === 'saving'}
+                Saving…
+              {:else if saveStatus.preferredIDE === 'saved'}
+                ✓
+              {:else if saveStatus.preferredIDE === 'error'}
                 ✗
               {/if}
             </span>
