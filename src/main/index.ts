@@ -294,18 +294,28 @@ if (!gotTheLock) {
 
     ipcMain.handle('os:show-item-in-folder', (event, itemPath: string) => {
       validateSender(event);
-      if (typeof itemPath !== 'string' || itemPath.trim() === '') {
-        throw new Error('Invalid path');
+      try {
+        if (typeof itemPath !== 'string' || itemPath.trim() === '') {
+          return { success: false, error: 'Invalid path' };
+        }
+        shell.showItemInFolder(itemPath);
+        return { success: true };
+      } catch (e: any) {
+        return { success: false, error: e.message };
       }
-      shell.showItemInFolder(itemPath);
     });
 
-    ipcMain.handle('os:open-in-ide', (event, itemPath: string) => {
+    ipcMain.handle('os:open-in-ide', async (event, itemPath: string) => {
       validateSender(event);
-      if (typeof itemPath !== 'string' || itemPath.trim() === '') {
-        throw new Error('Invalid path');
+      try {
+        if (typeof itemPath !== 'string' || itemPath.trim() === '') {
+          return { success: false, error: 'Invalid path' };
+        }
+        await shell.openExternal('vscode://file/' + encodeURI(itemPath));
+        return { success: true };
+      } catch (e: any) {
+        return { success: false, error: e.message };
       }
-      shell.openExternal('vscode://file/' + itemPath);
     });
 
     const isMac = process.platform === 'darwin';

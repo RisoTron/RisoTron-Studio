@@ -29,8 +29,8 @@ declare global {
         delete: (id: string) => Promise<{ success: boolean; data?: Project; error?: string }>;
       };
       os: {
-        showItemInFolder: (path: string) => Promise<void>;
-        openInIDE: (path: string) => Promise<void>;
+        showItemInFolder: (path: string) => Promise<{ success: boolean; error?: string }>;
+        openInIDE: (path: string) => Promise<{ success: boolean; error?: string }>;
       };
     };
   }

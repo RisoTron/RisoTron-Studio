@@ -30,14 +30,20 @@
 
   const statusLabel = $derived(project.is_archived === 1 ? 'Archived' : 'Active');
   const statusClass = $derived(project.is_archived === 1 ? 'badge-archived' : 'badge-active');
-  const templateLabel = $derived(project.template_id ?? 'No template');
-
-  function openInIDE() {
-    window.api.os.openInIDE(project.path);
+  async function openInIDE() {
+    const res = await window.api.os.openInIDE(project.path);
+    if (!res?.success) {
+      console.error('Failed to open in IDE:', res?.error);
+      alert('Could not open project in VS Code: ' + (res?.error || 'Unknown error'));
+    }
   }
 
-  function openInFinder() {
-    window.api.os.showItemInFolder(project.path);
+  async function openInFinder() {
+    const res = await window.api.os.showItemInFolder(project.path);
+    if (!res?.success) {
+      console.error('Failed to open in Finder/Explorer:', res?.error);
+      alert('Could not open folder: ' + (res?.error || 'Unknown error'));
+    }
   }
 </script>
 
@@ -56,9 +62,9 @@
       </div>
       <p class="project-path">{project.path}</p>
       {#if project.template_id}
-        <span class="badge badge-template">{templateLabel}</span>
+        <span class="badge badge-template">{project.template_id}</span>
       {:else}
-        <span class="badge badge-none">{templateLabel}</span>
+        <span class="badge badge-none">No template</span>
       {/if}
     </div>
   </header>
@@ -367,10 +373,4 @@
     user-select: all;
   }
 
-  /* ── Accessibility ── */
-  .action-btn:focus-visible,
-  .btn-back:focus-visible {
-    outline: 2px solid var(--vscode-focusBorder, #007fd4);
-    outline-offset: 2px;
-  }
 </style>
