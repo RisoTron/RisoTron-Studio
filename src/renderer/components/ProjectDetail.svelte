@@ -34,7 +34,7 @@
     const res = await window.api.os.openInIDE(project.path);
     if (!res?.success) {
       console.error('Failed to open in IDE:', res?.error);
-      alert('Could not open project in VS Code: ' + (res?.error || 'Unknown error'));
+      alert('Could not open project in IDE: ' + (res?.error || 'Unknown error'));
     }
   }
 
@@ -73,7 +73,7 @@
   <section class="quick-actions">
     <button class="action-btn" type="button" onclick={openInIDE}>
       <i class="codicon codicon-code"></i>
-      Open in VS Code
+      Open in IDE
     </button>
     <button class="action-btn" type="button" onclick={openInFinder}>
       <i class="codicon codicon-folder-opened"></i>

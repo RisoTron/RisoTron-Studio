@@ -29,7 +29,7 @@ backlog:
   title: '[US] View project details and status'
   epic: dashboard-ui
   feature: project-detail
-  status: in_progress
+  status: review
 - issue: 35
   type: us
   title: '[US] Pipeline executes 3 stages sequentially'

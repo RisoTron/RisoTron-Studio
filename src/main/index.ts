@@ -311,7 +311,10 @@ if (!gotTheLock) {
         if (typeof itemPath !== 'string' || itemPath.trim() === '') {
           return { success: false, error: 'Invalid path' };
         }
-        await shell.openExternal('vscode://file/' + encodeURI(itemPath));
+        const err = await shell.openPath(itemPath);
+        if (err) {
+          return { success: false, error: err };
+        }
         return { success: true };
       } catch (e: any) {
         return { success: false, error: e.message };
