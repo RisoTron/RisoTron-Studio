@@ -1,7 +1,7 @@
 {
   "name": "risotron-studio",
   "productName": "RisoTron Studio",
-  "version": "1.10.0",
+  "version": "1.10.0-dev.1",
   "description": "AI-powered creative studio platform",
   "main": ".vite/build/main.js",
   "type": "module",
