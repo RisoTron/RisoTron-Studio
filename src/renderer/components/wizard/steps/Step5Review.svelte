@@ -1,62 +1,76 @@
 <script lang="ts">
   import { wizardStore } from '../../../store/wizardStore.svelte';
 
+  const platformLabels: Record<string, string> = {
+    macos: 'macOS',
+    windows: 'Windows',
+    linux: 'Linux',
+  };
+
+  /** Human-readable label for the selected template, falling back to the raw ID. */
   const templateLabel = $derived(
-    {
+    (({
       blank: 'Blank Project',
       'svelte-electron': 'Svelte + Electron',
       'desktop-tool': 'Desktop Tool',
       'creative-suite': 'Creative Suite',
-    }[wizardStore.project.template]
+    } as Record<string, string>)[wizardStore.project.template] ?? wizardStore.project.template).trim() ||
+      'Unknown template'
   );
 
+  /** Human-readable label for the release provider, falling back to the raw ID. */
   const releaseProviderLabel = $derived(
-    {
+    (({
       none: 'None',
       github: 'GitHub Releases',
       s3: 'Amazon S3',
-    }[wizardStore.project.releaseProvider]
+    } as Record<string, string>)[wizardStore.project.releaseProvider] ?? wizardStore.project.releaseProvider).trim() ||
+      'Unknown provider'
   );
 
   const platformsLabel = $derived(
     wizardStore.project.targetPlatforms.length > 0
-      ? wizardStore.project.targetPlatforms.join(', ')
+      ? wizardStore.project.targetPlatforms.map((p) => platformLabels[p] ?? p).join(', ')
       : 'No platforms selected'
   );
 
+  /* Safe accessors for nested optional objects */
+  const github = $derived(wizardStore.project.github);
+  const s3 = $derived(wizardStore.project.s3);
+  const codeSigning = $derived(wizardStore.project.codeSigning);
 </script>
 
-<section class="wizard-step">
+<section class="wizard-step" aria-labelledby="review-heading">
   <div class="step-header">
     <span class="eyebrow">Review</span>
-    <h2>Confirm project setup</h2>
+    <h2 id="review-heading">Confirm project setup</h2>
     <p>Review the choices before creating the project.</p>
   </div>
 
   <div class="summary-grid">
-    <article class="summary-card">
+    <article class="summary-card" aria-label="Project details">
       <h3>Project</h3>
       <dl>
         <div>
           <dt>Name</dt>
-          <dd>{wizardStore.project.name || 'Untitled project'}</dd>
+          <dd>{wizardStore.project.name.trim() || 'Untitled project'}</dd>
         </div>
         <div>
           <dt>Path</dt>
-          <dd>{wizardStore.project.path || 'Not set'}</dd>
+          <dd>{wizardStore.project.path.trim() || 'Not set'}</dd>
         </div>
         <div>
           <dt>Author</dt>
-          <dd>{wizardStore.project.author || 'Not set'}</dd>
+          <dd>{wizardStore.project.author.trim() || 'Not set'}</dd>
         </div>
         <div>
           <dt>Description</dt>
-          <dd>{wizardStore.project.description || 'No description'}</dd>
+          <dd>{wizardStore.project.description.trim() || 'No description'}</dd>
         </div>
       </dl>
     </article>
 
-    <article class="summary-card">
+    <article class="summary-card" aria-label="Template selection">
       <h3>Template</h3>
       <dl>
         <div>
@@ -66,7 +80,7 @@
       </dl>
     </article>
 
-    <article class="summary-card">
+    <article class="summary-card" aria-label="Release configuration">
       <h3>Release</h3>
       <dl>
         <div>
@@ -76,30 +90,30 @@
         {#if wizardStore.project.releaseProvider === 'github'}
           <div>
             <dt>Repository</dt>
-            <dd>{wizardStore.project.github.owner}/{wizardStore.project.github.repository}</dd>
+            <dd>{github.owner.trim() || 'Not set'}/{github.repository.trim() || 'Not set'}</dd>
           </div>
           <div>
             <dt>Token</dt>
-            <dd>{wizardStore.project.github.tokenEnvVar}</dd>
+            <dd>{github.tokenEnvVar.trim() || 'Not set'}</dd>
           </div>
         {:else if wizardStore.project.releaseProvider === 's3'}
           <div>
             <dt>Bucket</dt>
-            <dd>{wizardStore.project.s3.bucket}</dd>
+            <dd>{s3.bucket.trim() || 'Not set'}</dd>
           </div>
           <div>
             <dt>Region</dt>
-            <dd>{wizardStore.project.s3.region}</dd>
+            <dd>{s3.region.trim() || 'Not set'}</dd>
           </div>
           <div>
             <dt>Prefix</dt>
-            <dd>{wizardStore.project.s3.prefix || 'No prefix'}</dd>
+            <dd>{s3.prefix.trim() || 'No prefix'}</dd>
           </div>
         {/if}
       </dl>
     </article>
 
-    <article class="summary-card">
+    <article class="summary-card" aria-label="Build configuration">
       <h3>Builds</h3>
       <dl>
         <div>
@@ -108,12 +122,24 @@
         </div>
         <div>
           <dt>Code signing</dt>
-          <dd>{wizardStore.project.codeSigning.enabled ? 'Enabled' : 'Disabled'}</dd>
+          <dd>{codeSigning.enabled ? 'Enabled' : 'Disabled'}</dd>
         </div>
-        {#if wizardStore.project.codeSigning.enabled}
+        {#if codeSigning.enabled}
           <div>
             <dt>macOS notarization</dt>
-            <dd>{wizardStore.project.codeSigning.notarizeMac ? 'Enabled' : 'Disabled'}</dd>
+            <dd>{codeSigning.notarizeMac ? 'Enabled' : 'Disabled'}</dd>
+          </div>
+          <div>
+            <dt>macOS certificate</dt>
+            <dd>{codeSigning.macCertificateName.trim() || 'Not set'}</dd>
+          </div>
+          <div>
+            <dt>Windows certificate</dt>
+            <dd>{codeSigning.windowsCertificatePath.trim() || 'Not set'}</dd>
+          </div>
+          <div>
+            <dt>Password env var</dt>
+            <dd>{codeSigning.certificatePasswordEnvVar.trim() || 'Not set'}</dd>
           </div>
         {/if}
         <div>
