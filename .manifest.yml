@@ -5,7 +5,7 @@ project:
   wiki: https://github.com/RisoTron/RisoTron-Studio.wiki.git
   wiki_path: wiki
   initialized_at: '2026-05-18'
-current_work: 34
+current_work: null
 github_project:
   number: 1
   owner: RisoTron
@@ -24,12 +24,7 @@ backlog:
   feature: project-list
   status: done
 
-- issue: 34
-  type: us
-  title: '[US] View project details and status'
-  epic: dashboard-ui
-  feature: project-detail
-  status: review
+
 - issue: 35
   type: us
   title: '[US] Pipeline executes 3 stages sequentially'
@@ -198,6 +193,12 @@ epics:
     issue: 51
     status: planned
 completed:
+- issue: 34
+  type: us
+  title: '[US] View project details and status'
+  epic: dashboard-ui
+  feature: project-detail
+  status: done
 - issue: 33
   type: us
   title: '[US] Preview project configuration before creating'
