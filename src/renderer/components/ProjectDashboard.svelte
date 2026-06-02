@@ -4,9 +4,10 @@
 
   interface Props {
     onNewProject?: () => void;
+    onSelectProject?: (project: Project) => void;
   }
 
-  let { onNewProject }: Props = $props();
+  let { onNewProject, onSelectProject }: Props = $props();
 
   let projects: Project[] = $state([]);
   let loading: boolean = $state(true);
@@ -258,7 +259,7 @@
     {:else}
       <div class="project-grid" class:list-view={viewMode === 'list'}>
         {#each filteredProjects as proj (proj.id)}
-          <ProjectCard project={proj} />
+          <ProjectCard project={proj} onSelectProject={onSelectProject} />
         {/each}
       </div>
     {/if}

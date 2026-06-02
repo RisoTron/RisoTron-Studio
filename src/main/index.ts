@@ -1,7 +1,8 @@
-import { app, BrowserWindow, nativeTheme, ipcMain, Menu, dialog } from 'electron';
+import { app, BrowserWindow, nativeTheme, ipcMain, Menu, dialog, shell } from 'electron';
 import { buildMenu } from './menu';
 import fs from 'node:fs';
 import path from 'node:path';
+import { exec } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import started from 'electron-squirrel-startup';
@@ -291,7 +292,41 @@ if (!gotTheLock) {
         return { success: false, error: message };
       }
     });
-    
+
+    ipcMain.handle('os:show-item-in-folder', (event, itemPath: string) => {
+      validateSender(event);
+      try {
+        if (typeof itemPath !== 'string' || itemPath.trim() === '') {
+          return { success: false, error: 'Invalid path' };
+        }
+        shell.showItemInFolder(itemPath);
+        return { success: true };
+      } catch (e: any) {
+        return { success: false, error: e.message };
+      }
+    });
+
+    ipcMain.handle('os:open-in-ide', async (event, itemPath: string) => {
+      validateSender(event);
+      try {
+        if (typeof itemPath !== 'string' || itemPath.trim() === '') {
+          return { success: false, error: 'Invalid path' };
+        }
+        const ideCommand = configService.getSetting('preferredIDE') as string || 'code';
+        return new Promise((resolve) => {
+          exec(`${ideCommand} "${itemPath}"`, (error) => {
+            if (error) {
+              resolve({ success: false, error: error.message });
+            } else {
+              resolve({ success: true });
+            }
+          });
+        });
+      } catch (e: any) {
+        return { success: false, error: e.message };
+      }
+    });
+
     const isMac = process.platform === 'darwin';
     const menu = buildMenu(isMac);
     Menu.setApplicationMenu(menu);
