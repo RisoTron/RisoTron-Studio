@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.0](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.9.0...risotron-studio-v1.10.0) (2026-06-02)
+
+
+### Features
+
+* **wizard:** preview project configuration before creating ([#101](https://github.com/RisoTron/RisoTron-Studio/issues/101)) ([93663b6](https://github.com/RisoTron/RisoTron-Studio/commit/93663b68ab0cc3c9154c713b1aa850425f6901d2))
+
 ## [1.9.0](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.8.0...risotron-studio-v1.9.0) (2026-06-02)
 
 
