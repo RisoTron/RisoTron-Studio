@@ -5,6 +5,7 @@ project:
   wiki: https://github.com/RisoTron/RisoTron-Studio.wiki.git
   wiki_path: wiki
   initialized_at: '2026-05-18'
+current_work: 33
 github_project:
   number: 1
   owner: RisoTron
@@ -27,7 +28,7 @@ backlog:
   title: '[US] Preview project configuration before creating'
   epic: dashboard-ui
   feature: create-wizard
-  status: backlog
+  status: in_progress
 - issue: 34
   type: us
   title: '[US] View project details and status'
