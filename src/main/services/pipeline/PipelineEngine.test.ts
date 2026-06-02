@@ -16,9 +16,13 @@ const makeConfig = (): PipelineContext => ({
 
 describe('PipelineEngine', () => {
   it('executes providers in the exact stage order', async () => {
-    const templateProvider = makeProvider('template', vi.fn().mockResolvedValue(undefined));
-    const releaseProvider = makeProvider('release', vi.fn().mockResolvedValue(undefined));
-    const cicdProvider = makeProvider('cicd', vi.fn().mockResolvedValue(undefined));
+    const templateExecute = vi.fn().mockResolvedValue(undefined);
+    const releaseExecute = vi.fn().mockResolvedValue(undefined);
+    const cicdExecute = vi.fn().mockResolvedValue(undefined);
+
+    const templateProvider = makeProvider('template', templateExecute);
+    const releaseProvider = makeProvider('release', releaseExecute);
+    const cicdProvider = makeProvider('cicd', cicdExecute);
 
     const engine = new PipelineEngine();
     engine.registerProvider(templateProvider);
@@ -28,14 +32,14 @@ describe('PipelineEngine', () => {
     const config = makeConfig();
     await engine.run(config);
 
-    expect(templateProvider.execute).toHaveBeenCalledOnce();
-    expect(templateProvider.execute).toHaveBeenCalledWith(config);
-    expect(releaseProvider.execute).toHaveBeenCalledOnce();
-    expect(releaseProvider.execute).toHaveBeenCalledWith(config);
-    expect(cicdProvider.execute).toHaveBeenCalledOnce();
-    expect(cicdProvider.execute).toHaveBeenCalledWith(config);
-    expect(templateProvider.execute).toHaveBeenCalledBefore(releaseProvider.execute);
-    expect(releaseProvider.execute).toHaveBeenCalledBefore(cicdProvider.execute);
+    expect(templateExecute).toHaveBeenCalledOnce();
+    expect(templateExecute).toHaveBeenCalledWith(config);
+    expect(releaseExecute).toHaveBeenCalledOnce();
+    expect(releaseExecute).toHaveBeenCalledWith(config);
+    expect(cicdExecute).toHaveBeenCalledOnce();
+    expect(cicdExecute).toHaveBeenCalledWith(config);
+    expect(templateExecute).toHaveBeenCalledBefore(releaseExecute);
+    expect(releaseExecute).toHaveBeenCalledBefore(cicdExecute);
   });
 
   it('handles empty pipeline without throwing', async () => {
@@ -45,9 +49,13 @@ describe('PipelineEngine', () => {
 
   it('fails fast and never executes subsequent providers when a provider throws', async () => {
     const error = new Error('Release provider failed');
-    const templateProvider = makeProvider('template', vi.fn().mockResolvedValue(undefined));
-    const releaseProvider = makeProvider('release', vi.fn().mockRejectedValue(error));
-    const cicdProvider = makeProvider('cicd', vi.fn().mockResolvedValue(undefined));
+    const templateExecute = vi.fn().mockResolvedValue(undefined);
+    const releaseExecute = vi.fn().mockRejectedValue(error);
+    const cicdExecute = vi.fn().mockResolvedValue(undefined);
+
+    const templateProvider = makeProvider('template', templateExecute);
+    const releaseProvider = makeProvider('release', releaseExecute);
+    const cicdProvider = makeProvider('cicd', cicdExecute);
 
     const engine = new PipelineEngine();
     engine.registerProvider(templateProvider);
@@ -56,8 +64,8 @@ describe('PipelineEngine', () => {
 
     await expect(engine.run(makeConfig())).rejects.toThrow(error);
 
-    expect(templateProvider.execute).toHaveBeenCalledOnce();
-    expect(releaseProvider.execute).toHaveBeenCalledOnce();
-    expect(cicdProvider.execute).not.toHaveBeenCalled();
+    expect(templateExecute).toHaveBeenCalledOnce();
+    expect(releaseExecute).toHaveBeenCalledOnce();
+    expect(cicdExecute).not.toHaveBeenCalled();
   });
 });
