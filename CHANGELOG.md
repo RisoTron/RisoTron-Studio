@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.0](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.11.0...risotron-studio-v1.12.0) (2026-06-02)
+
+
+### Features
+
+* Pipeline executes 3 stages sequentially ([#105](https://github.com/RisoTron/RisoTron-Studio/issues/105)) ([8c64de5](https://github.com/RisoTron/RisoTron-Studio/commit/8c64de5138a63bbc6cfbdfe13b1f25d6a4d15551))
+
 ## [1.11.0](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.10.0...risotron-studio-v1.11.0) (2026-06-02)
 
 
