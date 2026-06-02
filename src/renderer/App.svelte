@@ -3,9 +3,14 @@
   import '@vscode/codicons/dist/codicon.css';
   import SettingsView from './components/SettingsView.svelte';
   import ProjectDashboard from './components/ProjectDashboard.svelte';
+  import CreateProjectWizard from './components/wizard/CreateProjectWizard.svelte';
 
-  let appInfo: AppInfo | null = null;
-  let currentView: 'home' | 'settings' = 'home';
+  let appInfo: AppInfo | null = $state(null);
+  let currentView: 'home' | 'settings' | 'wizard' = $state('home');
+
+  function navigateToView(view: 'home' | 'settings' | 'wizard') {
+    currentView = view;
+  }
 
   let cleanupNewProject: (() => void) | undefined;
   let cleanupPreferences: (() => void) | undefined;
@@ -14,13 +19,13 @@
     if (window.api) {
       if (window.api.onMenuNewProject) {
         cleanupNewProject = window.api.onMenuNewProject(() => {
-          console.log('[STUB] "New Project" menu item clicked');
+          navigateToView('wizard');
         });
       }
       
       if (window.api.onMenuPreferences) {
         cleanupPreferences = window.api.onMenuPreferences(() => {
-          currentView = currentView === 'settings' ? 'home' : 'settings';
+          navigateToView(currentView === 'settings' ? 'home' : 'settings');
         });
       }
 
@@ -40,37 +45,41 @@
   });
 </script>
 
-<div class="vscode-layout">
-  <!-- Activity Bar -->
-  <aside class="activity-bar">
-    <button class="activity-icon {currentView === 'home' ? 'active' : ''}" on:click={() => currentView = 'home'} title="Explorer">
-      <i class="codicon codicon-files"></i>
-    </button>
-    <div class="activity-spacer"></div>
-    <button class="activity-icon {currentView === 'settings' ? 'active' : ''}" on:click={() => currentView = 'settings'} title="Settings">
-      <i class="codicon codicon-settings-gear"></i>
-    </button>
-  </aside>
+{#if currentView === 'wizard'}
+  <CreateProjectWizard onClose={() => navigateToView('home')} />
+{:else}
+  <div class="vscode-layout">
+    <!-- Activity Bar -->
+    <aside class="activity-bar">
+      <button class="activity-icon {currentView === 'home' ? 'active' : ''}" onclick={() => navigateToView('home')} title="Explorer">
+        <i class="codicon codicon-files"></i>
+      </button>
+      <div class="activity-spacer"></div>
+      <button class="activity-icon {currentView === 'settings' ? 'active' : ''}" onclick={() => navigateToView('settings')} title="Settings">
+        <i class="codicon codicon-settings-gear"></i>
+      </button>
+    </aside>
 
-  <!-- Editor Area -->
-  <main class="editor-area">
-    {#if currentView === 'settings'}
-      <SettingsView />
-    {:else}
-      <ProjectDashboard />
-    {/if}
-  </main>
+    <!-- Editor Area -->
+    <main class="editor-area">
+      {#if currentView === 'settings'}
+        <SettingsView />
+      {:else}
+        <ProjectDashboard onNewProject={() => navigateToView('wizard')} />
+      {/if}
+    </main>
 
-  <!-- Status Bar -->
-  <footer class="status-bar">
-    <div class="status-item">RisoTron Studio</div>
-    {#if appInfo}
-      <div class="status-item">v{appInfo.version}</div>
-    {/if}
-    <div class="status-spacer"></div>
-    <div class="status-item">Node 22</div>
-  </footer>
-</div>
+    <!-- Status Bar -->
+    <footer class="status-bar">
+      <div class="status-item">RisoTron Studio</div>
+      {#if appInfo}
+        <div class="status-item">v{appInfo.version}</div>
+      {/if}
+      <div class="status-spacer"></div>
+      <div class="status-item">Node 22</div>
+    </footer>
+  </div>
+{/if}
 
 <style>
   /* Base Layout */

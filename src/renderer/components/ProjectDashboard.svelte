@@ -3,6 +3,11 @@
   import type { Project } from '../../shared/types/project';
   import ProjectCard from './ProjectCard.svelte';
 
+  interface Props {
+    onNewProject?: () => void;
+  }
+  let { onNewProject }: Props = $props();
+
   let projects: Project[] = $state([]);
   let loading: boolean = $state(true);
   let error: string | null = $state(null);
@@ -52,7 +57,7 @@
         Release Server
       </button>
     </nav>
-    <button class="btn-primary" onclick={() => console.log('[STUB] New Project')}>
+    <button class="btn-primary" onclick={() => onNewProject?.()}>
       <i class="codicon codicon-add"></i>
       New Project
     </button>
@@ -122,7 +127,7 @@
           </div>
           <h2>No projects yet</h2>
           <p>Create your first project to get started with RisoTron Studio.</p>
-          <button class="btn-primary" onclick={() => console.log('[STUB] New Project')}>
+          <button class="btn-primary" onclick={() => onNewProject?.()}>
             <i class="codicon codicon-add"></i>
             Create New Project
           </button>

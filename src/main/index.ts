@@ -1,5 +1,6 @@
 import { app, BrowserWindow, nativeTheme, ipcMain, Menu, dialog } from 'electron';
 import { buildMenu } from './menu';
+import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -175,6 +176,13 @@ if (!gotTheLock) {
         if (typeof p.path !== 'string' || p.path.trim() === '') {
           return { success: false, error: 'Invalid payload: "path" is required and must be a non-empty string.' };
         }
+        const trimmedPath = p.path.trim();
+        if (!path.isAbsolute(trimmedPath)) {
+          return { success: false, error: 'Invalid payload: "path" must be an absolute path.' };
+        }
+        if (path.normalize(trimmedPath) !== trimmedPath) {
+          return { success: false, error: 'Invalid payload: "path" must be normalized.' };
+        }
         if (p.template_id !== undefined && typeof p.template_id !== 'string') {
           return { success: false, error: 'Invalid payload: "template_id" must be a string if provided.' };
         }
@@ -182,11 +190,16 @@ if (!gotTheLock) {
           return { success: false, error: 'Invalid payload: "providers" must be an array of strings if provided.' };
         }
         const createPayload: CreateProjectPayload = {
-          name: p.name,
-          path: p.path,
+          name: p.name.trim(),
+          path: trimmedPath,
           template_id: p.template_id as string | undefined,
           providers: p.providers as string[] | undefined,
         };
+        fs.mkdirSync(trimmedPath, { recursive: true });
+        fs.writeFileSync(
+          path.join(trimmedPath, 'risotron.json'),
+          JSON.stringify(createPayload, null, 2),
+        );
         const project = projectRepo.create(createPayload);
         return { success: true, data: project };
       } catch (err: unknown) {

@@ -81,3 +81,5 @@ test-asar*
 .agent-*.md
 .pr-body.md
 critic_review.txt
+.agent-task*
+test-results/
