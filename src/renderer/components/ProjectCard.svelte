@@ -76,8 +76,8 @@
     display: flex;
     flex-direction: column;
     gap: 14px;
-    background: #ffffff;
-    border: 1px solid #e8eaed;
+    background: var(--vscode-input-bg, #3c3c3c);
+    border: 1px solid var(--vscode-border, #3c3c3c);
     border-radius: 12px;
     padding: 20px;
     cursor: pointer;
@@ -85,18 +85,18 @@
   }
 
   .card:hover {
-    border-color: #cbd0d8;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border-color: var(--vscode-focusBorder, #007fd4);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
     transform: translateY(-2px);
   }
 
   .card:active {
     transform: translateY(0);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   }
 
   .card:focus-visible {
-    outline: 2px solid #3b82f6;
+    outline: 2px solid var(--vscode-focusBorder, #007fd4);
     outline-offset: 2px;
   }
 
@@ -128,14 +128,14 @@
     font-weight: 600;
     padding: 3px 10px;
     border-radius: 6px;
-    background: #eef2ff;
-    color: #6366f1;
+    background: var(--vscode-badge-bg, #4d4d4d);
+    color: var(--vscode-badge-fg, #ffffff);
     white-space: nowrap;
   }
 
   .badge-none {
-    background: #f3f4f6;
-    color: #9ca3af;
+    background: rgba(128, 128, 128, 0.15);
+    color: var(--vscode-fg-muted, #969696);
   }
 
   .card-body {
@@ -149,7 +149,7 @@
     margin: 0;
     font-size: 15px;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--vscode-fg, #cccccc);
     line-height: 1.3;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -159,7 +159,7 @@
   .card-path {
     margin: 0;
     font-size: 12px;
-    color: #94a3b8;
+    color: var(--vscode-fg-muted, #969696);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -169,7 +169,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-top: 1px solid #f1f5f9;
+    border-top: 1px solid var(--vscode-border, #3c3c3c);
     padding-top: 12px;
     margin-top: auto;
   }
@@ -179,7 +179,7 @@
     align-items: center;
     gap: 5px;
     font-size: 11px;
-    color: #94a3b8;
+    color: var(--vscode-fg-muted, #969696);
   }
 
   .date-item :global(.codicon) {

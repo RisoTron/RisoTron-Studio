@@ -1,20 +1,13 @@
-/* ── Design tokens ── */
+/* ── Design tokens (mapped to VS Code theme) ── */
 :root {
-  --bg: #f5f5f7;
-  --fg: #1d1d1f;
-  --fg-muted: #6e6e73;
-  --accent: #0071e3;
-
-  color-scheme: light dark;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #1d1d1f;
-    --fg: #f5f5f7;
-    --fg-muted: #a1a1a6;
-    --accent: #2997ff;
-  }
+  --bg: var(--vscode-editor, #1e1e1e);
+  --fg: var(--vscode-fg, #cccccc);
+  --fg-muted: var(--vscode-fg-muted, #969696);
+  --accent: var(--vscode-button-bg, #0e639c);
+  --border: var(--vscode-border, #3c3c3c);
+  --input-bg: var(--vscode-input-bg, #3c3c3c);
+  --badge-bg: var(--vscode-badge-bg, #4d4d4d);
+  --badge-fg: var(--vscode-badge-fg, #ffffff);
 }
 
 /* ── Reset ── */
