@@ -25,13 +25,22 @@ describe('PipelineEngine', () => {
     engine.registerProvider(releaseProvider);
     engine.registerProvider(cicdProvider);
 
-    await engine.run(makeConfig());
+    const config = makeConfig();
+    await engine.run(config);
 
     expect(templateProvider.execute).toHaveBeenCalledOnce();
+    expect(templateProvider.execute).toHaveBeenCalledWith(config);
     expect(releaseProvider.execute).toHaveBeenCalledOnce();
+    expect(releaseProvider.execute).toHaveBeenCalledWith(config);
     expect(cicdProvider.execute).toHaveBeenCalledOnce();
+    expect(cicdProvider.execute).toHaveBeenCalledWith(config);
     expect(templateProvider.execute).toHaveBeenCalledBefore(releaseProvider.execute);
     expect(releaseProvider.execute).toHaveBeenCalledBefore(cicdProvider.execute);
+  });
+
+  it('handles empty pipeline without throwing', async () => {
+    const engine = new PipelineEngine();
+    await expect(engine.run(makeConfig())).resolves.toBeUndefined();
   });
 
   it('fails fast and never executes subsequent providers when a provider throws', async () => {

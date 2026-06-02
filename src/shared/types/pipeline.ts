@@ -2,7 +2,7 @@
  * Shared context object passed through each stage of a pipeline run.
  * Providers read from and write to this record to share data between stages.
  */
-export type PipelineContext = Record<string, any>;
+export type PipelineContext = Record<string, unknown>;
 
 /**
  * Contract for a single pipeline stage provider.
