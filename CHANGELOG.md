@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.11.0](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.10.0...risotron-studio-v1.11.0) (2026-06-02)
+
+
+### Features
+
+* View project details and status ([#103](https://github.com/RisoTron/RisoTron-Studio/issues/103)) ([0b17242](https://github.com/RisoTron/RisoTron-Studio/commit/0b172425c3225aaa39a0afcd862cfaf0fb340bf8))
+
 ## [1.10.0](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.9.0...risotron-studio-v1.10.0) (2026-06-02)
 
 
