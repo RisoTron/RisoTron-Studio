@@ -2,6 +2,7 @@ import { app, BrowserWindow, nativeTheme, ipcMain, Menu, dialog, shell } from 'e
 import { buildMenu } from './menu';
 import fs from 'node:fs';
 import path from 'node:path';
+import { exec } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import started from 'electron-squirrel-startup';
@@ -311,11 +312,16 @@ if (!gotTheLock) {
         if (typeof itemPath !== 'string' || itemPath.trim() === '') {
           return { success: false, error: 'Invalid path' };
         }
-        const err = await shell.openPath(itemPath);
-        if (err) {
-          return { success: false, error: err };
-        }
-        return { success: true };
+        const ideCommand = configService.getSetting('preferredIDE') as string || 'code';
+        return new Promise((resolve) => {
+          exec(`${ideCommand} "${itemPath}"`, (error) => {
+            if (error) {
+              resolve({ success: false, error: error.message });
+            } else {
+              resolve({ success: true });
+            }
+          });
+        });
       } catch (e: any) {
         return { success: false, error: e.message };
       }

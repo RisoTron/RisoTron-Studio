@@ -7,6 +7,8 @@ export interface AppSettings {
   defaultTemplate: string;
   /** Default filesystem path for new projects. */
   defaultPath: string;
+  /** CLI command used to open projects in the user's preferred IDE (e.g. 'code', 'cursor'). */
+  preferredIDE: string;
 }
 
 /**
@@ -15,6 +17,7 @@ export interface AppSettings {
 export const DEFAULT_SETTINGS: AppSettings = {
   defaultTemplate: 'electron-forge-vite',
   defaultPath: '~/RisoTronProjects',
+  preferredIDE: 'code',
 };
 
 /**
@@ -24,6 +27,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
 export const VALID_SETTING_KEYS: ReadonlyArray<keyof AppSettings> = [
   'defaultTemplate',
   'defaultPath',
+  'preferredIDE',
 ] as const;
 
 /**
@@ -33,4 +37,5 @@ export const VALID_SETTING_KEYS: ReadonlyArray<keyof AppSettings> = [
 export const SETTING_TYPES: Record<keyof AppSettings, 'string' | 'number' | 'boolean'> = {
   defaultTemplate: 'string',
   defaultPath: 'string',
+  preferredIDE: 'string',
 };
