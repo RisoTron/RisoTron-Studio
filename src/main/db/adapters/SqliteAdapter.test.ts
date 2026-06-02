@@ -44,7 +44,7 @@ describe('SqliteAdapter migrations', () => {
       expect.arrayContaining(['project_settings', 'projects', 'settings', 'templates']),
     );
     expect(adapter.queryOne<{ user_version: number }>('PRAGMA user_version')?.user_version).toBe(
-      1,
+      2,
     );
 
     adapter.execute("INSERT INTO settings (key, value) VALUES ('migration-marker', 'present')");
@@ -53,7 +53,7 @@ describe('SqliteAdapter migrations', () => {
 
     expect(() => adapter.initialize()).not.toThrow();
     expect(adapter.queryOne<{ user_version: number }>('PRAGMA user_version')?.user_version).toBe(
-      1,
+      2,
     );
     expect(
       adapter.queryOne<{ value: string }>(
