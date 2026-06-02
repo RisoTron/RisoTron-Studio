@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.0](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.8.0...risotron-studio-v1.9.0) (2026-06-02)
+
+
+### Features
+
+* **dashboard:** search and filter projects (US 31) ([#99](https://github.com/RisoTron/RisoTron-Studio/issues/99)) ([05c5de4](https://github.com/RisoTron/RisoTron-Studio/commit/05c5de4e8bced993fd5704fcb10e6cff7ed5220d))
+
 ## [1.8.0](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.7.0...risotron-studio-v1.8.0) (2026-06-02)
 
 
