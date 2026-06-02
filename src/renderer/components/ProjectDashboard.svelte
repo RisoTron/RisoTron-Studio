@@ -32,8 +32,10 @@
   const filteredProjects = $derived.by(() => {
     const q = searchQuery.trim().toLowerCase();
     return projects.filter((p) => {
-      // Text search
-      if (q && !p.name.toLowerCase().includes(q) && !p.path.toLowerCase().includes(q)) {
+      // Text search (null-safe: p.name / p.path may be null in SQLite)
+      const name = (p.name || '').toLowerCase();
+      const path = (p.path || '').toLowerCase();
+      if (q && !name.includes(q) && !path.includes(q)) {
         return false;
       }
       // Status filter
@@ -485,6 +487,11 @@
     transition: border-color 0.15s, box-shadow 0.15s;
   }
 
+  .filter-select option {
+    background-color: var(--bg, #fff);
+    color: var(--fg, #1d1d1f);
+  }
+
   .filter-select:focus {
     border-color: var(--accent, #0071e3);
     box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.12);
@@ -654,7 +661,12 @@
     .search-input,
     .filter-select {
       --border: rgba(255, 255, 255, 0.12);
-      --input-bg: rgba(255, 255, 255, 0.06);
+      --input-bg: rgba(255, 255, 255, 0.08);
+    }
+
+    .filter-select option {
+      background-color: var(--bg, #2c2c2e);
+      color: var(--fg, #f5f5f7);
     }
 
     .filter-select {
