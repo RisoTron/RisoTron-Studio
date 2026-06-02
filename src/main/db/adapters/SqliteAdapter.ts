@@ -41,12 +41,14 @@ export class SqliteAdapter implements DatabasePort {
   }
 
   private runMigrations(): void {
+    if (!this.db) return;
+    const db = this.db;
     // EXCLUSIVE lock: blocks all other writers and readers for the duration of this migration.
     // We lock before reading the version to prevent race conditions.
-    this.db!.exec('BEGIN EXCLUSIVE');
+    db.exec('BEGIN EXCLUSIVE');
     
     try {
-      const stmt = this.db!.prepare('PRAGMA user_version');
+      const stmt = db.prepare('PRAGMA user_version');
       const { user_version: currentVersion } = stmt.get() as { user_version: number };
       
       const pendingMigrations = migrations
@@ -57,16 +59,16 @@ export class SqliteAdapter implements DatabasePort {
         console.group('Running DB Migrations');
         for (const migration of pendingMigrations) {
           console.group(`Migration v${migration.version}: ${migration.name}`);
-          this.db!.exec(migration.sql);
-          this.db!.exec(`PRAGMA user_version = ${migration.version}`);
+          db.exec(migration.sql);
+          db.exec(`PRAGMA user_version = ${migration.version}`);
           console.groupEnd();
         }
         console.groupEnd();
       }
-      this.db!.exec('COMMIT');
+      db.exec('COMMIT');
     } catch (err) {
       try {
-        this.db!.exec('ROLLBACK');
+        db.exec('ROLLBACK');
       } catch (rollbackErr) {
         console.error('Failed to rollback transaction:', rollbackErr);
       }
@@ -76,9 +78,9 @@ export class SqliteAdapter implements DatabasePort {
   }
 
   execute(sql: string, params: unknown[] = []): { lastInsertRowid: number; changes: number } {
-    this.ensureInitialized();
-    const stmt = this.db!.prepare(sql);
-    const result = stmt.run(...(params as any[]));
+    const db = this.ensureInitialized();
+    const stmt = db.prepare(sql);
+    const result = stmt.run(...(params as Array<string | number | bigint | Uint8Array | null>));
     return {
       lastInsertRowid: Number(result.lastInsertRowid),
       changes: Number(result.changes),
@@ -86,15 +88,15 @@ export class SqliteAdapter implements DatabasePort {
   }
 
   queryAll<T>(sql: string, params: unknown[] = []): T[] {
-    this.ensureInitialized();
-    const stmt = this.db!.prepare(sql);
-    return stmt.all(...(params as any[])) as T[];
+    const db = this.ensureInitialized();
+    const stmt = db.prepare(sql);
+    return stmt.all(...(params as Array<string | number | bigint | Uint8Array | null>)) as T[];
   }
 
   queryOne<T>(sql: string, params: unknown[] = []): T | undefined {
-    this.ensureInitialized();
-    const stmt = this.db!.prepare(sql);
-    const row = stmt.get(...(params as any[]));
+    const db = this.ensureInitialized();
+    const stmt = db.prepare(sql);
+    const row = stmt.get(...(params as Array<string | number | bigint | Uint8Array | null>));
     return row as T | undefined;
   }
 
@@ -106,11 +108,12 @@ export class SqliteAdapter implements DatabasePort {
     }
   }
 
-  private ensureInitialized(): void {
+  private ensureInitialized(): DatabaseSync {
     if (!this.isInitialized || !this.db) {
       throw new Error(
         'Database is not initialized. Call initialize() before performing queries.',
       );
     }
+    return this.db;
   }
 }
