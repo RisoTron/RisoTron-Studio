@@ -55,6 +55,8 @@ test.describe('Create Project Wizard', () => {
 
       await expect(page.getByRole('heading', { name: 'Create New Project' })).toHaveCount(0);
       await expect(page.getByText(projectName)).toBeVisible();
+      expect(fs.existsSync(projectPath)).toBe(true);
+      expect(fs.existsSync(path.join(projectPath, 'risotron.json'))).toBe(true);
     } finally {
       await app.close();
       fs.rmSync(userDataDir, { recursive: true, force: true });

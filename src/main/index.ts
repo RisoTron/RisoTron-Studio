@@ -1,5 +1,6 @@
 import { app, BrowserWindow, nativeTheme, ipcMain, Menu, dialog } from 'electron';
 import { buildMenu } from './menu';
+import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -194,6 +195,11 @@ if (!gotTheLock) {
           template_id: p.template_id as string | undefined,
           providers: p.providers as string[] | undefined,
         };
+        fs.mkdirSync(trimmedPath, { recursive: true });
+        fs.writeFileSync(
+          path.join(trimmedPath, 'risotron.json'),
+          JSON.stringify(createPayload, null, 2),
+        );
         const project = projectRepo.create(createPayload);
         return { success: true, data: project };
       } catch (err: unknown) {
