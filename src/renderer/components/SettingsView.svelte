@@ -177,12 +177,18 @@
             </p>
           </div>
           <div class="setting-control">
-            <input
+            <select
               id="setting-preferredIDE"
-              type="text"
               bind:value={preferredIDE}
-              on:input={() => handleChange('preferredIDE', preferredIDE)}
-            />
+              on:change={() => handleChange('preferredIDE', preferredIDE)}
+            >
+              <option value="code">Visual Studio Code (code)</option>
+              <option value="cursor">Cursor (cursor)</option>
+              <option value="open -a &quot;Antigravity IDE&quot;">Antigravity IDE</option>
+              <option value="webstorm">WebStorm (webstorm)</option>
+              <option value="idea">IntelliJ IDEA (idea)</option>
+              <option value="subl">Sublime Text (subl)</option>
+            </select>
             <span class="save-indicator {saveStatus.preferredIDE}">
               {#if saveStatus.preferredIDE === 'saving'}
                 Saving…
@@ -315,7 +321,8 @@
     align-items: center;
   }
 
-  .setting-control input {
+  .setting-control input,
+  .setting-control select {
     width: 300px;
     padding: 4px 6px;
     background: var(--vscode-input-bg);
@@ -328,11 +335,13 @@
     transition: border-color 0.15s;
   }
 
-  .setting-control input:focus {
+  .setting-control input:focus,
+  .setting-control select:focus {
     border-color: var(--vscode-input-focus-border);
   }
 
-  .setting-control input:hover:not(:focus) {
+  .setting-control input:hover:not(:focus),
+  .setting-control select:hover:not(:focus) {
     border-color: var(--vscode-fg-muted);
   }
 
