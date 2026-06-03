@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/no-unresolved
 import { describe, expect, it, vi } from 'vitest';
 import { PipelineEngine } from './PipelineEngine';
-import type { IProvider, PipelineContext } from '../../../shared/types/pipeline';
+import type { IProvider, PipelineContext, ProgressCallback } from '../../../shared/types/pipeline';
 
 const makeProvider = (id: string, execute = vi.fn(), name: string | null = id) =>
   ({
@@ -67,7 +67,7 @@ describe('PipelineEngine', () => {
     await (
       engine.run as (
         context: PipelineContext,
-        onProgress: typeof onProgress,
+        onProgress: ProgressCallback,
       ) => Promise<void>
     )(config, onProgress);
 
