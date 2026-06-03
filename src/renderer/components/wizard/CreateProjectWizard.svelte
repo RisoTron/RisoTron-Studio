@@ -1,10 +1,12 @@
 <script lang="ts">
+  import { onDestroy } from 'svelte';
   import { wizardStore } from '../../store/wizardStore.svelte';
   import Step1Info from './steps/Step1Info.svelte';
   import Step2Template from './steps/Step2Template.svelte';
   import Step3Release from './steps/Step3Release.svelte';
   import Step4CICD from './steps/Step4CICD.svelte';
   import Step5Review from './steps/Step5Review.svelte';
+  import type { PipelineProgress } from '../../../shared/types/pipeline';
 
   interface Props {
     onClose: () => void;
@@ -13,6 +15,12 @@
 
   let isSubmitting = $state(false);
   let errorMsg = $state<string | null>(null);
+  let scaffoldProgress = $state<PipelineProgress | null>(null);
+  let scaffoldPct = $derived(scaffoldProgress && scaffoldProgress.totalStages > 0
+    ? Math.round((scaffoldProgress.stageIndex / scaffoldProgress.totalStages) * 100)
+    : 0);
+
+  let cleanupProgress: (() => void) | undefined;
 
   const stepLabels = [
     'Project Info',
@@ -38,7 +46,14 @@
       if (isSubmitting) return;
       isSubmitting = true;
       errorMsg = null;
+      scaffoldProgress = null;
       try {
+        // Subscribe to progress before kicking off the create call.
+        if (cleanupProgress) cleanupProgress();
+        cleanupProgress = window.api.project.onScaffoldProgress((progress: PipelineProgress) => {
+          scaffoldProgress = progress;
+        });
+
         const payload = wizardStore.submit();
         const ipcPayload = {
           name: payload.name,
@@ -52,6 +67,7 @@
           errorMsg = res.error || 'Failed to create project.';
           return;
         }
+        await new Promise(r => setTimeout(r, 600));
         wizardStore.reset();
         onClose();
       } catch (err) {
@@ -59,6 +75,10 @@
         errorMsg = err instanceof Error ? err.message : String(err);
       } finally {
         isSubmitting = false;
+        if (cleanupProgress) {
+          cleanupProgress();
+          cleanupProgress = undefined;
+        }
       }
     } else {
       wizardStore.currentStep++;
@@ -76,6 +96,13 @@
       wizardStore.currentStep = step;
     }
   }
+
+  onDestroy(() => {
+    if (cleanupProgress) {
+      cleanupProgress();
+      cleanupProgress = undefined;
+    }
+  });
 </script>
 
 <div class="wizard-shell">
@@ -124,7 +151,34 @@
 
   <!-- ── Step Content ── -->
   <div class="wizard-content">
-    {#if wizardStore.currentStep === 1}
+    {#if isSubmitting && scaffoldProgress}
+      <div class="scaffold-progress">
+        <div class="scaffold-progress-icon">
+          {#if scaffoldProgress.currentStageName === 'Done'}
+            <i class="codicon codicon-check"></i>
+          {:else}
+            <i class="codicon codicon-loading codicon-modifier-spin"></i>
+          {/if}
+        </div>
+        <p class="scaffold-progress-stage">{scaffoldProgress.currentStageName}</p>
+        <div class="scaffold-progress-bar-track">
+          <div
+            class="scaffold-progress-bar-fill"
+            style="width: {scaffoldPct}%"
+          ></div>
+        </div>
+        <p class="scaffold-progress-pct">
+          {scaffoldPct}%
+        </p>
+      </div>
+    {:else if isSubmitting}
+      <div class="scaffold-progress">
+        <div class="scaffold-progress-icon">
+          <i class="codicon codicon-loading codicon-modifier-spin"></i>
+        </div>
+        <p class="scaffold-progress-stage">Preparing...</p>
+      </div>
+    {:else if wizardStore.currentStep === 1}
       <Step1Info />
     {:else if wizardStore.currentStep === 2}
       <Step2Template />
@@ -431,5 +485,56 @@
   .btn-ghost:hover {
     color: #ef4444;
     background: #fef2f2;
+  }
+
+  /* ── Scaffold Progress ── */
+  .scaffold-progress {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    flex: 1;
+    padding: 48px 0;
+  }
+
+  .scaffold-progress-icon {
+    font-size: 32px;
+    color: #3b82f6;
+  }
+
+  .scaffold-progress-icon :global(.codicon-check) {
+    color: #10b981;
+  }
+
+  .scaffold-progress-stage {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+
+  .scaffold-progress-bar-track {
+    width: 320px;
+    max-width: 100%;
+    height: 6px;
+    background: #e2e8f0;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .scaffold-progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #6366f1);
+    border-radius: 3px;
+    transition: width 0.35s ease;
+  }
+
+  .scaffold-progress-pct {
+    font-size: 13px;
+    font-weight: 500;
+    color: #64748b;
+    margin: 0;
   }
 </style>

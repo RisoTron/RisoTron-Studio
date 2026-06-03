@@ -12,7 +12,13 @@ import { ConfigService } from './services/ConfigService';
 import { ProjectRepository } from './services/ProjectRepository';
 import { VALID_SETTING_KEYS } from '../shared/types/settings';
 import type { AppSettings } from '../shared/types/settings';
-import type { CreateProjectPayload, UpdateProjectPayload } from '../shared/types/project';
+import type { CreateProjectPayload, UpdateProjectPayload, Project } from '../shared/types/project';
+import type { PipelineContext } from '../shared/types/pipeline';
+import { PipelineEngine } from './services/pipeline/PipelineEngine';
+import { BaseProjectProvider } from './services/pipeline/providers/BaseProjectProvider';
+import { TemplateProvider } from './services/pipeline/providers/TemplateProvider';
+import { ReleaseProvider } from './services/pipeline/providers/ReleaseProvider';
+import { CICDProvider } from './services/pipeline/providers/CICDProvider';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -164,7 +170,7 @@ if (!gotTheLock) {
     // ── Project IPC ──────────────────────────────────────────────
     const projectRepo = new ProjectRepository(db);
 
-    ipcMain.handle('app:create-project', (event, payload: unknown) => {
+    ipcMain.handle('app:create-project', async (event, payload: unknown) => {
       validateSender(event);
       try {
         if (!payload || typeof payload !== 'object') {
@@ -196,12 +202,26 @@ if (!gotTheLock) {
           template_id: p.template_id as string | undefined,
           providers: p.providers as string[] | undefined,
         };
-        fs.mkdirSync(trimmedPath, { recursive: true });
-        fs.writeFileSync(
-          path.join(trimmedPath, 'risotron.json'),
-          JSON.stringify(createPayload, null, 2),
-        );
-        const project = projectRepo.create(createPayload);
+
+        // ── Build pipeline ──
+        const engine = new PipelineEngine();
+        engine.registerProvider(new BaseProjectProvider());
+        engine.registerProvider(new TemplateProvider());
+        engine.registerProvider(new ReleaseProvider());
+        engine.registerProvider(new CICDProvider());
+
+        const context: PipelineContext = {
+          createPayload,
+          projectRepo,
+        };
+
+        await engine.run(context, (progress) => {
+          if (!event.sender.isDestroyed()) {
+            event.sender.send('app:scaffold-progress', progress);
+          }
+        });
+
+        const project = context['project'] as Project | undefined;
         return { success: true, data: project };
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : String(err);

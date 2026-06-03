@@ -4,6 +4,8 @@ import type { PipelineContext, IProvider } from '../../../../shared/types/pipeli
  * Stub provider for the CI/CD integration stage of the pipeline.
  */
 export class CICDProvider implements IProvider {
+  readonly name = 'CI/CD Integration';
+
   async execute(_context: PipelineContext): Promise<void> {
     console.log('[CICDProvider] Executing CI/CD stage');
   }

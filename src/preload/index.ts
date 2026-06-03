@@ -31,6 +31,12 @@ contextBridge.exposeInMainWorld('api', {
     get: (id: string) => ipcRenderer.invoke('app:get-project', id),
     update: (id: string, payload: Record<string, unknown>) => ipcRenderer.invoke('app:update-project', id, payload),
     delete: (id: string) => ipcRenderer.invoke('app:delete-project', id),
+    onScaffoldProgress: (callback: (progress: { stageIndex: number; totalStages: number; currentStageName: string }) => void) => {
+      if (typeof callback !== 'function') return () => { /* noop */ };
+      const handler = (_event: Electron.IpcRendererEvent, progress: { stageIndex: number; totalStages: number; currentStageName: string }) => callback(progress);
+      ipcRenderer.on('app:scaffold-progress', handler);
+      return () => ipcRenderer.removeListener('app:scaffold-progress', handler);
+    },
   },
   os: {
     showItemInFolder: (path: string) => ipcRenderer.invoke('os:show-item-in-folder', path),
