@@ -5,7 +5,7 @@ project:
   wiki: https://github.com/RisoTron/RisoTron-Studio.wiki.git
   wiki_path: wiki
   initialized_at: '2026-05-18'
-current_work: 37
+current_work: null
 github_project:
   number: 1
   owner: RisoTron
@@ -30,7 +30,7 @@ backlog:
   title: '[US] Scaffold from Electron Forge with auto-update'
   epic: project-scaffold
   feature: template-provider
-  status: in_progress
+  status: done
 - issue: 39
   type: us
   title: '[US] Configure GitHub Releases as update server'
@@ -187,6 +187,14 @@ epics:
     issue: 51
     status: planned
 completed:
+- issue: 37
+  type: us
+  title: '[US] Scaffold from Electron Forge with auto-update'
+  epic: project-scaffold
+  feature: template-provider
+  status: done
+  merged_pr: 113
+  completed_at: '2026-06-03'
 - issue: 35
   type: us
   title: '[US] Pipeline executes 3 stages sequentially'
