@@ -5,7 +5,13 @@ project:
   wiki: https://github.com/RisoTron/RisoTron-Studio.wiki.git
   wiki_path: wiki
   initialized_at: '2026-05-18'
-current_work: null
+current_work:
+  issue: null
+  type: hotfix
+  title: 'fix(devops): Electron renderer ERR_FILE_NOT_FOUND + e2e scaffold timeouts'
+  branch: fix/devops/electron-renderer-load-url-and-e2e-timeouts
+  pr: 126
+  status: review
 github_project:
   number: 1
   owner: RisoTron
