@@ -28,6 +28,11 @@ export class PipelineEngine {
     for (let i = 0; i < total; i++) {
       const provider = this.providers[i];
 
+      // Inject progress context so providers can emit sub-step callbacks
+      context['onProgress'] = onProgress;
+      context['currentStageIndex'] = i;
+      context['totalStages'] = total;
+
       if (onProgress) {
         onProgress({
           stageIndex: i,
