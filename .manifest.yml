@@ -5,7 +5,7 @@ project:
   wiki: https://github.com/RisoTron/RisoTron-Studio.wiki.git
   wiki_path: wiki
   initialized_at: '2026-05-18'
-current_work: 36
+current_work: 37
 github_project:
   number: 1
   owner: RisoTron
@@ -30,7 +30,7 @@ backlog:
   title: '[US] Scaffold from Electron Forge with auto-update'
   epic: project-scaffold
   feature: template-provider
-  status: backlog
+  status: in_progress
 - issue: 39
   type: us
   title: '[US] Configure GitHub Releases as update server'
