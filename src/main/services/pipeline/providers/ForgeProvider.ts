@@ -26,11 +26,14 @@ const ELECTRON_UPDATER_VERSION = '^6';
 const NPM_CMD = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 
 /**
- * TemplateProvider — Stage 1 of the scaffolding pipeline.
+ * ForgeProvider — Scaffold stage for Electron Forge-based templates.
  *
  * Initialises a new Electron Forge project (webpack template) in the
  * directory created by BaseProjectProvider, patches package.json to add
  * electron-updater, then runs npm install with a configurable timeout.
+ *
+ * Handles template IDs: 'electron-vanilla', 'electron-svelte', 'electron-react'
+ * (currently all use the webpack template; Svelte/React injection is future work).
  *
  * Note: api.init() with the webpack template runs its own npm install
  * internally. A second install is required after patching package.json
@@ -42,8 +45,8 @@ const NPM_CMD = process.platform === 'win32' ? 'npm.cmd' : 'npm';
  *   - `onProgress`                 — optional ProgressCallback for sub-step messages (injected by PipelineEngine)
  *   - `npmInstallTimeoutMs`        — optional timeout override (for tests)
  */
-export class TemplateProvider implements IProvider {
-  readonly name = 'Template Generation';
+export class ForgeProvider implements IProvider {
+  readonly name = 'Forge Scaffolding';
 
   async execute(context: PipelineContext): Promise<void> {
     const payload = context['createPayload'] as { path: string; name: string };
@@ -51,7 +54,7 @@ export class TemplateProvider implements IProvider {
     const timeoutMs = (context['npmInstallTimeoutMs'] as number | undefined) ?? DEFAULT_NPM_TIMEOUT_MS;
 
     if (!payload?.path || !payload?.name) {
-      throw new Error('[TemplateProvider] Missing createPayload.path or createPayload.name in context');
+      throw new Error('[ForgeProvider] Missing createPayload.path or createPayload.name in context');
     }
 
     const projectPath = payload.path;
@@ -148,7 +151,7 @@ export class TemplateProvider implements IProvider {
           const detail = stderrText ? `\nstderr:\n${stderrText}` : '';
           settle(() =>
             reject(
-              new Error(`[TemplateProvider] npm install exited with code ${code ?? 'null'}${detail}`),
+              new Error(`[ForgeProvider] npm install exited with code ${code ?? 'null'}${detail}`),
             ),
           );
         }

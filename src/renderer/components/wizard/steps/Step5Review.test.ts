@@ -7,11 +7,13 @@ import { wizardStore } from '../../../store/wizardStore.svelte';
 function getRowValue(label: string): string {
   const row = screen.getByText(label).closest('div');
   expect(row).not.toBeNull();
+  if (!row) throw new Error(`Row for label "${label}" not found`);
 
-  const value = row!.querySelector('dd');
+  const value = row.querySelector('dd');
   expect(value).not.toBeNull();
+  if (!value) throw new Error(`dd element for label "${label}" not found`);
 
-  return value!.textContent ?? '';
+  return value.textContent ?? '';
 }
 
 describe('Step5Review', () => {
@@ -24,7 +26,7 @@ describe('Step5Review', () => {
     wizardStore.project.path = '/workspace/poster-lab';
     wizardStore.project.author = 'Studio Ops';
     wizardStore.project.description = 'A riso poster production workspace';
-    wizardStore.project.template = 'creative-suite';
+    wizardStore.project.template = 'electron-react';
     wizardStore.project.releaseProvider = 'github';
     wizardStore.project.github.owner = 'risotron';
     wizardStore.project.github.repository = 'poster-lab';
@@ -45,7 +47,7 @@ describe('Step5Review', () => {
     expect(screen.getByText('/workspace/poster-lab')).toBeTruthy();
     expect(screen.getByText('Studio Ops')).toBeTruthy();
     expect(screen.getByText('A riso poster production workspace')).toBeTruthy();
-    expect(screen.getByText('Creative Suite')).toBeTruthy();
+    expect(screen.getByText('Electron + React')).toBeTruthy();
     expect(screen.getByText('GitHub Releases')).toBeTruthy();
     expect(getRowValue('Repository')).toBe('risotron/poster-lab');
     expect(getRowValue('Token')).toBe('POSTER_LAB_GITHUB_TOKEN');
@@ -60,13 +62,13 @@ describe('Step5Review', () => {
   });
 
   it('derives labels for template, release provider, and selected platforms', () => {
-    wizardStore.project.template = 'svelte-electron';
+    wizardStore.project.template = 'electron-svelte';
     wizardStore.project.releaseProvider = 'none';
     wizardStore.project.targetPlatforms = ['windows', 'linux'];
 
     render(Step5Review);
 
-    expect(screen.getByText('Svelte + Electron')).toBeTruthy();
+    expect(screen.getByText('Electron + Svelte')).toBeTruthy();
     expect(screen.getByText('None')).toBeTruthy();
     expect(screen.getByText('Windows, Linux')).toBeTruthy();
   });

@@ -1,6 +1,5 @@
 import { app, BrowserWindow, nativeTheme, ipcMain, Menu, dialog, shell } from 'electron';
 import { buildMenu } from './menu';
-import fs from 'node:fs';
 import path from 'node:path';
 import { exec } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -13,10 +12,10 @@ import { ProjectRepository } from './services/ProjectRepository';
 import { VALID_SETTING_KEYS } from '../shared/types/settings';
 import type { AppSettings } from '../shared/types/settings';
 import type { CreateProjectPayload, UpdateProjectPayload, Project } from '../shared/types/project';
-import type { PipelineContext } from '../shared/types/pipeline';
+import type { PipelineContext, IProvider } from '../shared/types/pipeline';
 import { PipelineEngine } from './services/pipeline/PipelineEngine';
 import { BaseProjectProvider } from './services/pipeline/providers/BaseProjectProvider';
-import { TemplateProvider } from './services/pipeline/providers/TemplateProvider';
+import { ForgeProvider } from './services/pipeline/providers/ForgeProvider';
 import { ReleaseProvider } from './services/pipeline/providers/ReleaseProvider';
 import { CICDProvider } from './services/pipeline/providers/CICDProvider';
 
@@ -24,6 +23,23 @@ import { CICDProvider } from './services/pipeline/providers/CICDProvider';
 if (started) {
   app.quit();
 }
+
+/**
+ * Select the appropriate scaffold provider based on the project template_id.
+ * Defaults to ForgeProvider for all Electron Forge-based templates.
+ * New providers (e.g. RisotronProvider) will be added here as they are implemented.
+ */
+function buildScaffoldProvider(templateId: string | undefined): IProvider {
+  switch (templateId) {
+    // Future: case 'risotron': return new RisotronProvider();
+    case 'electron-svelte':
+    case 'electron-react':
+    case 'electron-vanilla':
+    default:
+      return new ForgeProvider();
+  }
+}
+
 
 // Single-instance lock — only one Studio window at a time.
 const gotTheLock = app.requestSingleInstanceLock();
@@ -206,7 +222,7 @@ if (!gotTheLock) {
         // ── Build pipeline ──
         const engine = new PipelineEngine();
         engine.registerProvider(new BaseProjectProvider());
-        engine.registerProvider(new TemplateProvider());
+        engine.registerProvider(buildScaffoldProvider(createPayload.template_id));
         engine.registerProvider(new ReleaseProvider());
         engine.registerProvider(new CICDProvider());
 
@@ -321,8 +337,8 @@ if (!gotTheLock) {
         }
         shell.showItemInFolder(itemPath);
         return { success: true };
-      } catch (e: any) {
-        return { success: false, error: e.message };
+      } catch (e: unknown) {
+        return { success: false, error: e instanceof Error ? e.message : String(e) };
       }
     });
 
@@ -342,8 +358,8 @@ if (!gotTheLock) {
             }
           });
         });
-      } catch (e: any) {
-        return { success: false, error: e.message };
+      } catch (e: unknown) {
+        return { success: false, error: e instanceof Error ? e.message : String(e) };
       }
     });
 

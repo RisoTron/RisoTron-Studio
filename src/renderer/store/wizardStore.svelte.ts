@@ -10,7 +10,7 @@ export const defaultProjectWizardState: ProjectWizardState = {
   path: '',
   description: '',
   author: '',
-  template: 'blank',
+  template: 'electron-vanilla',
   releaseProvider: 'none',
   github: {
     owner: '',

@@ -3,7 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as os from 'node:os';
-import type { PipelineContext } from '../../../../shared/types/pipeline';
 
 // ---------------------------------------------------------------------------
 // Module-level mocks — hoisted before any imports of the subject module
@@ -25,7 +24,7 @@ vi.mock('node:child_process', async (importOriginal) => {
 // Import after mocks
 import { api as forgeApi } from '@electron-forge/core';
 import { spawn } from 'node:child_process';
-import { TemplateProvider } from './TemplateProvider';
+import { ForgeProvider } from './ForgeProvider';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -89,7 +88,7 @@ function seedPackageJson(dir: string, name = 'test-project'): void {
 // Test suites
 // ---------------------------------------------------------------------------
 
-describe('TemplateProvider', () => {
+describe('ForgeProvider', () => {
   let tmpDir: string;
 
   beforeEach(() => {
@@ -116,7 +115,7 @@ describe('TemplateProvider', () => {
   describe('SC1: forge init is invoked with correct args', () => {
     it('calls api.init() with webpack template and target dir', async () => {
       useSpawnOk();
-      await new TemplateProvider().execute({
+      await new ForgeProvider().execute({
         createPayload: { path: tmpDir, name: 'test-project' },
       });
       expect(forgeApi.init).toHaveBeenCalledOnce();
@@ -132,7 +131,7 @@ describe('TemplateProvider', () => {
   describe('SC2: electron-updater is added to package.json dependencies', () => {
     it('patches package.json with electron-updater after forge init', async () => {
       useSpawnOk();
-      await new TemplateProvider().execute({
+      await new ForgeProvider().execute({
         createPayload: { path: tmpDir, name: 'test-project' },
       });
       const pkg = JSON.parse(fs.readFileSync(path.join(tmpDir, 'package.json'), 'utf-8'));
@@ -150,7 +149,7 @@ describe('TemplateProvider', () => {
         ),
       );
       useSpawnOk();
-      await new TemplateProvider().execute({
+      await new ForgeProvider().execute({
         createPayload: { path: tmpDir, name: 'test-project' },
       });
       const pkg = JSON.parse(fs.readFileSync(path.join(tmpDir, 'package.json'), 'utf-8'));
@@ -163,10 +162,10 @@ describe('TemplateProvider', () => {
   // risotron.json preservation
   // -------------------------------------------------------------------------
   describe('risotron.json preservation', () => {
-    it('TemplateProvider code does not delete risotron.json (unit scope — real forge is mocked)', async () => {
+    it('ForgeProvider does not delete risotron.json (unit scope — real forge is mocked)', async () => {
       const original = fs.readFileSync(path.join(tmpDir, 'risotron.json'), 'utf-8');
       useSpawnOk();
-      await new TemplateProvider().execute({
+      await new ForgeProvider().execute({
         createPayload: { path: tmpDir, name: 'test-project' },
       });
       expect(fs.readFileSync(path.join(tmpDir, 'risotron.json'), 'utf-8')).toEqual(original);
@@ -180,7 +179,7 @@ describe('TemplateProvider', () => {
     it('emits "Initializing Electron Forge..." and "Installing dependencies..."', async () => {
       useSpawnOk();
       const onProgress = vi.fn();
-      await new TemplateProvider().execute({
+      await new ForgeProvider().execute({
         createPayload: { path: tmpDir, name: 'test-project' },
         onProgress,
       });
@@ -201,7 +200,7 @@ describe('TemplateProvider', () => {
       vi.mocked(spawn).mockReturnValue(hangChild as unknown as ReturnType<typeof spawn>);
 
       await expect(
-        new TemplateProvider().execute({
+        new ForgeProvider().execute({
           createPayload: { path: tmpDir, name: 'test-project' },
           npmInstallTimeoutMs: 250,
         }),
@@ -217,18 +216,18 @@ describe('TemplateProvider', () => {
   describe('SC4: errors are re-thrown so the pipeline halts', () => {
     it('throws when createPayload is missing path or name', async () => {
       await expect(
-        new TemplateProvider().execute({ createPayload: { path: '', name: 'x' } }),
-      ).rejects.toThrow('[TemplateProvider] Missing createPayload.path or createPayload.name in context');
+        new ForgeProvider().execute({ createPayload: { path: '', name: 'x' } }),
+      ).rejects.toThrow('[ForgeProvider] Missing createPayload.path or createPayload.name in context');
 
       await expect(
-        new TemplateProvider().execute({ createPayload: { path: tmpDir, name: '' } }),
-      ).rejects.toThrow('[TemplateProvider] Missing createPayload.path or createPayload.name in context');
+        new ForgeProvider().execute({ createPayload: { path: tmpDir, name: '' } }),
+      ).rejects.toThrow('[ForgeProvider] Missing createPayload.path or createPayload.name in context');
     });
 
     it('re-throws when forge init() fails', async () => {
       vi.mocked(forgeApi.init).mockRejectedValueOnce(new Error('forge init failed'));
       await expect(
-        new TemplateProvider().execute({ createPayload: { path: tmpDir, name: 'test-project' } }),
+        new ForgeProvider().execute({ createPayload: { path: tmpDir, name: 'test-project' } }),
       ).rejects.toThrow('forge init failed');
     });
 
@@ -239,7 +238,7 @@ describe('TemplateProvider', () => {
       setTimeout(() => { for (const cb of failChild._listeners['close'] ?? []) cb(1, null); }, 20);
 
       await expect(
-        new TemplateProvider().execute({
+        new ForgeProvider().execute({
           createPayload: { path: tmpDir, name: 'test-project' },
           npmInstallTimeoutMs: 10_000,
         }),
@@ -257,7 +256,7 @@ describe('TemplateProvider', () => {
       }, 20);
 
       await expect(
-        new TemplateProvider().execute({
+        new ForgeProvider().execute({
           createPayload: { path: tmpDir, name: 'test-project' },
           npmInstallTimeoutMs: 10_000,
         }),
@@ -269,7 +268,7 @@ describe('TemplateProvider', () => {
       vi.mocked(spawn).mockReturnValue(hangChild as unknown as ReturnType<typeof spawn>);
 
       const errors: unknown[] = [];
-      const promise = new TemplateProvider()
+      const promise = new ForgeProvider()
         .execute({
           createPayload: { path: tmpDir, name: 'test-project' },
           npmInstallTimeoutMs: 150,
