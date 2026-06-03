@@ -10,6 +10,15 @@ const FORGE_TEMPLATE = 'webpack';
 /** Default timeout for npm install (milliseconds). */
 const DEFAULT_NPM_TIMEOUT_MS = 120_000;
 
+/** electron-updater version range to inject into scaffolded package.json. */
+const ELECTRON_UPDATER_VERSION = '^6';
+
+/**
+ * On Windows, npm is a batch script (`npm.cmd`) and cannot be resolved
+ * without `shell: true`. Use the platform-specific binary name instead.
+ */
+const NPM_CMD = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+
 /**
  * TemplateProvider — Stage 1 of the scaffolding pipeline.
  *
@@ -58,7 +67,7 @@ export class TemplateProvider implements IProvider {
 
     const deps = (pkg['dependencies'] as Record<string, string> | undefined) ?? {};
     if (!deps['electron-updater']) {
-      deps['electron-updater'] = '^6';
+      deps['electron-updater'] = ELECTRON_UPDATER_VERSION;
       pkg['dependencies'] = deps;
       fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n', 'utf-8');
     }
@@ -90,29 +99,47 @@ export class TemplateProvider implements IProvider {
 
   private runNpmInstall(cwd: string, timeoutMs: number): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      const child = childProcess.spawn('npm', ['install'], {
+      let settled = false;
+      const settle = (fn: () => void) => {
+        if (settled) return;
+        settled = true;
+        fn();
+      };
+
+      const stderrChunks: Buffer[] = [];
+
+      const child = childProcess.spawn(NPM_CMD, ['install'], {
         cwd,
         stdio: 'pipe',
         shell: false,
       });
 
+      // Capture stderr for diagnostics (stdout is discarded — only errors matter)
+      child.stderr?.on('data', (chunk: Buffer) => stderrChunks.push(chunk));
+
       const timer = setTimeout(() => {
         child.kill('SIGTERM');
-        reject(new Error(`TimeoutError: npm install timed out after ${timeoutMs}ms`));
+        settle(() => reject(new Error(`TimeoutError: npm install timed out after ${timeoutMs}ms`)));
       }, timeoutMs);
 
       child.on('close', (code: number | null) => {
         clearTimeout(timer);
         if (code === 0) {
-          resolve();
+          settle(() => resolve());
         } else {
-          reject(new Error(`[TemplateProvider] npm install exited with code ${code ?? 'null'}`));
+          const stderrText = Buffer.concat(stderrChunks).toString('utf-8').trim();
+          const detail = stderrText ? `\nstderr:\n${stderrText}` : '';
+          settle(() =>
+            reject(
+              new Error(`[TemplateProvider] npm install exited with code ${code ?? 'null'}${detail}`),
+            ),
+          );
         }
       });
 
       child.on('error', (err: Error) => {
         clearTimeout(timer);
-        reject(err);
+        settle(() => reject(err));
       });
     });
   }

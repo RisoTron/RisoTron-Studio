@@ -31,16 +31,31 @@ import { TemplateProvider } from './TemplateProvider';
 // Helpers
 // ---------------------------------------------------------------------------
 
+type StderrMock = {
+  _dataListeners: ((chunk: Buffer) => void)[];
+  on(event: string, cb: (chunk: Buffer) => void): void;
+  emit(chunk: Buffer): void;
+};
+
 type MockChild = {
   pid: number;
   _listeners: Record<string, ((...args: unknown[]) => void)[]>;
   on(event: string, cb: (...args: unknown[]) => void): void;
   kill: ReturnType<typeof vi.fn>;
   stdout: { on: ReturnType<typeof vi.fn> };
-  stderr: { on: ReturnType<typeof vi.fn> };
+  stderr: StderrMock;
 };
 
 function makeMockChild(pid: number): MockChild {
+  const stderrMock: StderrMock = {
+    _dataListeners: [],
+    on(event: string, cb: (chunk: Buffer) => void) {
+      if (event === 'data') this._dataListeners.push(cb);
+    },
+    emit(chunk: Buffer) {
+      for (const cb of this._dataListeners) cb(chunk);
+    },
+  };
   return {
     pid,
     _listeners: {},
@@ -50,7 +65,7 @@ function makeMockChild(pid: number): MockChild {
     },
     kill: vi.fn(),
     stdout: { on: vi.fn() },
-    stderr: { on: vi.fn() },
+    stderr: stderrMock,
   };
 }
 
@@ -203,5 +218,46 @@ describe('TemplateProvider', () => {
         }),
       ).rejects.toThrow(/npm install/i);
     });
+
+    it('includes stderr output in the rejection error message', async () => {
+      const failChild = makeMockChild(9996);
+      vi.mocked(spawn).mockReturnValue(failChild as unknown as ReturnType<typeof spawn>);
+
+      setTimeout(() => {
+        // Emit stderr data before close
+        failChild.stderr.emit(Buffer.from('peer dependency missing: react@18'));
+        for (const cb of failChild._listeners['close'] ?? []) cb(1, null);
+      }, 20);
+
+      await expect(
+        new TemplateProvider().execute({
+          createPayload: { path: tmpDir, name: 'test-project' },
+          npmInstallTimeoutMs: 10_000,
+        }),
+      ).rejects.toThrow('peer dependency missing: react@18');
+    });
+
+    it('does not reject twice when timeout fires and then close emits', async () => {
+      const hangChild = makeMockChild(9995);
+      vi.mocked(spawn).mockReturnValue(hangChild as unknown as ReturnType<typeof spawn>);
+
+      const errors: unknown[] = [];
+      const promise = new TemplateProvider()
+        .execute({
+          createPayload: { path: tmpDir, name: 'test-project' },
+          npmInstallTimeoutMs: 150,
+        })
+        .catch((e) => errors.push(e));
+
+      // Wait for timeout to fire
+      await new Promise((r) => setTimeout(r, 250));
+      // Now fire close (simulating OS closing the killed process)
+      for (const cb of hangChild._listeners['close'] ?? []) cb(null, 'SIGTERM');
+      await promise;
+
+      // Only one rejection should have been caught
+      expect(errors).toHaveLength(1);
+      expect((errors[0] as Error).message).toMatch(/timeout/i);
+    }, 8000);
   });
 });
