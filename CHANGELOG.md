@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.15.1](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.15.0...risotron-studio-v1.15.1) (2026-06-03)
+
+
+### Bug Fixes
+
+* **devops:** fix Electron renderer ERR_FILE_NOT_FOUND and e2e scaffold timeouts ([#126](https://github.com/RisoTron/RisoTron-Studio/issues/126)) ([eb91eb5](https://github.com/RisoTron/RisoTron-Studio/commit/eb91eb5930f06a4b172a7dd89d095ba7b48aeac8))
+
 ## [1.15.0](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.14.1...risotron-studio-v1.15.0) (2026-06-03)
 
 
