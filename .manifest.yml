@@ -48,7 +48,7 @@ backlog:
   title: '[US] Progress feedback during scaffolding'
   epic: project-scaffold
   feature: pipeline-engine
-  status: in_progress
+  status: done
 - issue: 38
   type: us
   title: '[US] Scaffold from RisoTron template'
@@ -187,6 +187,14 @@ epics:
     issue: 51
     status: planned
 completed:
+- issue: 36
+  type: us
+  title: '[US] Progress feedback during scaffolding'
+  epic: project-scaffold
+  feature: pipeline-engine
+  status: done
+  merged_pr: 108
+  completed_at: '2026-06-03'
 - issue: 37
   type: us
   title: '[US] Scaffold from Electron Forge with auto-update'
