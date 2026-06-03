@@ -96,19 +96,22 @@ backlog:
   title: '[US] Pre-installed templates available'
   epic: template-registry
   feature: builtin-templates
-  status: backlog
+  status: ready
+  notes: Refactors hard-coded Step2Template.svelte to IPC-driven BuiltinTemplateRegistry. No blocker.
 - issue: 44
   type: us
   title: '[US] Browse community templates'
   epic: template-registry
   feature: community-registry
   status: backlog
+  blocked_by: [43]
 - issue: 45
   type: us
   title: '[US] Install and manage community templates'
   epic: template-registry
   feature: community-registry
   status: backlog
+  blocked_by: [44]
 - issue: 58
   type: us
   title: '[US] Setup GitHub Actions CI/CD workflows sequentially'
