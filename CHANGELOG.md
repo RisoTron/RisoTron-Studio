@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.0](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.13.0...risotron-studio-v1.14.0) (2026-06-03)
+
+
+### Features
+
+* **template-provider:** Electron Forge webpack scaffold + auto-update [US [#37](https://github.com/RisoTron/RisoTron-Studio/issues/37)] ([bfd46f4](https://github.com/RisoTron/RisoTron-Studio/commit/bfd46f49bf51bebd399e54dfb444cb6d9fe31a92))
+
 ## [1.13.0](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.12.0...risotron-studio-v1.13.0) (2026-06-03)
 
 
