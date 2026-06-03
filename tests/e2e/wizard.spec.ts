@@ -55,7 +55,7 @@ test.describe('Create Project Wizard', () => {
 
       await page.getByRole('button', { name: 'Create Project' }).click();
 
-      await expect(page.getByRole('heading', { name: 'Create New Project' })).toHaveCount(0);
+      await expect(page.getByRole('heading', { name: 'Create New Project' })).toHaveCount(0, { timeout: 300_000 });
       await expect(page.getByText(projectName)).toBeVisible();
       expect(fs.existsSync(projectPath)).toBe(true);
       expect(fs.existsSync(path.join(projectPath, 'risotron.json'))).toBe(true);

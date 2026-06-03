@@ -55,13 +55,14 @@ async function createProjectViaWizard(page: Page, name: string, projectPath: str
   await page.getByRole('button', { name: 'Create Project' }).click();
 
   // Wait for wizard to close and project to appear on dashboard
-  await expect(page.getByRole('heading', { name: 'Create New Project' })).toHaveCount(0);
-  await expect(page.getByText(name).first()).toBeVisible();
+  // Scaffold (Electron Forge + npm install) can take several minutes
+  await expect(page.getByRole('heading', { name: 'Create New Project' })).toHaveCount(0, { timeout: 300_000 });
+  await expect(page.getByText(name).first()).toBeVisible({ timeout: 300_000 });
 }
 
 test.describe('Project Dashboard Filters', () => {
   // Two full wizard flows + filter operations can exceed the default 60s timeout
-  test.setTimeout(120_000);
+  test.setTimeout(900_000); // 15 min — two full scaffold flows (Forge + npm install)
 
   test('search and filter projects on the dashboard', async () => {
     const ts = Date.now();

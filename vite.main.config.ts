@@ -32,12 +32,4 @@ export default defineConfig({
       },
     },
   },
-  /**
-   * Inject forge-style constants so e2e standalone builds work without forge.
-   * When running via `electron-forge start/package`, forge VitePlugin overrides these.
-   */
-  define: {
-    MAIN_WINDOW_VITE_DEV_SERVER_URL: JSON.stringify(''),
-    MAIN_WINDOW_VITE_NAME: JSON.stringify('main_window'),
-  },
 });
