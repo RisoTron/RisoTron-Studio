@@ -54,8 +54,8 @@ backlog:
   title: '[US] Pipeline routing by template_id — ForgeProvider rename'
   epic: project-scaffold
   feature: template-provider
-  status: ready
-  notes: Rename TemplateProvider→ForgeProvider, add buildScaffoldProvider() routing, update types + Step2 UI
+  status: done
+  notes: Merged via PR #121 — ForgeProvider rename + buildScaffoldProvider() routing + template ID refactor
 - issue: 38
   type: us
   title: '[US] Scaffold from RisoTron template'
