@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.13.0](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.12.0...risotron-studio-v1.13.0) (2026-06-03)
+
+
+### Features
+
+* implement progress feedback during scaffolding ([#36](https://github.com/RisoTron/RisoTron-Studio/issues/36)) ([be4ebcd](https://github.com/RisoTron/RisoTron-Studio/commit/be4ebcd96da2cc5796e9faa5dc443bc3a330dbaa))
+
 ## [1.12.0](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.11.0...risotron-studio-v1.12.0) (2026-06-02)
 
 
