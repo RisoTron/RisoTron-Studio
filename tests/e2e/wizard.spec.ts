@@ -23,6 +23,8 @@ async function launchApp(): Promise<{ app: ElectronApplication; page: Page; user
 
 test.describe('Create Project Wizard', () => {
   test('creates a project from the wizard happy path', async () => {
+    test.setTimeout(300_000); // 5 min — forge + npm install take time
+
     const projectName = `E2E Wizard Project ${Date.now()}`;
     const projectPath = path.join(os.tmpdir(), `risotron-e2e-project-${Date.now()}`);
     const { app, page, userDataDir } = await launchApp();
