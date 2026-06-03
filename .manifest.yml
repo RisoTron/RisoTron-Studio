@@ -56,28 +56,7 @@ backlog:
   feature: template-provider
   status: done
   notes: Merged via PR #121 — ForgeProvider rename + buildScaffoldProvider() routing + template ID refactor
-- issue: 38
-  type: us
-  title: '[US] Scaffold from RisoTron template'
-  epic: project-scaffold
-  feature: template-provider
-  status: backlog
-  blocked_by: [118]
-  notes: Adds RisotronProvider + pipeline routing by template_id. Partially implementable as stub.
-- issue: 119
-  type: us
-  title: '[US] electron-svelte template — Electron Forge + Svelte renderer'
-  epic: project-scaffold
-  feature: template-provider
-  status: backlog
-  blocked_by: [118]
-- issue: 120
-  type: us
-  title: '[US] electron-react template — Electron Forge + React renderer'
-  epic: project-scaffold
-  feature: template-provider
-  status: backlog
-  blocked_by: [118]
+
 
 - issue: 40
   type: us
@@ -91,27 +70,7 @@ backlog:
   epic: project-scaffold
   feature: cicd-provider
   status: backlog
-- issue: 43
-  type: us
-  title: '[US] Pre-installed templates available'
-  epic: template-registry
-  feature: builtin-templates
-  status: ready
-  notes: Refactors hard-coded Step2Template.svelte to IPC-driven BuiltinTemplateRegistry. No blocker.
-- issue: 44
-  type: us
-  title: '[US] Browse community templates'
-  epic: template-registry
-  feature: community-registry
-  status: backlog
-  blocked_by: [43]
-- issue: 45
-  type: us
-  title: '[US] Install and manage community templates'
-  epic: template-registry
-  feature: community-registry
-  status: backlog
-  blocked_by: [44]
+
 - issue: 58
   type: us
   title: '[US] Setup GitHub Actions CI/CD workflows sequentially'
@@ -179,10 +138,7 @@ epics:
     title: Pipeline Engine
     issue: 15
     status: planned
-  - id: template-provider
-    title: Template Provider
-    issue: 16
-    status: planned
+
   - id: release-provider
     title: Release Provider
     issue: 17
@@ -191,19 +147,7 @@ epics:
     title: CICD Provider
     issue: 18
     status: planned
-- id: template-registry
-  title: Template Registry
-  issue: 5
-  status: planned
-  features:
-  - id: builtin-templates
-    title: Built-in Templates
-    issue: 19
-    status: planned
-  - id: community-registry
-    title: Community Registry
-    issue: 20
-    status: planned
+
 - id: devops
   title: DevOps & Infrastructure
   issue: 50
@@ -331,7 +275,6 @@ labels_created:
   - epic:data-layer
   - epic:dashboard-ui
   - epic:project-scaffold
-  - epic:template-registry
   - epic:devops
   features:
   - feat:app-bootstrap
@@ -344,9 +287,7 @@ labels_created:
   - feat:create-wizard
   - feat:project-detail
   - feat:pipeline-engine
-  - feat:template-provider
+  - feat:forge-provider
   - feat:release-provider
   - feat:cicd-provider
-  - feat:builtin-templates
-  - feat:community-registry
   - feat:cicd-pipeline
