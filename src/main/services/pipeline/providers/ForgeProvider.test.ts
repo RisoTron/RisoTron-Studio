@@ -3,7 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as os from 'node:os';
-import type { PipelineContext } from '../../../../shared/types/pipeline';
 
 // ---------------------------------------------------------------------------
 // Module-level mocks — hoisted before any imports of the subject module

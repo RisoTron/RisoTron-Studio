@@ -1,6 +1,5 @@
 import { app, BrowserWindow, nativeTheme, ipcMain, Menu, dialog, shell } from 'electron';
 import { buildMenu } from './menu';
-import fs from 'node:fs';
 import path from 'node:path';
 import { exec } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -13,11 +12,10 @@ import { ProjectRepository } from './services/ProjectRepository';
 import { VALID_SETTING_KEYS } from '../shared/types/settings';
 import type { AppSettings } from '../shared/types/settings';
 import type { CreateProjectPayload, UpdateProjectPayload, Project } from '../shared/types/project';
-import type { PipelineContext } from '../shared/types/pipeline';
+import type { PipelineContext, IProvider } from '../shared/types/pipeline';
 import { PipelineEngine } from './services/pipeline/PipelineEngine';
 import { BaseProjectProvider } from './services/pipeline/providers/BaseProjectProvider';
 import { ForgeProvider } from './services/pipeline/providers/ForgeProvider';
-import type { IProvider } from '../shared/types/pipeline';
 import { ReleaseProvider } from './services/pipeline/providers/ReleaseProvider';
 import { CICDProvider } from './services/pipeline/providers/CICDProvider';
 
@@ -339,8 +337,8 @@ if (!gotTheLock) {
         }
         shell.showItemInFolder(itemPath);
         return { success: true };
-      } catch (e: any) {
-        return { success: false, error: e.message };
+      } catch (e: unknown) {
+        return { success: false, error: e instanceof Error ? e.message : String(e) };
       }
     });
 
@@ -360,8 +358,8 @@ if (!gotTheLock) {
             }
           });
         });
-      } catch (e: any) {
-        return { success: false, error: e.message };
+      } catch (e: unknown) {
+        return { success: false, error: e instanceof Error ? e.message : String(e) };
       }
     });
 
