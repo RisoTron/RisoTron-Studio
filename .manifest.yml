@@ -49,12 +49,36 @@ backlog:
   epic: project-scaffold
   feature: pipeline-engine
   status: done
+- issue: 118
+  type: us
+  title: '[US] Pipeline routing by template_id — ForgeProvider rename'
+  epic: project-scaffold
+  feature: template-provider
+  status: ready
+  notes: Rename TemplateProvider→ForgeProvider, add buildScaffoldProvider() routing, update types + Step2 UI
 - issue: 38
   type: us
   title: '[US] Scaffold from RisoTron template'
   epic: project-scaffold
   feature: template-provider
   status: backlog
+  blocked_by: [118]
+  notes: Adds RisotronProvider + pipeline routing by template_id. Partially implementable as stub.
+- issue: 119
+  type: us
+  title: '[US] electron-svelte template — Electron Forge + Svelte renderer'
+  epic: project-scaffold
+  feature: template-provider
+  status: backlog
+  blocked_by: [118]
+- issue: 120
+  type: us
+  title: '[US] electron-react template — Electron Forge + React renderer'
+  epic: project-scaffold
+  feature: template-provider
+  status: backlog
+  blocked_by: [118]
+
 - issue: 40
   type: us
   title: '[US] Configure S3/R2 as release server'

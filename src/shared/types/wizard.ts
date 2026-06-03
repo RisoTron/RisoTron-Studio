@@ -1,4 +1,9 @@
-export type ProjectTemplateId = 'blank' | 'svelte-electron' | 'desktop-tool' | 'creative-suite';
+export type ProjectTemplateId =
+  | 'electron-vanilla'   // Plain Electron Forge webpack (default, no UI framework)
+  | 'electron-svelte'    // Electron Forge + Svelte renderer (future — US #119)
+  | 'electron-react'     // Electron Forge + React renderer (future — US #120)
+  | 'risotron';          // RisoTron framework (future — US #38, blocked)
+
 
 export type ReleaseProvider = 'none' | 'github' | 's3';
 

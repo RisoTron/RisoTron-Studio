@@ -16,7 +16,8 @@ import type { CreateProjectPayload, UpdateProjectPayload, Project } from '../sha
 import type { PipelineContext } from '../shared/types/pipeline';
 import { PipelineEngine } from './services/pipeline/PipelineEngine';
 import { BaseProjectProvider } from './services/pipeline/providers/BaseProjectProvider';
-import { TemplateProvider } from './services/pipeline/providers/TemplateProvider';
+import { ForgeProvider } from './services/pipeline/providers/ForgeProvider';
+import type { IProvider } from '../shared/types/pipeline';
 import { ReleaseProvider } from './services/pipeline/providers/ReleaseProvider';
 import { CICDProvider } from './services/pipeline/providers/CICDProvider';
 
@@ -24,6 +25,23 @@ import { CICDProvider } from './services/pipeline/providers/CICDProvider';
 if (started) {
   app.quit();
 }
+
+/**
+ * Select the appropriate scaffold provider based on the project template_id.
+ * Defaults to ForgeProvider for all Electron Forge-based templates.
+ * New providers (e.g. RisotronProvider) will be added here as they are implemented.
+ */
+function buildScaffoldProvider(templateId: string | undefined): IProvider {
+  switch (templateId) {
+    // Future: case 'risotron': return new RisotronProvider();
+    case 'electron-svelte':
+    case 'electron-react':
+    case 'electron-vanilla':
+    default:
+      return new ForgeProvider();
+  }
+}
+
 
 // Single-instance lock — only one Studio window at a time.
 const gotTheLock = app.requestSingleInstanceLock();
@@ -206,7 +224,7 @@ if (!gotTheLock) {
         // ── Build pipeline ──
         const engine = new PipelineEngine();
         engine.registerProvider(new BaseProjectProvider());
-        engine.registerProvider(new TemplateProvider());
+        engine.registerProvider(buildScaffoldProvider(createPayload.template_id));
         engine.registerProvider(new ReleaseProvider());
         engine.registerProvider(new CICDProvider());
 

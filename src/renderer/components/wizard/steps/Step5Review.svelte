@@ -10,10 +10,10 @@
   /** Human-readable label for the selected template, falling back to the raw ID. */
   const templateLabel = $derived(
     (({
-      blank: 'Blank Project',
-      'svelte-electron': 'Svelte + Electron',
-      'desktop-tool': 'Desktop Tool',
-      'creative-suite': 'Creative Suite',
+      'electron-vanilla': 'Electron Vanilla',
+      'electron-svelte': 'Electron + Svelte',
+      'electron-react': 'Electron + React',
+      'risotron': 'RisoTron',
     } as Record<string, string>)[wizardStore.project.template] ?? wizardStore.project.template).trim() ||
       'Unknown template'
   );

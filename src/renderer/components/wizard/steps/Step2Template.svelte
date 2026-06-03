@@ -8,41 +8,47 @@
     icon: string;
     description: string;
     tags: string[];
+    disabled?: boolean;
   }
 
   const templates: TemplateOption[] = [
     {
-      id: 'blank',
-      name: 'Blank Project',
-      icon: 'codicon-file',
-      description: 'A clean workspace with the standard RisoTron project structure.',
-      tags: ['Minimal', 'Flexible'],
-    },
-    {
-      id: 'svelte-electron',
-      name: 'Svelte + Electron',
+      id: 'electron-vanilla',
+      name: 'Electron Vanilla',
       icon: 'codicon-window',
-      description: 'Renderer, preload, and main process scaffolding for desktop apps.',
-      tags: ['Desktop', 'UI'],
+      description: 'Plain Electron Forge (webpack) with no UI framework. Full control, minimal setup.',
+      tags: ['Default', 'Minimal'],
     },
     {
-      id: 'desktop-tool',
-      name: 'Desktop Tool',
-      icon: 'codicon-tools',
-      description: 'Menus, settings, local persistence, and release defaults included.',
-      tags: ['Utility', 'Release-ready'],
-    },
-    {
-      id: 'creative-suite',
-      name: 'Creative Suite',
+      id: 'electron-svelte',
+      name: 'Electron + Svelte',
       icon: 'codicon-symbol-color',
-      description: 'Asset folders, preview panes, and export-oriented project defaults.',
-      tags: ['Creative', 'Assets'],
+      description: 'Electron Forge with Svelte renderer. Reactive UI, fast compilation, small bundle.',
+      tags: ['Svelte', 'Coming Soon'],
+      disabled: true,
+    },
+    {
+      id: 'electron-react',
+      name: 'Electron + React',
+      icon: 'codicon-symbol-namespace',
+      description: 'Electron Forge with React renderer. Familiar ecosystem, broad community support.',
+      tags: ['React', 'Coming Soon'],
+      disabled: true,
+    },
+    {
+      id: 'risotron',
+      name: 'RisoTron',
+      icon: 'codicon-layers',
+      description: 'Scaffold from the RisoTron framework with auto-update pre-configured.',
+      tags: ['RisoTron', 'Coming Soon'],
+      disabled: true,
     },
   ];
 
   $effect(() => {
-    setStepValidity(2, wizardStore.project.template.trim().length > 0);
+    // Step is valid if a non-disabled template is selected
+    const selected = templates.find((t) => t.id === wizardStore.project.template);
+    setStepValidity(2, !!selected && !selected.disabled);
   });
 </script>
 
@@ -59,7 +65,9 @@
         type="button"
         class="template-card"
         class:selected={wizardStore.project.template === template.id}
-        onclick={() => (wizardStore.project.template = template.id)}
+        class:disabled={template.disabled}
+        onclick={() => { if (!template.disabled) wizardStore.project.template = template.id; }}
+        aria-disabled={template.disabled}
       >
         <div class="template-top">
           <span class="template-icon">
@@ -73,7 +81,7 @@
         <p>{template.description}</p>
         <div class="tags">
           {#each template.tags as tag}
-            <span>{tag}</span>
+            <span class:coming-soon={tag === 'Coming Soon'}>{tag}</span>
           {/each}
         </div>
       </button>
@@ -134,19 +142,26 @@
     transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
   }
 
-  .template-card:hover,
-  .template-card:focus-visible {
+  .template-card:not(.disabled):hover,
+  .template-card:not(.disabled):focus-visible {
     border-color: #bfdbfe;
     box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
   }
 
-  .template-card:active {
+  .template-card:not(.disabled):active {
     transform: scale(0.99);
   }
 
-  .template-card.selected {
+  .template-card.selected:not(.disabled) {
     border-color: #6366f1;
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.14);
+  }
+
+  /* Disabled / Coming Soon cards */
+  .template-card.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
   }
 
   .template-top {
@@ -183,7 +198,7 @@
     opacity: 0;
   }
 
-  .selected .check {
+  .selected:not(.disabled) .check {
     opacity: 1;
   }
 
@@ -211,5 +226,10 @@
     color: #475569;
     font-size: 12px;
     font-weight: 600;
+  }
+
+  .tags span.coming-soon {
+    background: #fef9c3;
+    color: #92400e;
   }
 </style>

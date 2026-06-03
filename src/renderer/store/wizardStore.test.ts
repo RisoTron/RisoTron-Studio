@@ -22,7 +22,7 @@ describe('wizardStore', () => {
       path: '',
       description: '',
       author: '',
-      template: 'blank',
+      template: 'electron-vanilla',
       releaseProvider: 'none',
       github: {
         owner: '',
@@ -83,7 +83,7 @@ describe('wizardStore', () => {
     wizardStore.project.path = '/tmp/poster-lab';
     wizardStore.project.description = 'Riso project workspace';
     wizardStore.project.author = 'Studio Ops';
-    wizardStore.project.template = 'svelte-electron';
+    wizardStore.project.template = 'electron-svelte';
     wizardStore.project.releaseProvider = 'github';
     wizardStore.project.github.owner = 'risotron';
     wizardStore.project.github.repository = 'poster-lab';
@@ -107,7 +107,7 @@ describe('wizardStore', () => {
       path: '/tmp/poster-lab',
       description: 'Riso project workspace',
       author: 'Studio Ops',
-      template: 'svelte-electron',
+      template: 'electron-svelte',
       releaseProvider: 'github',
       github: {
         owner: 'risotron',
