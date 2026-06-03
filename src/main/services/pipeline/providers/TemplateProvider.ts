@@ -10,6 +10,12 @@ const FORGE_TEMPLATE = 'webpack';
 /** Default timeout for npm install (milliseconds). */
 const DEFAULT_NPM_TIMEOUT_MS = 120_000;
 
+/**
+ * Grace period after SIGTERM before sending SIGKILL.
+ * npm may have signal handlers that delay shutdown.
+ */
+const SIGKILL_GRACE_MS = 5_000;
+
 /** electron-updater version range to inject into scaffolded package.json. */
 const ELECTRON_UPDATER_VERSION = '^6';
 
@@ -26,10 +32,14 @@ const NPM_CMD = process.platform === 'win32' ? 'npm.cmd' : 'npm';
  * directory created by BaseProjectProvider, patches package.json to add
  * electron-updater, then runs npm install with a configurable timeout.
  *
+ * Note: api.init() with the webpack template runs its own npm install
+ * internally. A second install is required after patching package.json
+ * to add electron-updater (which forge does not know about).
+ *
  * Reads from context:
  *   - `createPayload.path`         — destination directory (created by BaseProjectProvider)
  *   - `createPayload.name`         — project name
- *   - `onProgress`                 — optional ProgressCallback for sub-step messages
+ *   - `onProgress`                 — optional ProgressCallback for sub-step messages (injected by PipelineEngine)
  *   - `npmInstallTimeoutMs`        — optional timeout override (for tests)
  */
 export class TemplateProvider implements IProvider {
@@ -61,6 +71,7 @@ export class TemplateProvider implements IProvider {
 
     // ------------------------------------------------------------------
     // Patch package.json: inject electron-updater into dependencies
+    // (only if not already present — idempotent)
     // ------------------------------------------------------------------
     const pkgPath = path.join(projectPath, 'package.json');
     const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8')) as Record<string, unknown>;
@@ -74,6 +85,7 @@ export class TemplateProvider implements IProvider {
 
     // ------------------------------------------------------------------
     // Sub-step 2: npm install with timeout guard
+    // Second install needed to pick up electron-updater added post-forge-init
     // ------------------------------------------------------------------
     this.emitProgress(onProgress, context, 'Installing dependencies...');
 
@@ -110,15 +122,20 @@ export class TemplateProvider implements IProvider {
 
       const child = childProcess.spawn(NPM_CMD, ['install'], {
         cwd,
-        stdio: 'pipe',
+        // stdout is not needed — only capture stderr for diagnostics.
+        // Using explicit tuple avoids pumping npm's stdout into Node memory.
+        stdio: ['ignore', 'ignore', 'pipe'],
         shell: false,
       });
 
-      // Capture stderr for diagnostics (stdout is discarded — only errors matter)
       child.stderr?.on('data', (chunk: Buffer) => stderrChunks.push(chunk));
 
       const timer = setTimeout(() => {
         child.kill('SIGTERM');
+        // SIGKILL fallback: npm may delay shutdown due to its own signal handlers
+        setTimeout(() => {
+          try { child.kill('SIGKILL'); } catch { /* already dead */ }
+        }, SIGKILL_GRACE_MS);
         settle(() => reject(new Error(`TimeoutError: npm install timed out after ${timeoutMs}ms`)));
       }, timeoutMs);
 

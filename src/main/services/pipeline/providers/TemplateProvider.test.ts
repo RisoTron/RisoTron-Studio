@@ -42,7 +42,6 @@ type MockChild = {
   _listeners: Record<string, ((...args: unknown[]) => void)[]>;
   on(event: string, cb: (...args: unknown[]) => void): void;
   kill: ReturnType<typeof vi.fn>;
-  stdout: { on: ReturnType<typeof vi.fn> };
   stderr: StderrMock;
 };
 
@@ -64,7 +63,6 @@ function makeMockChild(pid: number): MockChild {
       this._listeners[event].push(cb);
     },
     kill: vi.fn(),
-    stdout: { on: vi.fn() },
     stderr: stderrMock,
   };
 }
@@ -140,13 +138,32 @@ describe('TemplateProvider', () => {
       const pkg = JSON.parse(fs.readFileSync(path.join(tmpDir, 'package.json'), 'utf-8'));
       expect(pkg.dependencies).toHaveProperty('electron-updater');
     });
+
+    it('does not overwrite existing electron-updater version in package.json', async () => {
+      // Pre-seed package.json with an existing electron-updater version
+      fs.writeFileSync(
+        path.join(tmpDir, 'package.json'),
+        JSON.stringify(
+          { name: 'test-project', version: '1.0.0', dependencies: { 'electron-updater': '^5' }, devDependencies: {} },
+          null,
+          2,
+        ),
+      );
+      useSpawnOk();
+      await new TemplateProvider().execute({
+        createPayload: { path: tmpDir, name: 'test-project' },
+      });
+      const pkg = JSON.parse(fs.readFileSync(path.join(tmpDir, 'package.json'), 'utf-8'));
+      // Existing '^5' should be preserved — not overwritten with '^6'
+      expect(pkg.dependencies['electron-updater']).toBe('^5');
+    });
   });
 
   // -------------------------------------------------------------------------
   // risotron.json preservation
   // -------------------------------------------------------------------------
   describe('risotron.json preservation', () => {
-    it('does not overwrite risotron.json created by BaseProjectProvider', async () => {
+    it('TemplateProvider code does not delete risotron.json (unit scope — real forge is mocked)', async () => {
       const original = fs.readFileSync(path.join(tmpDir, 'risotron.json'), 'utf-8');
       useSpawnOk();
       await new TemplateProvider().execute({
@@ -198,6 +215,16 @@ describe('TemplateProvider', () => {
   // SC4 — Error propagation (pipeline halts)
   // -------------------------------------------------------------------------
   describe('SC4: errors are re-thrown so the pipeline halts', () => {
+    it('throws when createPayload is missing path or name', async () => {
+      await expect(
+        new TemplateProvider().execute({ createPayload: { path: '', name: 'x' } }),
+      ).rejects.toThrow('[TemplateProvider] Missing createPayload.path or createPayload.name in context');
+
+      await expect(
+        new TemplateProvider().execute({ createPayload: { path: tmpDir, name: '' } }),
+      ).rejects.toThrow('[TemplateProvider] Missing createPayload.path or createPayload.name in context');
+    });
+
     it('re-throws when forge init() fails', async () => {
       vi.mocked(forgeApi.init).mockRejectedValueOnce(new Error('forge init failed'));
       await expect(
