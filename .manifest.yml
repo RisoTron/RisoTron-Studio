@@ -5,7 +5,7 @@ project:
   wiki: https://github.com/RisoTron/RisoTron-Studio.wiki.git
   wiki_path: wiki
   initialized_at: '2026-05-18'
-current_work: null
+current_work: 36
 github_project:
   number: 1
   owner: RisoTron
@@ -48,7 +48,7 @@ backlog:
   title: '[US] Progress feedback during scaffolding'
   epic: project-scaffold
   feature: pipeline-engine
-  status: backlog
+  status: in_progress
 - issue: 38
   type: us
   title: '[US] Scaffold from RisoTron template'
