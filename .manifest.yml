@@ -53,9 +53,17 @@ backlog:
   type: us
   title: '[US] Pipeline routing by template_id — ForgeProvider rename'
   epic: project-scaffold
-  feature: template-provider
+  feature: forge-provider
   status: done
-  notes: Merged via PR #121 — ForgeProvider rename + buildScaffoldProvider() routing + template ID refactor
+  notes: Merged via PR #121 — ForgeProvider rename + buildScaffoldProvider() routing
+- issue: 38
+  type: us
+  title: '[US] Scaffold from RisoTron framework'
+  epic: project-scaffold
+  feature: forge-provider
+  status: backlog
+  blocked_by: [118]
+  notes: Implement RisotronProvider as alternative scaffold pipeline to ForgeProvider. User chooses framework (electron-forge vs risotron) in wizard.
 
 
 - issue: 40
