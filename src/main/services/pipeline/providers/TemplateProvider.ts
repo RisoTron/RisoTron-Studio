@@ -4,6 +4,8 @@ import type { PipelineContext, IProvider } from '../../../../shared/types/pipeli
  * Stub provider for the template-generation stage of the pipeline.
  */
 export class TemplateProvider implements IProvider {
+  readonly name = 'Template Generation';
+
   async execute(_context: PipelineContext): Promise<void> {
     console.log('[TemplateProvider] Executing template stage');
   }

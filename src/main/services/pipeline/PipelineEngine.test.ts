@@ -3,9 +3,10 @@ import { describe, expect, it, vi } from 'vitest';
 import { PipelineEngine } from './PipelineEngine';
 import type { IProvider, PipelineContext } from '../../../shared/types/pipeline';
 
-const makeProvider = (id: string, execute = vi.fn()) =>
+const makeProvider = (id: string, execute = vi.fn(), name: string | null = id) =>
   ({
     id,
+    ...(name === null ? {} : { name }),
     execute,
   }) as unknown as IProvider;
 
@@ -45,6 +46,58 @@ describe('PipelineEngine', () => {
   it('handles empty pipeline without throwing', async () => {
     const engine = new PipelineEngine();
     await expect(engine.run(makeConfig())).resolves.toBeUndefined();
+  });
+
+  it('emits progress before each provider and Done after completion', async () => {
+    const templateExecute = vi.fn().mockResolvedValue(undefined);
+    const releaseExecute = vi.fn().mockResolvedValue(undefined);
+    const cicdExecute = vi.fn().mockResolvedValue(undefined);
+    const onProgress = vi.fn();
+
+    const templateProvider = makeProvider('template', templateExecute, 'Template setup');
+    const releaseProvider = makeProvider('release', releaseExecute, null);
+    const cicdProvider = makeProvider('cicd', cicdExecute, 'CI/CD setup');
+
+    const engine = new PipelineEngine();
+    engine.registerProvider(templateProvider);
+    engine.registerProvider(releaseProvider);
+    engine.registerProvider(cicdProvider);
+
+    const config = makeConfig();
+    await (
+      engine.run as (
+        context: PipelineContext,
+        onProgress: typeof onProgress,
+      ) => Promise<void>
+    )(config, onProgress);
+
+    expect(onProgress).toHaveBeenCalledTimes(4);
+    expect(onProgress).toHaveBeenNthCalledWith(1, {
+      stageIndex: 0,
+      totalStages: 3,
+      currentStageName: 'Template setup',
+    });
+    expect(onProgress).toHaveBeenNthCalledWith(2, {
+      stageIndex: 1,
+      totalStages: 3,
+      currentStageName: 'Processing...',
+    });
+    expect(onProgress).toHaveBeenNthCalledWith(3, {
+      stageIndex: 2,
+      totalStages: 3,
+      currentStageName: 'CI/CD setup',
+    });
+    expect(onProgress).toHaveBeenNthCalledWith(4, {
+      stageIndex: 3,
+      totalStages: 3,
+      currentStageName: 'Done',
+    });
+    expect(onProgress).toHaveBeenCalledBefore(templateExecute);
+    expect(templateExecute).toHaveBeenCalledBefore(releaseExecute);
+    expect(releaseExecute).toHaveBeenCalledBefore(cicdExecute);
+    expect(onProgress.mock.invocationCallOrder[3]).toBeGreaterThan(
+      cicdExecute.mock.invocationCallOrder[0],
+    );
   });
 
   it('fails fast and never executes subsequent providers when a provider throws', async () => {
