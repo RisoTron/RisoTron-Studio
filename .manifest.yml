@@ -85,6 +85,79 @@ backlog:
   epic: devops
   feature: cicd-pipeline
   status: backlog
+- issue: 145
+  type: us
+  title: '[US] Add a credential to the vault'
+  epic: credential-vault
+  feature: credential-crud
+  status: backlog
+- issue: 146
+  type: us
+  title: '[US] View all credentials with masked values'
+  epic: credential-vault
+  feature: credential-crud
+  status: backlog
+- issue: 147
+  type: us
+  title: '[US] Update credential name or rotate value'
+  epic: credential-vault
+  feature: credential-crud
+  status: backlog
+- issue: 148
+  type: us
+  title: '[US] Delete a credential'
+  epic: credential-vault
+  feature: credential-crud
+  status: backlog
+- issue: 149
+  type: us
+  title: '[US] Add a release server'
+  epic: release-server
+  feature: server-config-store
+  status: backlog
+  blocked_by: [145]
+- issue: 150
+  type: us
+  title: '[US] View all release servers'
+  epic: release-server
+  feature: server-config-store
+  status: backlog
+  blocked_by: [145]
+- issue: 151
+  type: us
+  title: '[US] Edit release server config'
+  epic: release-server
+  feature: server-config-store
+  status: backlog
+  blocked_by: [145]
+- issue: 152
+  type: us
+  title: '[US] Delete a release server'
+  epic: release-server
+  feature: server-config-store
+  status: backlog
+  blocked_by: [145]
+- issue: 153
+  type: us
+  title: '[US] Assign release server to project'
+  epic: release-server
+  feature: project-binding
+  status: backlog
+  blocked_by: [149]
+- issue: 154
+  type: us
+  title: '[US] Unassign release server from project'
+  epic: release-server
+  feature: project-binding
+  status: backlog
+  blocked_by: [153]
+- issue: 155
+  type: us
+  title: '[US] View release stats from GitHub'
+  epic: release-server
+  feature: release-status
+  status: backlog
+  blocked_by: [153]
 epics:
 - id: electron-shell
   title: Electron Shell
@@ -164,6 +237,40 @@ epics:
   - id: cicd-pipeline
     title: CI/CD Pipeline
     issue: 51
+    status: planned
+- id: credential-vault
+  title: Credential Vault
+  issue: 137
+  status: planned
+  features:
+  - id: secure-storage
+    title: Secure Storage
+    issue: 139
+    status: planned
+  - id: credential-crud
+    title: Credential CRUD
+    issue: 140
+    status: planned
+- id: release-server
+  title: Release Server Management
+  issue: 138
+  status: planned
+  features:
+  - id: server-config-store
+    title: Server Config Store
+    issue: 141
+    status: planned
+  - id: provider-registry
+    title: Provider Registry
+    issue: 142
+    status: planned
+  - id: project-binding
+    title: Project Binding
+    issue: 143
+    status: planned
+  - id: release-status
+    title: Release Status
+    issue: 144
     status: planned
 completed:
 - issue: null
@@ -284,6 +391,8 @@ labels_created:
   - epic:dashboard-ui
   - epic:project-scaffold
   - epic:devops
+  - epic:credential-vault
+  - epic:release-server
   features:
   - feat:app-bootstrap
   - feat:ipc-bridge
@@ -299,3 +408,9 @@ labels_created:
   - feat:release-provider
   - feat:cicd-provider
   - feat:cicd-pipeline
+  - feat:secure-storage
+  - feat:credential-crud
+  - feat:server-config-store
+  - feat:provider-registry
+  - feat:project-binding
+  - feat:release-status
