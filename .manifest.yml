@@ -11,6 +11,7 @@ current_work:
   branch: feat/credential-vault/add-credential
   started_at: '2026-06-04'
   tasks: [157, 158, 159]
+  pr: 160
 github_project:
   number: 1
   owner: RisoTron
