@@ -1,4 +1,4 @@
-import { app, BrowserWindow, nativeTheme, ipcMain, Menu, dialog, shell } from 'electron';
+import { app, BrowserWindow, nativeTheme, ipcMain, Menu, dialog, shell, safeStorage } from 'electron';
 import { buildMenu } from './menu';
 import path from 'node:path';
 import { exec } from 'node:child_process';
@@ -13,6 +13,7 @@ import { VALID_SETTING_KEYS } from '../shared/types/settings';
 import type { AppSettings } from '../shared/types/settings';
 import type { CreateProjectPayload, UpdateProjectPayload, Project } from '../shared/types/project';
 import type { PipelineContext, IProvider } from '../shared/types/pipeline';
+import type { AddCredentialArgs, AddCredentialResult, CredentialError } from '../shared/types/credential';
 import { PipelineEngine } from './services/pipeline/PipelineEngine';
 import { BaseProjectProvider } from './services/pipeline/providers/BaseProjectProvider';
 import { ForgeProvider } from './services/pipeline/providers/ForgeProvider';
@@ -360,6 +361,54 @@ if (!gotTheLock) {
         });
       } catch (e: unknown) {
         return { success: false, error: e instanceof Error ? e.message : String(e) };
+      }
+    });
+
+    // ── Credential IPC ────────────────────────────────────────────
+    ipcMain.handle('credential:add', async (_event, args: AddCredentialArgs) => {
+      try {
+        if (!safeStorage.isEncryptionAvailable()) {
+          const err: CredentialError = { code: 'ENCRYPTION_UNAVAILABLE', message: 'Encryption is not available on this system.' };
+          return { success: false, error: err };
+        }
+        const name = (args.name ?? '').trim();
+        if (!name) {
+          return { success: false, error: { code: 'VALIDATION_ERROR', field: 'name', message: 'Name is required' } as CredentialError };
+        }
+        if (name.length > 100) {
+          return { success: false, error: { code: 'VALIDATION_ERROR', field: 'name', message: 'Name must be 100 characters or fewer' } as CredentialError };
+        }
+        const payload = args.payload as Record<string, string>;
+        for (const [key, val] of Object.entries(payload)) {
+          if (!(val ?? '').trim()) {
+            return { success: false, error: { code: 'VALIDATION_ERROR', field: key, message: `${key} is required` } as CredentialError };
+          }
+        }
+        const json = JSON.stringify(args.payload);
+        const encryptedBuffer = safeStorage.encryptString(json);
+        let insertId: number;
+        try {
+          const result = db.execute(
+            `INSERT INTO credentials (name, type, encrypted_payload, created_at) VALUES (?, ?, ?, datetime('now', 'utc'))`,
+            [name, args.type, encryptedBuffer]
+          );
+          insertId = result.lastInsertRowid as number;
+        } catch (sqlErr: unknown) {
+          const msg = sqlErr instanceof Error ? sqlErr.message : String(sqlErr);
+          if (msg.includes('UNIQUE constraint failed')) {
+            return { success: false, error: { code: 'DUPLICATE_NAME', field: 'name', message: 'Credential name already exists' } as CredentialError };
+          }
+          throw sqlErr;
+        }
+        let masked = '****';
+        if (args.type === 'aws' && 'accessKeyId' in args.payload) {
+          masked = (args.payload as { accessKeyId: string }).accessKeyId.substring(0, 4) + '****';
+        }
+        const row = db.queryOne<{ created_at: string }>('SELECT created_at FROM credentials WHERE id = ?', [insertId]);
+        const data: AddCredentialResult = { id: insertId, name, type: args.type, masked, created_at: row!.created_at };
+        return { success: true, data };
+      } catch (err: unknown) {
+        return { success: false, error: { code: 'VALIDATION_ERROR', message: err instanceof Error ? err.message : String(err) } as CredentialError };
       }
     });
 

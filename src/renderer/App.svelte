@@ -5,13 +5,14 @@
   import ProjectDashboard from './components/ProjectDashboard.svelte';
   import CreateProjectWizard from './components/wizard/CreateProjectWizard.svelte';
   import ProjectDetail from './components/ProjectDetail.svelte';
+  import CredentialVaultView from './components/credential/CredentialVaultView.svelte';
   import type { Project } from '../shared/types/project';
 
   let appInfo: AppInfo | null = $state(null);
-  let currentView: 'home' | 'settings' | 'wizard' | 'project-detail' = $state('home');
+  let currentView: 'home' | 'settings' | 'wizard' | 'project-detail' | 'credentials' = $state('home');
   let selectedProject: Project | null = $state(null);
 
-  function navigateToView(view: 'home' | 'settings' | 'wizard' | 'project-detail') {
+  function navigateToView(view: 'home' | 'settings' | 'wizard' | 'project-detail' | 'credentials') {
     currentView = view;
   }
 
@@ -60,6 +61,9 @@
         <i class="codicon codicon-files"></i>
       </button>
       <div class="activity-spacer"></div>
+      <button class="activity-icon {currentView === 'credentials' ? 'active' : ''}" onclick={() => navigateToView('credentials')} title="Credential Vault">
+        <i class="codicon codicon-key"></i>
+      </button>
       <button class="activity-icon {currentView === 'settings' ? 'active' : ''}" onclick={() => navigateToView('settings')} title="Settings">
         <i class="codicon codicon-settings-gear"></i>
       </button>
@@ -69,6 +73,8 @@
     <main class="editor-area">
       {#if currentView === 'settings'}
         <SettingsView />
+      {:else if currentView === 'credentials'}
+        <CredentialVaultView />
       {:else}
         <ProjectDashboard onNewProject={() => navigateToView('wizard')} onSelectProject={(p) => { selectedProject = p; navigateToView('project-detail'); }} />
       {/if}
