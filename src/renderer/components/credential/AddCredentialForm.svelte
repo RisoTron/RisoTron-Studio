@@ -10,6 +10,17 @@
   let accessKeyId = '';
   let secretAccessKey = '';
   let submitting = false;
+
+  // Clear irrelevant secret fields when type changes to avoid retaining secrets
+  $: if (type) {
+    if (type !== 'aws') {
+      accessKeyId = '';
+      secretAccessKey = '';
+    } else {
+      tokenValue = '';
+    }
+  }
+
   let bannerError = '';
   let fieldErrors: Record<string, string> = {};
 

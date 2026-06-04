@@ -1,15 +1,22 @@
 <script lang="ts">
+  import { onDestroy } from 'svelte';
   import AddCredentialForm from './AddCredentialForm.svelte';
   import type { AddCredentialResult } from '../../../shared/types/credential';
 
   let showForm = false;
   let successMessage = '';
+  let successTimer: ReturnType<typeof setTimeout> | null = null;
 
   function handleCredentialAdded(event: CustomEvent<AddCredentialResult>) {
     showForm = false;
     successMessage = `Credential "${event.detail.name}" saved successfully.`;
-    setTimeout(() => (successMessage = ''), 4000);
+    if (successTimer) clearTimeout(successTimer);
+    successTimer = setTimeout(() => (successMessage = ''), 4000);
   }
+
+  onDestroy(() => {
+    if (successTimer) clearTimeout(successTimer);
+  });
 </script>
 
 <div class="credential-vault-view">

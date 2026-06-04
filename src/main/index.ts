@@ -13,7 +13,7 @@ import { VALID_SETTING_KEYS } from '../shared/types/settings';
 import type { AppSettings } from '../shared/types/settings';
 import type { CreateProjectPayload, UpdateProjectPayload, Project } from '../shared/types/project';
 import type { PipelineContext, IProvider } from '../shared/types/pipeline';
-import type { AddCredentialArgs, AddCredentialResult, CredentialError } from '../shared/types/credential';
+import type { AddCredentialArgs, AddCredentialResult, CredentialError, CredentialType } from '../shared/types/credential';
 import { PipelineEngine } from './services/pipeline/PipelineEngine';
 import { BaseProjectProvider } from './services/pipeline/providers/BaseProjectProvider';
 import { ForgeProvider } from './services/pipeline/providers/ForgeProvider';
@@ -365,32 +365,93 @@ if (!gotTheLock) {
     });
 
     // ── Credential IPC ────────────────────────────────────────────
-    ipcMain.handle('credential:add', async (_event, args: AddCredentialArgs) => {
+    ipcMain.handle('credential:add', async (event, args: unknown) => {
       try {
-        if (!safeStorage.isEncryptionAvailable()) {
-          const err: CredentialError = { code: 'ENCRYPTION_UNAVAILABLE', message: 'Encryption is not available on this system.' };
-          return { success: false, error: err };
+        validateSender(event);
+
+        // Runtime shape validation (IPC is untrusted boundary)
+        if (
+          !args ||
+          typeof args !== 'object' ||
+          typeof (args as Record<string, unknown>).name !== 'string' ||
+          typeof (args as Record<string, unknown>).type !== 'string' ||
+          typeof (args as Record<string, unknown>).payload !== 'object' ||
+          (args as Record<string, unknown>).payload === null
+        ) {
+          return { success: false, error: { code: 'VALIDATION_ERROR', message: 'Malformed request' } as CredentialError };
         }
-        const name = (args.name ?? '').trim();
+
+        const typedArgs = args as { name: string; type: string; payload: Record<string, unknown> };
+
+        // Validate type against allowlist
+        const VALID_TYPES: CredentialType[] = ['github-pat', 'aws', 'generic-token'];
+        if (!VALID_TYPES.includes(typedArgs.type as CredentialType)) {
+          return { success: false, error: { code: 'VALIDATION_ERROR', field: 'type', message: 'Invalid credential type' } as CredentialError };
+        }
+
+        const credType = typedArgs.type as CredentialType;
+
+        if (!safeStorage.isEncryptionAvailable()) {
+          return { success: false, error: { code: 'ENCRYPTION_UNAVAILABLE', message: 'Encryption is not available on this system.' } as CredentialError };
+        }
+
+        // Validate name
+        const name = typedArgs.name.trim();
         if (!name) {
           return { success: false, error: { code: 'VALIDATION_ERROR', field: 'name', message: 'Name is required' } as CredentialError };
         }
         if (name.length > 100) {
           return { success: false, error: { code: 'VALIDATION_ERROR', field: 'name', message: 'Name must be 100 characters or fewer' } as CredentialError };
         }
-        const payload = args.payload as Record<string, string>;
-        for (const [key, val] of Object.entries(payload)) {
-          if (!(val ?? '').trim()) {
-            return { success: false, error: { code: 'VALIDATION_ERROR', field: key, message: `${key} is required` } as CredentialError };
+
+        // Type-aware payload validation with explicit field allowlist and length limits
+        let validatedPayload: AddCredentialArgs['payload'];
+        if (credType === 'aws') {
+          const { accessKeyId, secretAccessKey } = typedArgs.payload as Record<string, unknown>;
+          if (typeof accessKeyId !== 'string' || !accessKeyId.trim()) {
+            return { success: false, error: { code: 'VALIDATION_ERROR', field: 'accessKeyId', message: 'Access Key ID is required' } as CredentialError };
           }
+          if (accessKeyId.trim().length > 40) {
+            return { success: false, error: { code: 'VALIDATION_ERROR', field: 'accessKeyId', message: 'Access Key ID is too long' } as CredentialError };
+          }
+          if (typeof secretAccessKey !== 'string' || !secretAccessKey.trim()) {
+            return { success: false, error: { code: 'VALIDATION_ERROR', field: 'secretAccessKey', message: 'Secret Access Key is required' } as CredentialError };
+          }
+          if (secretAccessKey.trim().length > 512) {
+            return { success: false, error: { code: 'VALIDATION_ERROR', field: 'secretAccessKey', message: 'Secret Access Key is too long' } as CredentialError };
+          }
+          validatedPayload = { accessKeyId: accessKeyId.trim(), secretAccessKey: secretAccessKey.trim() };
+        } else {
+          // github-pat and generic-token
+          const { value } = typedArgs.payload as Record<string, unknown>;
+          if (typeof value !== 'string' || !value.trim()) {
+            return { success: false, error: { code: 'VALIDATION_ERROR', field: 'value', message: 'Token value is required' } as CredentialError };
+          }
+          if (value.trim().length > 512) {
+            return { success: false, error: { code: 'VALIDATION_ERROR', field: 'value', message: 'Token value is too long' } as CredentialError };
+          }
+          validatedPayload = { value: value.trim() };
         }
-        const json = JSON.stringify(args.payload);
+
+        // Encrypt validated payload
+        const json = JSON.stringify(validatedPayload);
         const encryptedBuffer = safeStorage.encryptString(json);
+
+        // Build masked value
+        let masked = '****';
+        if (credType === 'aws') {
+          masked = (validatedPayload as { accessKeyId: string }).accessKeyId.substring(0, 4) + '****';
+        }
+
+        // Generate timestamp in JS to avoid SELECT-after-INSERT
+        const created_at = new Date().toISOString().replace('T', ' ').split('.')[0] + ' UTC';
+
+        // Insert
         let insertId: number;
         try {
           const result = db.execute(
-            `INSERT INTO credentials (name, type, encrypted_payload, created_at) VALUES (?, ?, ?, datetime('now', 'utc'))`,
-            [name, args.type, encryptedBuffer]
+            `INSERT INTO credentials (name, type, encrypted_payload, created_at) VALUES (?, ?, ?, ?)`,
+            [name, credType, encryptedBuffer, created_at]
           );
           insertId = result.lastInsertRowid as number;
         } catch (sqlErr: unknown) {
@@ -398,17 +459,15 @@ if (!gotTheLock) {
           if (msg.includes('UNIQUE constraint failed')) {
             return { success: false, error: { code: 'DUPLICATE_NAME', field: 'name', message: 'Credential name already exists' } as CredentialError };
           }
-          throw sqlErr;
+          return { success: false, error: { code: 'VALIDATION_ERROR', message: 'Failed to save credential' } as CredentialError };
         }
-        let masked = '****';
-        if (args.type === 'aws' && 'accessKeyId' in args.payload) {
-          masked = (args.payload as { accessKeyId: string }).accessKeyId.substring(0, 4) + '****';
-        }
-        const row = db.queryOne<{ created_at: string }>('SELECT created_at FROM credentials WHERE id = ?', [insertId]);
-        const data: AddCredentialResult = { id: insertId, name, type: args.type, masked, created_at: row!.created_at };
+
+        const data: AddCredentialResult = { id: insertId, name, type: credType, masked, created_at };
         return { success: true, data };
       } catch (err: unknown) {
-        return { success: false, error: { code: 'VALIDATION_ERROR', message: err instanceof Error ? err.message : String(err) } as CredentialError };
+        // Log internally but don't expose system details to renderer
+        console.error('[credential:add] Unexpected error:', err);
+        return { success: false, error: { code: 'VALIDATION_ERROR', message: 'An unexpected error occurred' } as CredentialError };
       }
     });
 
