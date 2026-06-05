@@ -96,7 +96,7 @@ backlog:
   title: '[US] View all credentials with masked values'
   epic: credential-vault
   feature: credential-crud
-  status: backlog
+  status: done
 - issue: 147
   type: us
   title: '[US] Update credential name or rotate value'
@@ -273,6 +273,14 @@ epics:
     issue: 144
     status: planned
 completed:
+- issue: 146
+  type: us
+  title: '[US] View all credentials with masked values'
+  epic: credential-vault
+  feature: credential-crud
+  status: done
+  merged_pr: 163
+  completed_at: '2026-06-05'
 - issue: 145
   type: us
   title: '[US] Add a credential to the vault'
