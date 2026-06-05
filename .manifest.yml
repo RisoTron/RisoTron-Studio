@@ -5,7 +5,10 @@ project:
   wiki: https://github.com/RisoTron/RisoTron-Studio.wiki.git
   wiki_path: wiki
   initialized_at: '2026-05-18'
-current_work: {}
+current_work:
+  issue: 148
+  branch: feat/credential-vault/delete-credential
+  started_at: '2026-06-05'
 github_project:
   number: 1
   owner: RisoTron
@@ -102,7 +105,7 @@ backlog:
   title: '[US] Delete a credential'
   epic: credential-vault
   feature: credential-crud
-  status: backlog
+  status: ready
 - issue: 149
   type: us
   title: '[US] Add a release server'
