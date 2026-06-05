@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.18.0](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.17.0...risotron-studio-v1.18.0) (2026-06-05)
+
+
+### Features
+
+* **credential-vault:** US [#147](https://github.com/RisoTron/RisoTron-Studio/issues/147) — update credential name and rotate secret value ([#170](https://github.com/RisoTron/RisoTron-Studio/issues/170)) ([862cf02](https://github.com/RisoTron/RisoTron-Studio/commit/862cf02df7ed1104283bf824d8eb75b054efdc51))
+
 ## [1.17.0](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.16.0...risotron-studio-v1.17.0) (2026-06-05)
 
 
