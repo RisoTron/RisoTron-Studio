@@ -43,6 +43,14 @@
     // List is already patched in-place by CredentialList; no re-fetch needed.
   }
 
+  function handleCredentialDeleted(event: CustomEvent<number>) {
+    const deletedId = event.detail;
+    credentials = credentials.filter(c => c.id !== deletedId);
+    successMessage = 'Credential deleted successfully.';
+    if (successTimer) clearTimeout(successTimer);
+    successTimer = setTimeout(() => (successMessage = ''), 4000);
+  }
+
   onMount(() => {
     loadCredentials();
   });
@@ -80,7 +88,7 @@
       </button>
     </div>
   {:else}
-    <CredentialList items={credentials} on:credentialUpdated={handleCredentialUpdated} />
+    <CredentialList items={credentials} on:credentialUpdated={handleCredentialUpdated} on:credentialDeleted={handleCredentialDeleted} />
   {/if}
 </div>
 
