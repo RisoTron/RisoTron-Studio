@@ -641,6 +641,50 @@ if (!gotTheLock) {
       }
     });
 
+    ipcMain.handle('credential:delete', async (event, args: unknown) => {
+      try {
+        validateSender(event);
+        if (!args || typeof args !== 'object' || typeof (args as Record<string, unknown>).id !== 'number') {
+          return { success: false, error: { code: 'VALIDATION_ERROR', message: 'Malformed request' } as CredentialError };
+        }
+        const { id } = args as { id: number };
+        if (!Number.isInteger(id) || id <= 0) {
+          return { success: false, error: { code: 'VALIDATION_ERROR', field: 'id', message: 'Invalid credential ID' } as CredentialError };
+        }
+
+        // Check existence
+        const rows = db.queryAll<{ id: number }>('SELECT id FROM credentials WHERE id = ?', [id]);
+        if (rows.length === 0) {
+          return { success: false, error: { code: 'QUERY_ERROR', message: 'Credential not found' } as CredentialError };
+        }
+
+        // Guard: check linked servers (future-proof; currently always 0)
+        const serverRows = db.queryAll<{ count: number }>(
+          "SELECT COUNT(*) as count FROM sqlite_master WHERE type='table' AND name='release_servers'"
+        );
+        const tableExists = serverRows[0]?.count > 0;
+        if (tableExists) {
+          const linked = db.queryAll<{ count: number }>(
+            'SELECT COUNT(*) as count FROM release_servers WHERE credential_id = ?',
+            [id]
+          );
+          if ((linked[0]?.count ?? 0) > 0) {
+            return {
+              success: false,
+              error: { code: 'CREDENTIAL_IN_USE', message: `This credential is used by ${linked[0].count} server(s). Remove those servers first.` } as CredentialError,
+            };
+          }
+        }
+
+        // Delete (purges encrypted blob)
+        db.execute('DELETE FROM credentials WHERE id = ?', [id]);
+        return { success: true };
+      } catch (err: unknown) {
+        console.error('[credential:delete] Unexpected error:', err);
+        return { success: false, error: { code: 'QUERY_ERROR', message: 'An unexpected error occurred' } as CredentialError };
+      }
+    });
+
     const isMac = process.platform === 'darwin';
     const menu = buildMenu(isMac);
     Menu.setApplicationMenu(menu);

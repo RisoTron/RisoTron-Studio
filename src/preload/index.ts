@@ -42,6 +42,7 @@ contextBridge.exposeInMainWorld('api', {
     add: (args: unknown) => ipcRenderer.invoke('credential:add', args),
     list: () => ipcRenderer.invoke('credential:list'),
     update: (args: unknown) => ipcRenderer.invoke('credential:update', args),
+    delete: (args: unknown) => ipcRenderer.invoke('credential:delete', args),
   },
   os: {
     showItemInFolder: (path: string) => ipcRenderer.invoke('os:show-item-in-folder', path),

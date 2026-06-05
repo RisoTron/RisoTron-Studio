@@ -4,7 +4,8 @@ export type CredentialErrorCode =
   | 'ENCRYPTION_UNAVAILABLE'
   | 'DUPLICATE_NAME'
   | 'VALIDATION_ERROR'
-  | 'QUERY_ERROR';
+  | 'QUERY_ERROR'
+  | 'CREDENTIAL_IN_USE';
 
 export type CredentialPayload =
   | { value: string }
@@ -54,4 +55,8 @@ export interface UpdateCredentialArgs {
 
 export type UpdateCredentialResult =
   | { success: true; data: CredentialListItem }
+  | { success: false; error: CredentialError };
+
+export type DeleteCredentialResult =
+  | { success: true }
   | { success: false; error: CredentialError };
