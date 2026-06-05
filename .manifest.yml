@@ -5,13 +5,7 @@ project:
   wiki: https://github.com/RisoTron/RisoTron-Studio.wiki.git
   wiki_path: wiki
   initialized_at: '2026-05-18'
-current_work:
-  issue: 145
-  title: '[US] Add a credential to the vault'
-  branch: feat/credential-vault/add-credential
-  started_at: '2026-06-04'
-  tasks: [157, 158, 159]
-  pr: 160
+current_work: {}
 github_project:
   number: 1
   owner: RisoTron
@@ -96,7 +90,7 @@ backlog:
   title: '[US] Add a credential to the vault'
   epic: credential-vault
   feature: credential-crud
-  status: in-progress
+  status: done
 - issue: 146
   type: us
   title: '[US] View all credentials with masked values'
@@ -279,6 +273,14 @@ epics:
     issue: 144
     status: planned
 completed:
+- issue: 145
+  type: us
+  title: '[US] Add a credential to the vault'
+  epic: credential-vault
+  feature: credential-crud
+  status: done
+  merged_pr: 160
+  completed_at: '2026-06-05'
 - issue: null
   type: hotfix
   title: 'fix(devops): Electron renderer ERR_FILE_NOT_FOUND + e2e scaffold timeouts'
