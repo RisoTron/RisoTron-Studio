@@ -102,7 +102,9 @@ backlog:
   title: '[US] Update credential name or rotate value'
   epic: credential-vault
   feature: credential-crud
-  status: backlog
+  status: in-progress
+  pr: 170
+  branch: feat/credential-vault/update-rotate-credential
 - issue: 148
   type: us
   title: '[US] Delete a credential'
