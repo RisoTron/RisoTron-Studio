@@ -66,7 +66,7 @@
   {/if}
 
   <div class="form-group">
-    <label>Type</label>
+    <span class="field-label">Type</span>
     <span class="type-readonly">{item.type}</span>
   </div>
 
@@ -121,7 +121,7 @@
     flex-direction: column;
     gap: 4px;
   }
-  label {
+  label, .field-label {
     font-size: 12px;
     color: var(--vscode-foreground, #ccc);
     font-weight: 500;
