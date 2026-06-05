@@ -19,7 +19,7 @@
       if (result.success) {
         credentials = result.data;
       } else {
-        listError = result.error?.message ?? 'Failed to load credentials.';
+        listError = result.error.message;
       }
     } catch (err) {
       listError = 'Unexpected error loading credentials.';

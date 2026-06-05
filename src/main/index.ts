@@ -447,10 +447,7 @@ if (!gotTheLock) {
         const encryptedBuffer = safeStorage.encryptString(json);
 
         // Build masked value
-        let masked = '****';
-        if (credType === 'aws') {
-          masked = (validatedPayload as { accessKeyId: string }).accessKeyId.substring(0, 4) + '****';
-        }
+        const masked = getMasked(credType);
 
         // Generate timestamp in JS to avoid SELECT-after-INSERT
         const created_at = new Date().toISOString().replace('T', ' ').split('.')[0] + ' UTC';
