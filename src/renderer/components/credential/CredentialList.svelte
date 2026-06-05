@@ -5,11 +5,13 @@
 
   export let items: CredentialListItem[];
 
-  const dispatch = createEventDispatcher<{ credentialUpdated: CredentialListItem; credentialDeleted: number }>();
+  const dispatch = createEventDispatcher<{ credentialUpdated: CredentialListItem; credentialDeleted: { id: number; name: string } }>();
 
   let editingId: number | null = null;
   let deletingId: number | null = null;
   let deleteError = '';
+  let errorItemId: number | null = null;
+  let isDeleting = false;
 
   function formatDate(iso: string): string {
     return new Date(iso).toLocaleDateString(undefined, {
@@ -34,10 +36,12 @@
 
   function handleDelete(id: number) {
     deleteError = '';
+    deletingId = null;
+    errorItemId = null;
     const item = items.find(i => i.id === id);
     if (item && item.linked_server_count > 0) {
-      deletingId = id;
-      deleteError = `Cannot delete: used by ${item.linked_server_count} server(s). Remove those servers first.`;
+      errorItemId = id;
+      deleteError = `Cannot delete "${item.name}": used by ${item.linked_server_count} server(s). Remove those servers first.`;
       return;
     }
     deletingId = id;
@@ -45,23 +49,29 @@
 
   async function confirmDelete(id: number) {
     deleteError = '';
+    errorItemId = null;
+    isDeleting = true;
     try {
       const result = await window.api.credential.delete({ id });
       if (result.success) {
-        items = items.filter(i => i.id !== id);
         deletingId = null;
-        dispatch('credentialDeleted', id);
+        dispatch('credentialDeleted', { id, name: items.find(i => i.id === id)?.name ?? '' });
       } else {
         deleteError = result.error.message;
+        errorItemId = id;
       }
     } catch {
       deleteError = 'An unexpected error occurred.';
+      errorItemId = id;
+    } finally {
+      isDeleting = false;
     }
   }
 
   function cancelDelete() {
     deletingId = null;
     deleteError = '';
+    errorItemId = null;
   }
 </script>
 
@@ -97,11 +107,13 @@
       {#if deletingId === item.id}
         <div id="cred-delete-confirm-{item.id}" class="delete-confirm">
           <span>Delete "{item.name}"? This cannot be undone.</span>
-          <button id="cred-delete-confirm-yes-{item.id}" class="btn-confirm-delete" on:click={() => confirmDelete(item.id)}>Delete</button>
+          <button id="cred-delete-confirm-yes-{item.id}" class="btn-confirm-delete" on:click={() => confirmDelete(item.id)} disabled={isDeleting}>
+            {isDeleting ? 'Deleting…' : 'Delete'}
+          </button>
           <button id="cred-delete-confirm-cancel-{item.id}" class="btn-secondary-sm" on:click={cancelDelete}>Cancel</button>
         </div>
       {/if}
-      {#if deleteError && deletingId === item.id}
+      {#if deleteError && (deletingId === item.id || errorItemId === item.id)}
         <div class="delete-error">{deleteError}</div>
       {/if}
       {#if editingId === item.id}
@@ -232,6 +244,10 @@
   .btn-confirm-delete:hover {
     background: var(--vscode-errorForeground, #f14c4c);
     color: #fff;
+  }
+  .btn-confirm-delete:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
   .btn-secondary-sm {
     padding: 3px 10px;

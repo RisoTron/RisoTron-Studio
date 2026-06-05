@@ -39,7 +39,7 @@ export interface CredentialListItem {
   type: CredentialType;
   masked: string;
   created_at: string;
-  linked_server_count: number; // always 0 for this US
+  linked_server_count: number;
 }
 
 export type ListCredentialsResult =

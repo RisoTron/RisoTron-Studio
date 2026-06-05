@@ -43,10 +43,9 @@
     // List is already patched in-place by CredentialList; no re-fetch needed.
   }
 
-  function handleCredentialDeleted(event: CustomEvent<number>) {
-    const deletedId = event.detail;
-    credentials = credentials.filter(c => c.id !== deletedId);
-    successMessage = 'Credential deleted successfully.';
+  function handleCredentialDeleted(event: CustomEvent<{ id: number; name: string }>) {
+    credentials = credentials.filter(c => c.id !== event.detail.id);
+    successMessage = `Credential "${event.detail.name}" deleted.`;
     if (successTimer) clearTimeout(successTimer);
     successTimer = setTimeout(() => (successMessage = ''), 4000);
   }
