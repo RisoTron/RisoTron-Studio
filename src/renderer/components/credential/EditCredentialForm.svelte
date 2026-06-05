@@ -1,13 +1,10 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  import type { CredentialListItem, UpdateCredentialArgs, UpdateCredentialResult, CredentialError } from '../../../shared/types/credential';
+  import type { CredentialListItem, CredentialError } from '../../../shared/types/credential';
 
   export let item: CredentialListItem;
 
-  const dispatch = createEventDispatcher<{
-    credentialUpdated: CredentialListItem;
-    cancelled: void;
-  }>();
+  const dispatch = createEventDispatcher<{ credentialUpdated: CredentialListItem; cancelled: void }>();
 
   let name = item.name;
   let tokenValue = '';
@@ -17,7 +14,7 @@
   let bannerError = '';
   let fieldErrors: Record<string, string> = {};
 
-  function buildPayload(): UpdateCredentialArgs['payload'] {
+  function buildPayload() {
     if (item.type === 'aws') {
       return { accessKeyId: accessKeyId.trim(), secretAccessKey: secretAccessKey.trim() };
     }
@@ -29,13 +26,12 @@
     bannerError = '';
     submitting = true;
     try {
-      const args: UpdateCredentialArgs = {
+      const result = await window.api.credential.update({
         id: item.id,
         name: name.trim(),
         type: item.type,
         payload: buildPayload(),
-      };
-      const result: UpdateCredentialResult = await window.api.credential.update(args);
+      });
       if (result.success) {
         dispatch('credentialUpdated', result.data);
       } else {
@@ -67,7 +63,7 @@
 
   <div class="form-group">
     <span class="field-label">Type</span>
-    <span class="type-readonly">{item.type}</span>
+    <span class="type-display">{item.type}</span>
   </div>
 
   <div class="form-group">
@@ -78,27 +74,25 @@
 
   {#if item.type === 'aws'}
     <div class="form-group">
-      <label for="edit-cred-value">New Access Key ID</label>
-      <input id="edit-cred-value" type="password" bind:value={accessKeyId} placeholder="Enter new Access Key ID" />
+      <label for="edit-cred-access-key-id">New Access Key ID</label>
+      <input id="edit-cred-access-key-id" type="password" bind:value={accessKeyId} placeholder="••••••••" />
       {#if fieldErrors['accessKeyId']}<span class="field-error">{fieldErrors['accessKeyId']}</span>{/if}
     </div>
     <div class="form-group">
       <label for="edit-cred-secret">New Secret Access Key</label>
-      <input id="edit-cred-secret" type="password" bind:value={secretAccessKey} placeholder="Enter new Secret Access Key" />
+      <input id="edit-cred-secret" type="password" bind:value={secretAccessKey} placeholder="••••••••" />
       {#if fieldErrors['secretAccessKey']}<span class="field-error">{fieldErrors['secretAccessKey']}</span>{/if}
     </div>
   {:else}
     <div class="form-group">
       <label for="edit-cred-value">New Token Value</label>
-      <input id="edit-cred-value" type="password" bind:value={tokenValue} placeholder="Enter new token value" />
+      <input id="edit-cred-value" type="password" bind:value={tokenValue} placeholder="••••••••" />
       {#if fieldErrors['value']}<span class="field-error">{fieldErrors['value']}</span>{/if}
     </div>
   {/if}
 
   <div class="form-actions">
-    <button id="edit-cred-cancel" type="button" class="btn-secondary" on:click={handleCancel} disabled={submitting}>
-      Cancel
-    </button>
+    <button id="edit-cred-cancel" type="button" class="btn-secondary" on:click={handleCancel}>Cancel</button>
     <button id="edit-cred-save" type="submit" class="btn-primary" disabled={submitting}>
       {submitting ? 'Saving…' : 'Save Changes'}
     </button>
@@ -113,7 +107,6 @@
     padding: 16px;
     background: var(--vscode-sideBar-background, #1e1e1e);
     border-radius: 6px;
-    border: 1px solid var(--vscode-focusBorder, #007fd4);
     margin-top: 8px;
   }
   .form-group {
@@ -126,11 +119,11 @@
     color: var(--vscode-foreground, #ccc);
     font-weight: 500;
   }
-  .type-readonly {
-    font-size: 12px;
+  .type-display {
+    font-size: 13px;
     color: var(--vscode-descriptionForeground, #888);
-    font-family: monospace;
-    padding: 4px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
   }
   input {
     padding: 6px 8px;
@@ -180,17 +173,13 @@
   .btn-secondary {
     padding: 6px 14px;
     background: var(--vscode-button-secondaryBackground, #3a3d41);
-    color: var(--vscode-button-secondaryForeground, #ccc);
+    color: var(--vscode-button-secondaryForeground, #fff);
     border: none;
     border-radius: 4px;
     cursor: pointer;
     font-size: 13px;
   }
-  .btn-secondary:hover:not(:disabled) {
+  .btn-secondary:hover {
     background: var(--vscode-button-secondaryHoverBackground, #45494e);
-  }
-  .btn-secondary:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
   }
 </style>

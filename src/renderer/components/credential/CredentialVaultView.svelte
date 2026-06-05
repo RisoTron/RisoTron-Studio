@@ -36,13 +36,11 @@
     loadCredentials();
   }
 
-  let updateSuccessTimer: ReturnType<typeof setTimeout> | null = null;
-
   function handleCredentialUpdated(event: CustomEvent<CredentialListItem>) {
     successMessage = `Credential "${event.detail.name}" updated.`;
     if (successTimer) clearTimeout(successTimer);
     successTimer = setTimeout(() => (successMessage = ''), 4000);
-    loadCredentials();
+    // List is already patched in-place by CredentialList; no re-fetch needed.
   }
 
   onMount(() => {
@@ -51,7 +49,6 @@
 
   onDestroy(() => {
     if (successTimer) clearTimeout(successTimer);
-    if (updateSuccessTimer) clearTimeout(updateSuccessTimer);
   });
 </script>
 

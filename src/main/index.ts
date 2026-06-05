@@ -500,34 +500,44 @@ if (!gotTheLock) {
       }
     });
 
+
     ipcMain.handle('credential:update', async (event, args: unknown) => {
       try {
         validateSender(event);
 
+        // Runtime shape validation
         if (
           !args ||
           typeof args !== 'object' ||
           typeof (args as Record<string, unknown>).id !== 'number' ||
           typeof (args as Record<string, unknown>).name !== 'string' ||
-          typeof (args as Record<string, unknown>).type !== 'string' ||
           typeof (args as Record<string, unknown>).payload !== 'object' ||
           (args as Record<string, unknown>).payload === null
         ) {
           return { success: false, error: { code: 'VALIDATION_ERROR', message: 'Malformed request' } as CredentialError };
         }
 
-        const typedArgs = args as { id: number; name: string; type: string; payload: Record<string, unknown> };
+        const typedArgs = args as { id: number; name: string; payload: Record<string, unknown> };
 
+        // Validate id
         if (!Number.isInteger(typedArgs.id) || typedArgs.id <= 0) {
           return { success: false, error: { code: 'VALIDATION_ERROR', field: 'id', message: 'Invalid credential ID' } as CredentialError };
         }
 
-        const VALID_TYPES: CredentialType[] = ['github-pat', 'aws', 'generic-token'];
-        if (!VALID_TYPES.includes(typedArgs.type as CredentialType)) {
-          return { success: false, error: { code: 'VALIDATION_ERROR', field: 'type', message: 'Invalid credential type' } as CredentialError };
+        // Fetch type + existing encrypted payload from DB.
+        // Type is immutable — do not trust the renderer's type field.
+        // Existing payload is needed to support rename-only (when secret fields are left empty).
+        const credRow = db.queryAll<{ type: string; encrypted_payload: Buffer }>(
+          'SELECT type, encrypted_payload FROM credentials WHERE id = ?',
+          [typedArgs.id]
+        );
+        if (credRow.length === 0) {
+          return { success: false, error: { code: 'QUERY_ERROR', message: 'Credential not found' } as CredentialError };
         }
-        const credType = typedArgs.type as CredentialType;
+        const credType = credRow[0].type as CredentialType;
+        const existingEncryptedPayload = credRow[0].encrypted_payload;
 
+        // Validate name
         const name = typedArgs.name.trim();
         if (!name) {
           return { success: false, error: { code: 'VALIDATION_ERROR', field: 'name', message: 'Name is required' } as CredentialError };
@@ -536,37 +546,55 @@ if (!gotTheLock) {
           return { success: false, error: { code: 'VALIDATION_ERROR', field: 'name', message: 'Name must be 100 characters or fewer' } as CredentialError };
         }
 
-        if (!safeStorage.isEncryptionAvailable()) {
-          return { success: false, error: { code: 'ENCRYPTION_UNAVAILABLE', message: 'Encryption is not available on this system.' } as CredentialError };
-        }
+        // Determine whether the user provided new secret values.
+        // Empty secret fields = rename-only operation → reuse existing encrypted blob.
+        // Non-empty secret fields = rotate operation → re-validate + re-encrypt.
+        const isRotate = credType === 'aws'
+          ? Boolean((typedArgs.payload as Record<string, unknown>).accessKeyId || (typedArgs.payload as Record<string, unknown>).secretAccessKey)
+          : Boolean((typedArgs.payload as Record<string, unknown>).value);
 
-        let validatedPayload: { value: string } | { accessKeyId: string; secretAccessKey: string };
-        if (credType === 'aws') {
-          const { accessKeyId, secretAccessKey } = typedArgs.payload;
-          if (typeof accessKeyId !== 'string' || !accessKeyId.trim()) {
-            return { success: false, error: { code: 'VALIDATION_ERROR', field: 'accessKeyId', message: 'Access Key ID is required' } as CredentialError };
+        let encryptedBuffer: Buffer;
+
+        if (isRotate) {
+          if (!safeStorage.isEncryptionAvailable()) {
+            return { success: false, error: { code: 'ENCRYPTION_UNAVAILABLE', message: 'Encryption is not available on this system.' } as CredentialError };
           }
-          if ((accessKeyId as string).trim().length > 40) {
-            return { success: false, error: { code: 'VALIDATION_ERROR', field: 'accessKeyId', message: 'Access Key ID is too long' } as CredentialError };
+
+          // Type-aware payload validation (same rules as credential:add)
+          let validatedPayload: { value: string } | { accessKeyId: string; secretAccessKey: string };
+          if (credType === 'aws') {
+            const { accessKeyId, secretAccessKey } = typedArgs.payload;
+            if (typeof accessKeyId !== 'string' || !accessKeyId.trim()) {
+              return { success: false, error: { code: 'VALIDATION_ERROR', field: 'accessKeyId', message: 'Access Key ID is required' } as CredentialError };
+            }
+            if (accessKeyId.trim().length > 40) {
+              return { success: false, error: { code: 'VALIDATION_ERROR', field: 'accessKeyId', message: 'Access Key ID is too long' } as CredentialError };
+            }
+            if (typeof secretAccessKey !== 'string' || !secretAccessKey.trim()) {
+              return { success: false, error: { code: 'VALIDATION_ERROR', field: 'secretAccessKey', message: 'Secret Access Key is required' } as CredentialError };
+            }
+            if (secretAccessKey.trim().length > 512) {
+              return { success: false, error: { code: 'VALIDATION_ERROR', field: 'secretAccessKey', message: 'Secret Access Key is too long' } as CredentialError };
+            }
+            validatedPayload = { accessKeyId: accessKeyId.trim(), secretAccessKey: secretAccessKey.trim() };
+          } else {
+            const { value } = typedArgs.payload;
+            if (typeof value !== 'string' || !value.trim()) {
+              return { success: false, error: { code: 'VALIDATION_ERROR', field: 'value', message: 'Secret value cannot be empty' } as CredentialError };
+            }
+            if (value.trim().length > 512) {
+              return { success: false, error: { code: 'VALIDATION_ERROR', field: 'value', message: 'Token value is too long' } as CredentialError };
+            }
+            validatedPayload = { value: value.trim() };
           }
-          if (typeof secretAccessKey !== 'string' || !secretAccessKey.trim()) {
-            return { success: false, error: { code: 'VALIDATION_ERROR', field: 'secretAccessKey', message: 'Secret Access Key is required' } as CredentialError };
-          }
-          if ((secretAccessKey as string).trim().length > 512) {
-            return { success: false, error: { code: 'VALIDATION_ERROR', field: 'secretAccessKey', message: 'Secret Access Key is too long' } as CredentialError };
-          }
-          validatedPayload = { accessKeyId: (accessKeyId as string).trim(), secretAccessKey: (secretAccessKey as string).trim() };
+
+          encryptedBuffer = safeStorage.encryptString(JSON.stringify(validatedPayload));
         } else {
-          const { value } = typedArgs.payload;
-          if (typeof value !== 'string' || !value.trim()) {
-            return { success: false, error: { code: 'VALIDATION_ERROR', field: 'value', message: 'Secret value cannot be empty' } as CredentialError };
-          }
-          if ((value as string).trim().length > 512) {
-            return { success: false, error: { code: 'VALIDATION_ERROR', field: 'value', message: 'Token value is too long' } as CredentialError };
-          }
-          validatedPayload = { value: (value as string).trim() };
+          // Rename-only: reuse existing encrypted blob unchanged
+          encryptedBuffer = existingEncryptedPayload;
         }
 
+        // Check uniqueness (exclude current id)
         const existing = db.queryAll<{ id: number }>(
           'SELECT id FROM credentials WHERE name = ? AND id != ?',
           [name, typedArgs.id]
@@ -575,9 +603,7 @@ if (!gotTheLock) {
           return { success: false, error: { code: 'DUPLICATE_NAME', field: 'name', message: 'A credential with this name already exists' } as CredentialError };
         }
 
-        const json = JSON.stringify(validatedPayload);
-        const encryptedBuffer = safeStorage.encryptString(json);
-
+        // Update
         try {
           db.execute(
             'UPDATE credentials SET name = ?, encrypted_payload = ? WHERE id = ?',
@@ -591,6 +617,7 @@ if (!gotTheLock) {
           return { success: false, error: { code: 'QUERY_ERROR', message: 'Failed to update credential' } as CredentialError };
         }
 
+        // Fetch the updated row to return consistent data
         const rows = db.queryAll<{ id: number; name: string; type: string; created_at: string }>(
           'SELECT id, name, type, created_at FROM credentials WHERE id = ?',
           [typedArgs.id]
