@@ -13,7 +13,7 @@ import { VALID_SETTING_KEYS } from '../shared/types/settings';
 import type { AppSettings } from '../shared/types/settings';
 import type { CreateProjectPayload, UpdateProjectPayload, Project } from '../shared/types/project';
 import type { PipelineContext, IProvider } from '../shared/types/pipeline';
-import type { AddCredentialArgs, AddCredentialResult, CredentialError, CredentialType } from '../shared/types/credential';
+import type { AddCredentialArgs, AddCredentialResult, CredentialError, CredentialListItem, CredentialType } from '../shared/types/credential';
 import { PipelineEngine } from './services/pipeline/PipelineEngine';
 import { BaseProjectProvider } from './services/pipeline/providers/BaseProjectProvider';
 import { ForgeProvider } from './services/pipeline/providers/ForgeProvider';
@@ -364,6 +364,15 @@ if (!gotTheLock) {
       }
     });
 
+    function getMasked(type: CredentialType): string {
+      switch (type) {
+        case 'github-pat':    return 'ghp_****';
+        case 'aws':           return 'AKIA****';
+        case 'generic-token': return '****';
+        default:              return '****';
+      }
+    }
+
     // ── Credential IPC ────────────────────────────────────────────
     ipcMain.handle('credential:add', async (event, args: unknown) => {
       try {
@@ -438,10 +447,7 @@ if (!gotTheLock) {
         const encryptedBuffer = safeStorage.encryptString(json);
 
         // Build masked value
-        let masked = '****';
-        if (credType === 'aws') {
-          masked = (validatedPayload as { accessKeyId: string }).accessKeyId.substring(0, 4) + '****';
-        }
+        const masked = getMasked(credType);
 
         // Generate timestamp in JS to avoid SELECT-after-INSERT
         const created_at = new Date().toISOString().replace('T', ' ').split('.')[0] + ' UTC';
@@ -468,6 +474,29 @@ if (!gotTheLock) {
         // Log internally but don't expose system details to renderer
         console.error('[credential:add] Unexpected error:', err);
         return { success: false, error: { code: 'VALIDATION_ERROR', message: 'An unexpected error occurred' } as CredentialError };
+      }
+    });
+
+    ipcMain.handle('credential:list', async (event) => {
+      try {
+        validateSender(event);
+        const rows = db.queryAll<{ id: number; name: string; type: string; created_at: string }>(
+          'SELECT id, name, type, created_at FROM credentials ORDER BY created_at DESC'
+        );
+
+        const data: CredentialListItem[] = rows.map((row) => ({
+          id: row.id,
+          name: row.name,
+          type: row.type as CredentialType,
+          masked: getMasked(row.type as CredentialType),
+          created_at: row.created_at,
+          linked_server_count: 0,
+        }));
+
+        return { success: true, data };
+      } catch (err: unknown) {
+        console.error('[credential:list] Error:', err);
+        return { success: false, error: { code: 'QUERY_ERROR', message: 'Failed to list credentials' } as CredentialError };
       }
     });
 

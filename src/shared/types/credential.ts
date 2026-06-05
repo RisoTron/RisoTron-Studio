@@ -3,7 +3,8 @@ export type CredentialType = 'github-pat' | 'aws' | 'generic-token';
 export type CredentialErrorCode =
   | 'ENCRYPTION_UNAVAILABLE'
   | 'DUPLICATE_NAME'
-  | 'VALIDATION_ERROR';
+  | 'VALIDATION_ERROR'
+  | 'QUERY_ERROR';
 
 export type CredentialPayload =
   | { value: string }
@@ -30,3 +31,16 @@ export interface CredentialError {
   field?: string;
   message: string;
 }
+
+export interface CredentialListItem {
+  id: number;
+  name: string;
+  type: CredentialType;
+  masked: string;
+  created_at: string;
+  linked_server_count: number; // always 0 for this US
+}
+
+export type ListCredentialsResult =
+  | { success: true; data: CredentialListItem[] }
+  | { success: false; error: CredentialError };
