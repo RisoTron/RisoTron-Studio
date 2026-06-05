@@ -60,4 +60,19 @@ export const migrations: Migration[] = [
       CREATE UNIQUE INDEX IF NOT EXISTS uq_projects_name ON projects(name) WHERE is_archived = 0;
     `,
   },
+  {
+    version: 3,
+    name: 'credentials_table',
+    sql: `
+      CREATE TABLE IF NOT EXISTS credentials (
+        id                INTEGER PRIMARY KEY AUTOINCREMENT,
+        name              TEXT    NOT NULL,
+        type              TEXT    NOT NULL CHECK(type IN ('github-pat', 'aws', 'generic-token')),
+        encrypted_payload BLOB    NOT NULL,
+        created_at        TEXT    NOT NULL DEFAULT (datetime('now', 'utc'))
+      );
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_credentials_name_ci
+        ON credentials (name COLLATE NOCASE);
+    `,
+  },
 ];

@@ -4,6 +4,7 @@ import type { WindowState } from '../main/utils/window-state';
 import type { AppSettings } from '../shared/types/settings';
 import type { Project } from '../shared/types/project';
 import type { PipelineProgress } from '../shared/types/pipeline';
+import type { AddCredentialArgs, Credential, CredentialError } from '../shared/types/credential';
 
 declare global {
   interface AppInfo {
@@ -33,6 +34,9 @@ declare global {
       os: {
         showItemInFolder: (path: string) => Promise<{ success: boolean; error?: string }>;
         openInIDE: (path: string) => Promise<{ success: boolean; error?: string }>;
+      };
+      credential: {
+        add: (args: AddCredentialArgs) => Promise<{ success: boolean; data?: Credential; error?: CredentialError }>;
       };
     };
   }

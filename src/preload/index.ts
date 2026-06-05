@@ -38,6 +38,9 @@ contextBridge.exposeInMainWorld('api', {
       return () => ipcRenderer.removeListener('app:scaffold-progress', handler);
     },
   },
+  credential: {
+    add: (args: unknown) => ipcRenderer.invoke('credential:add', args),
+  },
   os: {
     showItemInFolder: (path: string) => ipcRenderer.invoke('os:show-item-in-folder', path),
     openInIDE: (path: string) => ipcRenderer.invoke('os:open-in-ide', path),

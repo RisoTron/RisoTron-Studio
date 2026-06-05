@@ -5,7 +5,13 @@ project:
   wiki: https://github.com/RisoTron/RisoTron-Studio.wiki.git
   wiki_path: wiki
   initialized_at: '2026-05-18'
-current_work: null
+current_work:
+  issue: 145
+  title: '[US] Add a credential to the vault'
+  branch: feat/credential-vault/add-credential
+  started_at: '2026-06-04'
+  tasks: [157, 158, 159]
+  pr: 160
 github_project:
   number: 1
   owner: RisoTron
@@ -90,7 +96,7 @@ backlog:
   title: '[US] Add a credential to the vault'
   epic: credential-vault
   feature: credential-crud
-  status: backlog
+  status: in-progress
 - issue: 146
   type: us
   title: '[US] View all credentials with masked values'
