@@ -1,12 +1,33 @@
 <script lang="ts">
+  import { createEventDispatcher } from 'svelte';
   import type { CredentialListItem } from '../../../shared/types/credential';
+  import EditCredentialForm from './EditCredentialForm.svelte';
 
   export let items: CredentialListItem[];
+
+  const dispatch = createEventDispatcher<{ credentialUpdated: CredentialListItem }>();
+
+  let editingId: number | null = null;
 
   function formatDate(iso: string): string {
     return new Date(iso).toLocaleDateString(undefined, {
       year: 'numeric', month: 'short', day: 'numeric',
     });
+  }
+
+  function handleEdit(id: number) {
+    editingId = id;
+  }
+
+  function handleUpdated(event: CustomEvent<CredentialListItem>) {
+    const updated = event.detail;
+    items = items.map(i => i.id === updated.id ? updated : i);
+    editingId = null;
+    dispatch('credentialUpdated', updated);
+  }
+
+  function handleCancelled() {
+    editingId = null;
   }
 </script>
 
@@ -16,12 +37,27 @@
       <div class="cred-main">
         <span class="cred-name">{item.name}</span>
         <span class="cred-type-badge" data-type={item.type}>{item.type}</span>
+        <button
+          id="cred-edit-btn-{item.id}"
+          class="btn-edit"
+          on:click={() => handleEdit(item.id)}
+          aria-label="Edit {item.name}"
+        >
+          Edit
+        </button>
       </div>
       <div class="cred-meta">
         <span class="cred-masked-value">{item.masked}</span>
         <span class="cred-server-count">Used by {item.linked_server_count} server{item.linked_server_count !== 1 ? 's' : ''}</span>
         <span class="cred-date">{formatDate(item.created_at)}</span>
       </div>
+      {#if editingId === item.id}
+        <EditCredentialForm
+          {item}
+          on:credentialUpdated={handleUpdated}
+          on:cancelled={handleCancelled}
+        />
+      {/if}
     </div>
   {/each}
 </div>
@@ -93,5 +129,17 @@
   }
   .cred-date {
     margin-left: auto;
+  }
+  .btn-edit {
+    padding: 2px 10px;
+    background: var(--vscode-button-secondaryBackground, #3a3d41);
+    color: var(--vscode-button-secondaryForeground, #ccc);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+  }
+  .btn-edit:hover {
+    background: var(--vscode-button-secondaryHoverBackground, #45494e);
   }
 </style>

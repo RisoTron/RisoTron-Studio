@@ -500,6 +500,120 @@ if (!gotTheLock) {
       }
     });
 
+    ipcMain.handle('credential:update', async (event, args: unknown) => {
+      try {
+        validateSender(event);
+
+        if (
+          !args ||
+          typeof args !== 'object' ||
+          typeof (args as Record<string, unknown>).id !== 'number' ||
+          typeof (args as Record<string, unknown>).name !== 'string' ||
+          typeof (args as Record<string, unknown>).type !== 'string' ||
+          typeof (args as Record<string, unknown>).payload !== 'object' ||
+          (args as Record<string, unknown>).payload === null
+        ) {
+          return { success: false, error: { code: 'VALIDATION_ERROR', message: 'Malformed request' } as CredentialError };
+        }
+
+        const typedArgs = args as { id: number; name: string; type: string; payload: Record<string, unknown> };
+
+        if (!Number.isInteger(typedArgs.id) || typedArgs.id <= 0) {
+          return { success: false, error: { code: 'VALIDATION_ERROR', field: 'id', message: 'Invalid credential ID' } as CredentialError };
+        }
+
+        const VALID_TYPES: CredentialType[] = ['github-pat', 'aws', 'generic-token'];
+        if (!VALID_TYPES.includes(typedArgs.type as CredentialType)) {
+          return { success: false, error: { code: 'VALIDATION_ERROR', field: 'type', message: 'Invalid credential type' } as CredentialError };
+        }
+        const credType = typedArgs.type as CredentialType;
+
+        const name = typedArgs.name.trim();
+        if (!name) {
+          return { success: false, error: { code: 'VALIDATION_ERROR', field: 'name', message: 'Name is required' } as CredentialError };
+        }
+        if (name.length > 100) {
+          return { success: false, error: { code: 'VALIDATION_ERROR', field: 'name', message: 'Name must be 100 characters or fewer' } as CredentialError };
+        }
+
+        if (!safeStorage.isEncryptionAvailable()) {
+          return { success: false, error: { code: 'ENCRYPTION_UNAVAILABLE', message: 'Encryption is not available on this system.' } as CredentialError };
+        }
+
+        let validatedPayload: { value: string } | { accessKeyId: string; secretAccessKey: string };
+        if (credType === 'aws') {
+          const { accessKeyId, secretAccessKey } = typedArgs.payload;
+          if (typeof accessKeyId !== 'string' || !accessKeyId.trim()) {
+            return { success: false, error: { code: 'VALIDATION_ERROR', field: 'accessKeyId', message: 'Access Key ID is required' } as CredentialError };
+          }
+          if ((accessKeyId as string).trim().length > 40) {
+            return { success: false, error: { code: 'VALIDATION_ERROR', field: 'accessKeyId', message: 'Access Key ID is too long' } as CredentialError };
+          }
+          if (typeof secretAccessKey !== 'string' || !secretAccessKey.trim()) {
+            return { success: false, error: { code: 'VALIDATION_ERROR', field: 'secretAccessKey', message: 'Secret Access Key is required' } as CredentialError };
+          }
+          if ((secretAccessKey as string).trim().length > 512) {
+            return { success: false, error: { code: 'VALIDATION_ERROR', field: 'secretAccessKey', message: 'Secret Access Key is too long' } as CredentialError };
+          }
+          validatedPayload = { accessKeyId: (accessKeyId as string).trim(), secretAccessKey: (secretAccessKey as string).trim() };
+        } else {
+          const { value } = typedArgs.payload;
+          if (typeof value !== 'string' || !value.trim()) {
+            return { success: false, error: { code: 'VALIDATION_ERROR', field: 'value', message: 'Secret value cannot be empty' } as CredentialError };
+          }
+          if ((value as string).trim().length > 512) {
+            return { success: false, error: { code: 'VALIDATION_ERROR', field: 'value', message: 'Token value is too long' } as CredentialError };
+          }
+          validatedPayload = { value: (value as string).trim() };
+        }
+
+        const existing = db.queryAll<{ id: number }>(
+          'SELECT id FROM credentials WHERE name = ? AND id != ?',
+          [name, typedArgs.id]
+        );
+        if (existing.length > 0) {
+          return { success: false, error: { code: 'DUPLICATE_NAME', field: 'name', message: 'A credential with this name already exists' } as CredentialError };
+        }
+
+        const json = JSON.stringify(validatedPayload);
+        const encryptedBuffer = safeStorage.encryptString(json);
+
+        try {
+          db.execute(
+            'UPDATE credentials SET name = ?, encrypted_payload = ? WHERE id = ?',
+            [name, encryptedBuffer, typedArgs.id]
+          );
+        } catch (sqlErr: unknown) {
+          const msg = sqlErr instanceof Error ? sqlErr.message : String(sqlErr);
+          if (msg.includes('UNIQUE constraint failed')) {
+            return { success: false, error: { code: 'DUPLICATE_NAME', field: 'name', message: 'A credential with this name already exists' } as CredentialError };
+          }
+          return { success: false, error: { code: 'QUERY_ERROR', message: 'Failed to update credential' } as CredentialError };
+        }
+
+        const rows = db.queryAll<{ id: number; name: string; type: string; created_at: string }>(
+          'SELECT id, name, type, created_at FROM credentials WHERE id = ?',
+          [typedArgs.id]
+        );
+        if (rows.length === 0) {
+          return { success: false, error: { code: 'QUERY_ERROR', message: 'Credential not found after update' } as CredentialError };
+        }
+        const row = rows[0];
+        const data: CredentialListItem = {
+          id: row.id,
+          name: row.name,
+          type: row.type as CredentialType,
+          masked: getMasked(row.type as CredentialType),
+          created_at: row.created_at,
+          linked_server_count: 0,
+        };
+        return { success: true, data };
+      } catch (err: unknown) {
+        console.error('[credential:update] Unexpected error:', err);
+        return { success: false, error: { code: 'QUERY_ERROR', message: 'An unexpected error occurred' } as CredentialError };
+      }
+    });
+
     const isMac = process.platform === 'darwin';
     const menu = buildMenu(isMac);
     Menu.setApplicationMenu(menu);

@@ -36,12 +36,22 @@
     loadCredentials();
   }
 
+  let updateSuccessTimer: ReturnType<typeof setTimeout> | null = null;
+
+  function handleCredentialUpdated(event: CustomEvent<CredentialListItem>) {
+    successMessage = `Credential "${event.detail.name}" updated.`;
+    if (successTimer) clearTimeout(successTimer);
+    successTimer = setTimeout(() => (successMessage = ''), 4000);
+    loadCredentials();
+  }
+
   onMount(() => {
     loadCredentials();
   });
 
   onDestroy(() => {
     if (successTimer) clearTimeout(successTimer);
+    if (updateSuccessTimer) clearTimeout(updateSuccessTimer);
   });
 </script>
 
@@ -73,7 +83,7 @@
       </button>
     </div>
   {:else}
-    <CredentialList items={credentials} />
+    <CredentialList items={credentials} on:credentialUpdated={handleCredentialUpdated} />
   {/if}
 </div>
 

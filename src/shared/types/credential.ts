@@ -44,3 +44,14 @@ export interface CredentialListItem {
 export type ListCredentialsResult =
   | { success: true; data: CredentialListItem[] }
   | { success: false; error: CredentialError };
+
+export interface UpdateCredentialArgs {
+  id: number;
+  name: string;
+  type: CredentialType;
+  payload: CredentialPayload;
+}
+
+export type UpdateCredentialResult =
+  | { success: true; data: CredentialListItem }
+  | { success: false; error: CredentialError };

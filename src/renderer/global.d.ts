@@ -4,7 +4,7 @@ import type { WindowState } from '../main/utils/window-state';
 import type { AppSettings } from '../shared/types/settings';
 import type { Project } from '../shared/types/project';
 import type { PipelineProgress } from '../shared/types/pipeline';
-import type { AddCredentialArgs, Credential, CredentialError, CredentialListItem, ListCredentialsResult } from '../shared/types/credential';
+import type { AddCredentialArgs, Credential, CredentialError, CredentialListItem, ListCredentialsResult, UpdateCredentialArgs, UpdateCredentialResult } from '../shared/types/credential';
 
 declare global {
   interface AppInfo {
@@ -38,6 +38,7 @@ declare global {
       credential: {
         add: (args: AddCredentialArgs) => Promise<{ success: boolean; data?: Credential; error?: CredentialError }>;
         list: () => Promise<ListCredentialsResult>;
+        update: (args: UpdateCredentialArgs) => Promise<UpdateCredentialResult>;
       };
     };
   }
