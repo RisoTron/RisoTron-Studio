@@ -36,6 +36,13 @@
     loadCredentials();
   }
 
+  function handleCredentialUpdated(event: CustomEvent<CredentialListItem>) {
+    successMessage = `Credential "${event.detail.name}" updated.`;
+    if (successTimer) clearTimeout(successTimer);
+    successTimer = setTimeout(() => (successMessage = ''), 4000);
+    // List is already patched in-place by CredentialList; no re-fetch needed.
+  }
+
   onMount(() => {
     loadCredentials();
   });
@@ -73,7 +80,7 @@
       </button>
     </div>
   {:else}
-    <CredentialList items={credentials} />
+    <CredentialList items={credentials} on:credentialUpdated={handleCredentialUpdated} />
   {/if}
 </div>
 
