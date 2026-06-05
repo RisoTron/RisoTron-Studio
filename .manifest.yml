@@ -97,14 +97,6 @@ backlog:
   epic: credential-vault
   feature: credential-crud
   status: backlog
-- issue: 147
-  type: us
-  title: '[US] Update credential name or rotate value'
-  epic: credential-vault
-  feature: credential-crud
-  status: in-progress
-  pr: 170
-  branch: feat/credential-vault/update-rotate-credential
 - issue: 148
   type: us
   title: '[US] Delete a credential'
@@ -275,6 +267,14 @@ epics:
     issue: 144
     status: planned
 completed:
+- issue: 147
+  type: us
+  title: '[US] Update credential name or rotate value'
+  epic: credential-vault
+  feature: credential-crud
+  status: done
+  merged_pr: 170
+  completed_at: '2026-06-05'
 - issue: 145
   type: us
   title: '[US] Add a credential to the vault'
