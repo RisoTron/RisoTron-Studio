@@ -483,9 +483,9 @@ if (!gotTheLock) {
     ipcMain.handle('credential:list', async (event) => {
       try {
         validateSender(event);
-        const rows = db.prepare(
+        const rows = db.queryAll<{ id: number; name: string; type: string; created_at: string }>(
           'SELECT id, name, type, created_at FROM credentials ORDER BY created_at DESC'
-        ).all() as Array<{ id: number; name: string; type: string; created_at: string }>;
+        );
 
         const data: CredentialListItem[] = rows.map((row) => ({
           id: row.id,
