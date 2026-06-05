@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.17.0](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.16.0...risotron-studio-v1.17.0) (2026-06-05)
+
+
+### Features
+
+* **credential-vault:** US [#146](https://github.com/RisoTron/RisoTron-Studio/issues/146) — view all credentials with masked values ([#163](https://github.com/RisoTron/RisoTron-Studio/issues/163)) ([bd77fa5](https://github.com/RisoTron/RisoTron-Studio/commit/bd77fa5f14b94d31db385128a6f2deda34da7e43))
+
 ## [1.16.0](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.15.1...risotron-studio-v1.16.0) (2026-06-05)
 
 
