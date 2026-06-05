@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.0](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.15.1...risotron-studio-v1.16.0) (2026-06-05)
+
+
+### Features
+
+* **credential-vault:** US [#145](https://github.com/RisoTron/RisoTron-Studio/issues/145) — Add a credential to the vault ([#160](https://github.com/RisoTron/RisoTron-Studio/issues/160)) ([d02e974](https://github.com/RisoTron/RisoTron-Studio/commit/d02e97407fb317323fd40aa76d64c51078ec2d03))
+
 ## [1.15.1](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.15.0...risotron-studio-v1.15.1) (2026-06-03)
 
 
