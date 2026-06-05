@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.19.0](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.18.0...risotron-studio-v1.19.0) (2026-06-05)
+
+
+### Features
+
+* **credential-vault:** delete a credential (US [#148](https://github.com/RisoTron/RisoTron-Studio/issues/148)) ([#174](https://github.com/RisoTron/RisoTron-Studio/issues/174)) ([e615c68](https://github.com/RisoTron/RisoTron-Studio/commit/e615c68d28ba33e16510fcd5b2411d3ca7ded3dd))
+
 ## [1.18.0](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.17.0...risotron-studio-v1.18.0) (2026-06-05)
 
 
