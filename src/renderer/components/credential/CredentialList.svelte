@@ -15,13 +15,9 @@
     });
   }
 
-  function handleEdit(id: number) {
-    editingId = id;
-  }
-
-  function handleUpdated(event: CustomEvent<CredentialListItem>) {
+  function handleCredentialUpdated(event: CustomEvent<CredentialListItem>) {
     const updated = event.detail;
-    items = items.map(i => i.id === updated.id ? updated : i);
+    items = items.map((c) => (c.id === updated.id ? updated : c));
     editingId = null;
     dispatch('credentialUpdated', updated);
   }
@@ -36,15 +32,14 @@
     <div id="cred-list-item-{item.id}" class="cred-row">
       <div class="cred-main">
         <span class="cred-name">{item.name}</span>
-        <span class="cred-type-badge" data-type={item.type}>{item.type}</span>
         <button
           id="cred-edit-btn-{item.id}"
           class="btn-edit"
-          on:click={() => handleEdit(item.id)}
-          aria-label="Edit {item.name}"
+          on:click={() => { editingId = editingId === item.id ? null : item.id; }}
         >
-          Edit
+          {editingId === item.id ? 'Cancel' : 'Edit'}
         </button>
+        <span class="cred-type-badge" data-type={item.type}>{item.type}</span>
       </div>
       <div class="cred-meta">
         <span class="cred-masked-value">{item.masked}</span>
@@ -52,11 +47,7 @@
         <span class="cred-date">{formatDate(item.created_at)}</span>
       </div>
       {#if editingId === item.id}
-        <EditCredentialForm
-          {item}
-          on:credentialUpdated={handleUpdated}
-          on:cancelled={handleCancelled}
-        />
+        <EditCredentialForm {item} on:credentialUpdated={handleCredentialUpdated} on:cancelled={handleCancelled} />
       {/if}
     </div>
   {/each}
@@ -87,6 +78,18 @@
     font-weight: 600;
     color: var(--vscode-foreground, #ccc);
     flex: 1;
+  }
+  .btn-edit {
+    padding: 2px 10px;
+    font-size: 11px;
+    background: var(--vscode-button-secondaryBackground, #3a3d41);
+    color: var(--vscode-button-secondaryForeground, #fff);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .btn-edit:hover {
+    background: var(--vscode-button-secondaryHoverBackground, #45494e);
   }
   .cred-type-badge {
     font-size: 11px;
@@ -129,17 +132,5 @@
   }
   .cred-date {
     margin-left: auto;
-  }
-  .btn-edit {
-    padding: 2px 10px;
-    background: var(--vscode-button-secondaryBackground, #3a3d41);
-    color: var(--vscode-button-secondaryForeground, #ccc);
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 11px;
-  }
-  .btn-edit:hover {
-    background: var(--vscode-button-secondaryHoverBackground, #45494e);
   }
 </style>
