@@ -1,15 +1,26 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import type { ReleaseProvider } from '../../../../shared/types/wizard';
+  import type { ReleaseServer } from '../../../../shared/types/release-server';
+  import { PROVIDER_TYPES } from '../../../../shared/constants/providers';
   import { setStepValidity, wizardStore } from '../../../store/wizardStore.svelte';
 
+  type ExtendedProvider = ReleaseProvider | 'saved';
+
   interface ProviderOption {
-    id: ReleaseProvider;
+    id: ExtendedProvider;
     name: string;
     icon: string;
     description: string;
   }
 
   const providers: ProviderOption[] = [
+    {
+      id: 'saved',
+      name: 'Saved Server',
+      icon: 'codicon-server-environment',
+      description: 'Pick a pre-configured release server.',
+    },
     {
       id: 'github',
       name: 'GitHub Releases',
@@ -30,13 +41,45 @@
     },
   ];
 
+  let selectedMode: ExtendedProvider = $state(wizardStore.project.releaseServerId ? 'saved' : (wizardStore.project.releaseProvider ?? 'none'));
+  let savedServers: ReleaseServer[] = $state([]);
+  let loadingServers = $state(true);
+
+  onMount(async () => {
+    try {
+      const result = await window.api.releaseServer.list();
+      if (result.success) {
+        savedServers = result.data;
+      }
+    } catch (e) {
+      console.error('Failed to load release servers', e);
+    } finally {
+      loadingServers = false;
+    }
+  });
+
+  function selectMode(mode: ExtendedProvider) {
+    selectedMode = mode;
+    if (mode === 'saved') {
+      wizardStore.project.releaseProvider = 'none';
+    } else {
+      wizardStore.project.releaseProvider = mode;
+      wizardStore.project.releaseServerId = undefined;
+    }
+  }
+
+  function selectSavedServer(serverId: number) {
+    wizardStore.project.releaseServerId = serverId;
+  }
+
   const isStepValid = $derived(
-    wizardStore.project.releaseProvider === 'none' ||
-      (wizardStore.project.releaseProvider === 'github' &&
+    selectedMode === 'none' ||
+      (selectedMode === 'saved' && wizardStore.project.releaseServerId != null) ||
+      (selectedMode === 'github' &&
         /^[a-zA-Z0-9](?:[a-zA-Z0-9]|-(?=[a-zA-Z0-9])){0,38}$/.test(wizardStore.project.github.owner.trim()) &&
         /^[a-zA-Z0-9_.-]+$/.test(wizardStore.project.github.repository.trim()) &&
         wizardStore.project.github.tokenEnvVar.trim().length > 0) ||
-      (wizardStore.project.releaseProvider === 's3' &&
+      (selectedMode === 's3' &&
         /^[a-z0-9.-]{3,63}$/.test(wizardStore.project.s3.bucket.trim()) &&
         /^[a-z0-9-]+$/.test(wizardStore.project.s3.region.trim()))
   );
@@ -58,8 +101,8 @@
       <button
         type="button"
         class="provider-card"
-        class:selected={wizardStore.project.releaseProvider === provider.id}
-        onclick={() => (wizardStore.project.releaseProvider = provider.id)}
+        class:selected={selectedMode === provider.id}
+        onclick={() => selectMode(provider.id)}
       >
         <i class={`codicon ${provider.icon}`}></i>
         <span>
@@ -70,7 +113,32 @@
     {/each}
   </div>
 
-  {#if wizardStore.project.releaseProvider === 'github'}
+  {#if selectedMode === 'saved'}
+    <div class="config-panel">
+      {#if loadingServers}
+        <p class="hint wide">Loading saved servers…</p>
+      {:else if savedServers.length === 0}
+        <p class="hint wide">No saved servers yet. Add one from the Release Servers view first, or choose a manual option above.</p>
+      {:else}
+        <div class="server-picker wide">
+          {#each savedServers as server (server.id)}
+            <button
+              type="button"
+              class="server-option"
+              class:selected={wizardStore.project.releaseServerId === server.id}
+              onclick={() => selectSavedServer(server.id)}
+            >
+              <i class={`codicon ${PROVIDER_TYPES[server.provider_type]?.icon ?? 'codicon-server'}`}></i>
+              <div class="server-option-info">
+                <strong>{server.name}</strong>
+                <small>{PROVIDER_TYPES[server.provider_type]?.label ?? server.provider_type} · {server.credential_name}</small>
+              </div>
+            </button>
+          {/each}
+        </div>
+      {/if}
+    </div>
+  {:else if selectedMode === 'github'}
     <div class="config-panel">
       <label class="field">
         <span>Owner</span>
@@ -85,7 +153,7 @@
         <input type="text" bind:value={wizardStore.project.github.tokenEnvVar} placeholder="GITHUB_TOKEN" />
       </label>
     </div>
-  {:else if wizardStore.project.releaseProvider === 's3'}
+  {:else if selectedMode === 's3'}
     <div class="config-panel">
       <label class="field">
         <span>Bucket</span>
@@ -209,6 +277,12 @@
     grid-column: 1 / -1;
   }
 
+  .hint {
+    color: #64748b;
+    font-size: 13px;
+    font-style: italic;
+  }
+
   input {
     width: 100%;
     border: 1px solid #e2e8f0;
@@ -224,6 +298,57 @@
   input:focus {
     border-color: #3b82f6;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.14);
+  }
+
+  .server-picker {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .server-option {
+    all: unset;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 12px 14px;
+    border: 1px solid #e8eaed;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+
+  .server-option:hover {
+    border-color: #bfdbfe;
+    background: #f8fafc;
+  }
+
+  .server-option.selected {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.14);
+    background: #f5f3ff;
+  }
+
+  .server-option :global(.codicon) {
+    color: #6366f1;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .server-option-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .server-option-info strong {
+    font-size: 13px;
+    color: #1e293b;
+  }
+
+  .server-option-info small {
+    font-size: 12px;
+    color: #64748b;
   }
 
   @media (max-width: 720px) {

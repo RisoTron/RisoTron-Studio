@@ -5,6 +5,7 @@ import type { AppSettings } from '../shared/types/settings';
 import type { Project } from '../shared/types/project';
 import type { PipelineProgress } from '../shared/types/pipeline';
 import type { AddCredentialArgs, Credential, CredentialError, CredentialListItem, DeleteCredentialResult, ListCredentialsResult, UpdateCredentialArgs, UpdateCredentialResult } from '../shared/types/credential';
+import type { AddReleaseServerArgs, AddReleaseServerResult, ListReleaseServersResult } from '../shared/types/release-server';
 
 declare global {
   interface AppInfo {
@@ -40,6 +41,10 @@ declare global {
         list: () => Promise<ListCredentialsResult>;
         update: (args: UpdateCredentialArgs) => Promise<UpdateCredentialResult>;
         delete: (args: { id: number }) => Promise<DeleteCredentialResult>;
+      };
+      releaseServer: {
+        add: (args: AddReleaseServerArgs) => Promise<AddReleaseServerResult>;
+        list: () => Promise<ListReleaseServersResult>;
       };
     };
   }

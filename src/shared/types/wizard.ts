@@ -36,6 +36,7 @@ export interface ProjectWizardState {
   author: string;
   template: ProjectTemplateId;
   releaseProvider: ReleaseProvider;
+  releaseServerId?: number;
   github: GitHubReleaseConfig;
   s3: S3ReleaseConfig;
   targetPlatforms: TargetPlatform[];
