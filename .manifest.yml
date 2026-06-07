@@ -153,6 +153,18 @@ backlog:
     status: backlog
     blocked_by:
       - 153
+  - issue: 181
+    type: us
+    title: '[US] Extract FeatureLayout and Button shared components'
+    epic: dashboard-ui
+    feature: ui-standard
+    status: ready
+  - issue: 182
+    type: us
+    title: '[US] Migrate views to Svelte 5 and apply FeatureLayout'
+    epic: dashboard-ui
+    feature: ui-standard
+    status: ready
 epics:
   - id: electron-shell
     title: Electron Shell
@@ -204,6 +216,10 @@ epics:
       - id: project-detail
         title: Project Detail View
         issue: 14
+        status: planned
+      - id: ui-standard
+        title: UI Standard & Shared Components
+        issue: 180
         status: planned
   - id: project-scaffold
     title: Project Scaffolding Core
@@ -430,3 +446,4 @@ labels_created:
     - feat:provider-registry
     - feat:project-binding
     - feat:release-status
+    - feat:ui-standard
