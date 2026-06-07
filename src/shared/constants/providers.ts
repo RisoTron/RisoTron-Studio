@@ -5,8 +5,8 @@ export const PROVIDER_TYPES = {
     description: 'Publish builds via GitHub Releases API.',
     requiredCredential: 'github-pat' as const,
     configFields: [
-      { key: 'owner', label: 'Owner', placeholder: 'organization' },
-      { key: 'repo', label: 'Repository', placeholder: 'my-app' },
+      { key: 'owner', label: 'Owner', placeholder: 'organization', required: true },
+      { key: 'repo', label: 'Repository', placeholder: 'my-app', required: true },
     ],
   },
   's3': {
@@ -15,9 +15,9 @@ export const PROVIDER_TYPES = {
     description: 'Upload artifacts to an S3 bucket.',
     requiredCredential: 'aws' as const,
     configFields: [
-      { key: 'bucket', label: 'Bucket', placeholder: 'release-artifacts' },
-      { key: 'region', label: 'Region', placeholder: 'us-east-1' },
-      { key: 'prefix', label: 'Prefix', placeholder: 'apps/my-app' },
+      { key: 'bucket', label: 'Bucket', placeholder: 'release-artifacts', required: true },
+      { key: 'region', label: 'Region', placeholder: 'us-east-1', required: true },
+      { key: 'prefix', label: 'Prefix', placeholder: 'apps/my-app', required: false },
     ],
   },
   'generic-url': {
@@ -26,7 +26,7 @@ export const PROVIDER_TYPES = {
     description: 'Point to a self-hosted update server.',
     requiredCredential: 'generic-token' as const,
     configFields: [
-      { key: 'url', label: 'Server URL', placeholder: 'https://releases.example.com' },
+      { key: 'url', label: 'Server URL', placeholder: 'https://releases.example.com', required: true },
     ],
   },
 } as const;

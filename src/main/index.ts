@@ -453,7 +453,7 @@ if (!gotTheLock) {
         const masked = getMasked(credType);
 
         // Generate timestamp in JS to avoid SELECT-after-INSERT
-        const created_at = new Date().toISOString().replace('T', ' ').split('.')[0] + ' UTC';
+        const created_at = new Date().toISOString().replace('T', ' ').split('.')[0];
 
         // Insert
         let insertId: number;
@@ -744,7 +744,7 @@ if (!gotTheLock) {
         const config: Record<string, string> = {};
         for (const field of providerDef.configFields) {
           const val = typeof typedArgs.config[field.key] === 'string' ? typedArgs.config[field.key].trim() : '';
-          if (!val) {
+          if (field.required !== false && !val) {
             return { success: false, error: { code: 'VALIDATION_ERROR', field: field.key, message: `${field.label} is required` } as ReleaseServerError };
           }
           if (val.length > 255) {
@@ -754,7 +754,7 @@ if (!gotTheLock) {
         }
 
         const configJson = JSON.stringify(config);
-        const created_at = new Date().toISOString().replace('T', ' ').split('.')[0] + ' UTC';
+        const created_at = new Date().toISOString().replace('T', ' ').split('.')[0];
 
         let insertId: number;
         try {

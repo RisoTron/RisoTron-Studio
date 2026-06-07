@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { PROVIDER_TYPES, PROVIDER_TYPE_KEYS } from '../../../shared/constants/providers';
   import type { ProviderTypeKey } from '../../../shared/constants/providers';
   import type { AddReleaseServerArgs, ReleaseServer, ReleaseServerError } from '../../../shared/types/release-server';
@@ -27,17 +28,18 @@
     credentials.filter((c) => c.type === requiredCredType)
   );
 
-  $effect(() => {
+  onMount(() => {
     loadCredentials();
   });
 
   $effect(() => {
     // Reset credential and config when provider changes
-    void providerType;
-    credentialId = null;
-    configValues = {};
-    fieldErrors = {};
-    bannerError = '';
+    if (providerType) {
+      credentialId = null;
+      configValues = {};
+      fieldErrors = {};
+      bannerError = '';
+    }
   });
 
   async function loadCredentials() {

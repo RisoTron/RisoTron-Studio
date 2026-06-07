@@ -83,7 +83,7 @@ export const migrations: Migration[] = [
         id              INTEGER PRIMARY KEY AUTOINCREMENT,
         name            TEXT    NOT NULL,
         provider_type   TEXT    NOT NULL CHECK(provider_type IN ('github-releases', 's3', 'generic-url')),
-        credential_id   INTEGER NOT NULL REFERENCES credentials(id),
+        credential_id   INTEGER NOT NULL REFERENCES credentials(id) ON DELETE RESTRICT,
         config          TEXT    NOT NULL DEFAULT '{}',
         created_at      TEXT    NOT NULL DEFAULT (datetime('now', 'utc'))
       );

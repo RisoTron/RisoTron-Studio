@@ -1,3 +1,5 @@
+// @vitest-environment node
+
 // eslint-disable-next-line import/no-unresolved
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { SqliteAdapter } from '../db/adapters/SqliteAdapter';

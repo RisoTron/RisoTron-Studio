@@ -6,6 +6,7 @@
 
   let servers: ReleaseServer[] = $state([]);
   let loading = $state(true);
+  let error = $state('');
   let showForm = $state(false);
 
   onMount(() => {
@@ -14,13 +15,17 @@
 
   async function loadServers() {
     loading = true;
+    error = '';
     try {
       const result = await window.api.releaseServer.list();
       if (result.success) {
         servers = result.data;
+      } else {
+        error = result.error.message;
       }
     } catch (e) {
       console.error('Failed to load release servers', e);
+      error = e instanceof Error ? e.message : 'Failed to load release servers';
     } finally {
       loading = false;
     }
@@ -47,6 +52,8 @@
 
   {#if loading}
     <div class="empty-state">Loading…</div>
+  {:else if error}
+    <div class="error-state">{error}</div>
   {:else if servers.length === 0}
     <div class="empty-state">
       <i class="codicon codicon-server-environment"></i>
@@ -125,6 +132,14 @@
   .empty-state .codicon {
     font-size: 36px;
     opacity: 0.5;
+  }
+  .error-state {
+    padding: 10px 12px;
+    background: var(--vscode-inputValidation-errorBackground, #5a1d1d);
+    border: 1px solid var(--vscode-inputValidation-errorBorder, #be1100);
+    border-radius: 4px;
+    color: var(--vscode-inputValidation-errorForeground, #f85149);
+    font-size: 13px;
   }
   .btn-link {
     background: none;
