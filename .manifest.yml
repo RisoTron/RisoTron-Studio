@@ -9,441 +9,437 @@ github_project:
   number: 1
   owner: RisoTron
   board_url: https://github.com/orgs/RisoTron/projects/1
-current_work:
-  - issue: 149
+current_work: []
 backlog:
-  - issue: 26
-    type: us
-    title: '[US] Project data persisted in SQLite'
-    epic: data-layer
-    feature: sqlite-storage
-    status: done
-  - issue: 30
-    type: us
-    title: '[US] See all projects in dashboard'
-    epic: dashboard-ui
-    feature: project-list
-    status: done
-  - issue: 37
-    type: us
-    title: '[US] Scaffold from Electron Forge with auto-update'
-    epic: project-scaffold
-    feature: template-provider
-    status: done
-  - issue: 39
-    type: us
-    title: '[US] Configure GitHub Releases as update server'
-    epic: project-scaffold
-    feature: release-provider
-    status: backlog
-  - issue: 41
-    type: us
-    title: '[US] GitHub Actions workflows with build+sign+publish'
-    epic: project-scaffold
-    feature: cicd-provider
-    status: backlog
-  - issue: 36
-    type: us
-    title: '[US] Progress feedback during scaffolding'
-    epic: project-scaffold
-    feature: pipeline-engine
-    status: done
-  - issue: 118
-    type: us
-    title: '[US] Pipeline routing by template_id — ForgeProvider rename'
-    epic: project-scaffold
-    feature: forge-provider
-    status: done
-    notes: Merged via PR
-  - issue: 38
-    type: us
-    title: '[US] Scaffold from RisoTron framework'
-    epic: project-scaffold
-    feature: forge-provider
-    status: backlog
-    blocked_by:
-      - 118
-    notes: >-
-      Implement RisotronProvider as alternative scaffold pipeline to
-      ForgeProvider. User chooses framework (electron-forge vs risotron) in
-      wizard.
-  - issue: 40
-    type: us
-    title: '[US] Configure S3/R2 as release server'
-    epic: project-scaffold
-    feature: release-provider
-    status: backlog
-  - issue: 42
-    type: us
-    title: '[US] Code signing in CD pipeline'
-    epic: project-scaffold
-    feature: cicd-provider
-    status: backlog
-  - issue: 58
-    type: us
-    title: '[US] Setup GitHub Actions CI/CD workflows sequentially'
-    epic: devops
-    feature: cicd-pipeline
-    status: backlog
-  - issue: 145
-    type: us
-    title: '[US] Add a credential to the vault'
-    epic: credential-vault
-    feature: credential-crud
-    status: done
-  - issue: 146
-    type: us
-    title: '[US] View all credentials with masked values'
-    epic: credential-vault
-    feature: credential-crud
-    status: backlog
-  - issue: 149
-    type: us
-    title: '[US] Add a release server'
-    epic: release-server
-    feature: server-config-store
-    status: ready
-    blocked_by:
-      - 145
-  - issue: 150
-    type: us
-    title: '[US] View all release servers'
-    epic: release-server
-    feature: server-config-store
-    status: backlog
-    blocked_by:
-      - 145
-  - issue: 151
-    type: us
-    title: '[US] Edit release server config'
-    epic: release-server
-    feature: server-config-store
-    status: backlog
-    blocked_by:
-      - 145
-  - issue: 152
-    type: us
-    title: '[US] Delete a release server'
-    epic: release-server
-    feature: server-config-store
-    status: backlog
-    blocked_by:
-      - 145
-  - issue: 153
-    type: us
-    title: '[US] Assign release server to project'
-    epic: release-server
-    feature: project-binding
-    status: backlog
-    blocked_by:
-      - 149
-  - issue: 154
-    type: us
-    title: '[US] Unassign release server from project'
-    epic: release-server
-    feature: project-binding
-    status: backlog
-    blocked_by:
-      - 153
-  - issue: 155
-    type: us
-    title: '[US] View release stats from GitHub'
-    epic: release-server
-    feature: release-status
-    status: backlog
-    blocked_by:
-      - 153
-  - issue: 181
-    type: us
-    title: '[US] Extract FeatureLayout and Button shared components'
-    epic: dashboard-ui
-    feature: ui-standard
-    status: ready
-  - issue: 182
-    type: us
-    title: '[US] Migrate views to Svelte 5 and apply FeatureLayout'
-    epic: dashboard-ui
-    feature: ui-standard
-    status: ready
+- issue: 26
+  type: us
+  title: '[US] Project data persisted in SQLite'
+  epic: data-layer
+  feature: sqlite-storage
+  status: done
+- issue: 30
+  type: us
+  title: '[US] See all projects in dashboard'
+  epic: dashboard-ui
+  feature: project-list
+  status: done
+- issue: 37
+  type: us
+  title: '[US] Scaffold from Electron Forge with auto-update'
+  epic: project-scaffold
+  feature: template-provider
+  status: done
+- issue: 39
+  type: us
+  title: '[US] Configure GitHub Releases as update server'
+  epic: project-scaffold
+  feature: release-provider
+  status: backlog
+- issue: 41
+  type: us
+  title: '[US] GitHub Actions workflows with build+sign+publish'
+  epic: project-scaffold
+  feature: cicd-provider
+  status: backlog
+- issue: 36
+  type: us
+  title: '[US] Progress feedback during scaffolding'
+  epic: project-scaffold
+  feature: pipeline-engine
+  status: done
+- issue: 118
+  type: us
+  title: '[US] Pipeline routing by template_id — ForgeProvider rename'
+  epic: project-scaffold
+  feature: forge-provider
+  status: done
+  notes: Merged via PR
+- issue: 38
+  type: us
+  title: '[US] Scaffold from RisoTron framework'
+  epic: project-scaffold
+  feature: forge-provider
+  status: backlog
+  blocked_by:
+  - 118
+  notes: Implement RisotronProvider as alternative scaffold pipeline to ForgeProvider.
+    User chooses framework (electron-forge vs risotron) in wizard.
+- issue: 40
+  type: us
+  title: '[US] Configure S3/R2 as release server'
+  epic: project-scaffold
+  feature: release-provider
+  status: backlog
+- issue: 42
+  type: us
+  title: '[US] Code signing in CD pipeline'
+  epic: project-scaffold
+  feature: cicd-provider
+  status: backlog
+- issue: 58
+  type: us
+  title: '[US] Setup GitHub Actions CI/CD workflows sequentially'
+  epic: devops
+  feature: cicd-pipeline
+  status: backlog
+- issue: 145
+  type: us
+  title: '[US] Add a credential to the vault'
+  epic: credential-vault
+  feature: credential-crud
+  status: done
+- issue: 146
+  type: us
+  title: '[US] View all credentials with masked values'
+  epic: credential-vault
+  feature: credential-crud
+  status: backlog
+- issue: 150
+  type: us
+  title: '[US] View all release servers'
+  epic: release-server
+  feature: server-config-store
+  status: backlog
+  blocked_by:
+  - 145
+- issue: 151
+  type: us
+  title: '[US] Edit release server config'
+  epic: release-server
+  feature: server-config-store
+  status: backlog
+  blocked_by:
+  - 145
+- issue: 152
+  type: us
+  title: '[US] Delete a release server'
+  epic: release-server
+  feature: server-config-store
+  status: backlog
+  blocked_by:
+  - 145
+- issue: 153
+  type: us
+  title: '[US] Assign release server to project'
+  epic: release-server
+  feature: project-binding
+  status: backlog
+  blocked_by:
+  - 149
+- issue: 154
+  type: us
+  title: '[US] Unassign release server from project'
+  epic: release-server
+  feature: project-binding
+  status: backlog
+  blocked_by:
+  - 153
+- issue: 155
+  type: us
+  title: '[US] View release stats from GitHub'
+  epic: release-server
+  feature: release-status
+  status: backlog
+  blocked_by:
+  - 153
+- issue: 181
+  type: us
+  title: '[US] Extract FeatureLayout and Button shared components'
+  epic: dashboard-ui
+  feature: ui-standard
+  status: ready
+- issue: 182
+  type: us
+  title: '[US] Migrate views to Svelte 5 and apply FeatureLayout'
+  epic: dashboard-ui
+  feature: ui-standard
+  status: ready
 epics:
-  - id: electron-shell
-    title: Electron Shell
-    issue: 1
+- id: electron-shell
+  title: Electron Shell
+  issue: 1
+  status: planned
+  features:
+  - id: app-bootstrap
+    title: App Bootstrap
+    issue: 6
     status: planned
-    features:
-      - id: app-bootstrap
-        title: App Bootstrap
-        issue: 6
-        status: planned
-      - id: ipc-bridge
-        title: IPC Bridge
-        issue: 7
-        status: planned
-      - id: app-lifecycle
-        title: App Lifecycle
-        issue: 8
-        status: planned
-  - id: data-layer
-    title: Data Layer
-    issue: 2
+  - id: ipc-bridge
+    title: IPC Bridge
+    issue: 7
     status: planned
-    features:
-      - id: sqlite-storage
-        title: SQLite Storage
-        issue: 9
-        status: planned
-      - id: project-crud
-        title: Project CRUD
-        issue: 10
-        status: planned
-      - id: config-manager
-        title: Config Manager
-        issue: 11
-        status: planned
-  - id: dashboard-ui
-    title: Dashboard UI
-    issue: 3
+  - id: app-lifecycle
+    title: App Lifecycle
+    issue: 8
     status: planned
-    features:
-      - id: project-list
-        title: Project List
-        issue: 12
-        status: planned
-      - id: create-wizard
-        title: Create Wizard
-        issue: 13
-        status: planned
-      - id: project-detail
-        title: Project Detail View
-        issue: 14
-        status: planned
-      - id: ui-standard
-        title: UI Standard & Shared Components
-        issue: 180
-        status: planned
-  - id: project-scaffold
-    title: Project Scaffolding Core
-    issue: 4
+- id: data-layer
+  title: Data Layer
+  issue: 2
+  status: planned
+  features:
+  - id: sqlite-storage
+    title: SQLite Storage
+    issue: 9
     status: planned
-    features:
-      - id: pipeline-engine
-        title: Pipeline Engine
-        issue: 15
-        status: planned
-      - id: release-provider
-        title: Release Provider
-        issue: 17
-        status: planned
-      - id: cicd-provider
-        title: CICD Provider
-        issue: 18
-        status: planned
-  - id: devops
-    title: DevOps & Infrastructure
-    issue: 50
+  - id: project-crud
+    title: Project CRUD
+    issue: 10
     status: planned
-    features:
-      - id: cicd-pipeline
-        title: CI/CD Pipeline
-        issue: 51
-        status: planned
-  - id: credential-vault
-    title: Credential Vault
-    issue: 137
+  - id: config-manager
+    title: Config Manager
+    issue: 11
     status: planned
-    features:
-      - id: secure-storage
-        title: Secure Storage
-        issue: 139
-        status: planned
-      - id: credential-crud
-        title: Credential CRUD
-        issue: 140
-        status: planned
-  - id: release-server
-    title: Release Server Management
-    issue: 138
+- id: dashboard-ui
+  title: Dashboard UI
+  issue: 3
+  status: planned
+  features:
+  - id: project-list
+    title: Project List
+    issue: 12
     status: planned
-    features:
-      - id: server-config-store
-        title: Server Config Store
-        issue: 141
-        status: planned
-      - id: provider-registry
-        title: Provider Registry
-        issue: 142
-        status: planned
-      - id: project-binding
-        title: Project Binding
-        issue: 143
-        status: planned
-      - id: release-status
-        title: Release Status
-        issue: 144
-        status: planned
+  - id: create-wizard
+    title: Create Wizard
+    issue: 13
+    status: planned
+  - id: project-detail
+    title: Project Detail View
+    issue: 14
+    status: planned
+  - id: ui-standard
+    title: UI Standard & Shared Components
+    issue: 180
+    status: planned
+- id: project-scaffold
+  title: Project Scaffolding Core
+  issue: 4
+  status: planned
+  features:
+  - id: pipeline-engine
+    title: Pipeline Engine
+    issue: 15
+    status: planned
+  - id: release-provider
+    title: Release Provider
+    issue: 17
+    status: planned
+  - id: cicd-provider
+    title: CICD Provider
+    issue: 18
+    status: planned
+- id: devops
+  title: DevOps & Infrastructure
+  issue: 50
+  status: planned
+  features:
+  - id: cicd-pipeline
+    title: CI/CD Pipeline
+    issue: 51
+    status: planned
+- id: credential-vault
+  title: Credential Vault
+  issue: 137
+  status: planned
+  features:
+  - id: secure-storage
+    title: Secure Storage
+    issue: 139
+    status: planned
+  - id: credential-crud
+    title: Credential CRUD
+    issue: 140
+    status: planned
+- id: release-server
+  title: Release Server Management
+  issue: 138
+  status: planned
+  features:
+  - id: server-config-store
+    title: Server Config Store
+    issue: 141
+    status: planned
+  - id: provider-registry
+    title: Provider Registry
+    issue: 142
+    status: planned
+  - id: project-binding
+    title: Project Binding
+    issue: 143
+    status: planned
+  - id: release-status
+    title: Release Status
+    issue: 144
+    status: planned
 completed:
-  - issue: 147
-    type: us
-    title: '[US] Update credential name or rotate value'
-    epic: credential-vault
-    feature: credential-crud
-    status: done
-    merged_pr: 170
-    completed_at: '2026-06-05'
-  - issue: 145
-    type: us
-    title: '[US] Add a credential to the vault'
-    epic: credential-vault
-    feature: credential-crud
-    status: done
-    merged_pr: 160
-    completed_at: '2026-06-05'
-  - issue: null
-    type: hotfix
-    title: 'fix(devops): Electron renderer ERR_FILE_NOT_FOUND + e2e scaffold timeouts'
-    merged_pr: 126
-    completed_at: '2026-06-03'
-  - issue: 36
-    type: us
-    title: '[US] Progress feedback during scaffolding'
-    epic: project-scaffold
-    feature: pipeline-engine
-    status: done
-    merged_pr: 108
-    completed_at: '2026-06-03'
-  - issue: 37
-    type: us
-    title: '[US] Scaffold from Electron Forge with auto-update'
-    epic: project-scaffold
-    feature: template-provider
-    status: done
-    merged_pr: 113
-    completed_at: '2026-06-03'
-  - issue: 35
-    type: us
-    title: '[US] Pipeline executes 3 stages sequentially'
-    epic: project-scaffold
-    feature: pipeline-engine
-    status: done
-  - issue: 34
-    type: us
-    title: '[US] View project details and status'
-    epic: dashboard-ui
-    feature: project-detail
-    status: done
-  - issue: 33
-    type: us
-    title: '[US] Preview project configuration before creating'
-    epic: dashboard-ui
-    feature: create-wizard
-    status: done
-  - issue: 31
-    type: us
-    title: '[US] Search and filter projects'
-    epic: dashboard-ui
-    feature: project-list
-    status: done
-  - issue: 32
-    type: us
-    title: '[US] Step-by-step wizard to create projects'
-    epic: dashboard-ui
-    feature: create-wizard
-    status: done
-  - issue: 28
-    type: us
-    title: >-
-      [US] SQLite database stores, retrieves, updates, and soft-deletes project
-      records via IPC
-    epic: data-layer
-    feature: project-crud
-    status: done
-  - issue: 27
-    type: us
-    title: '[US] Migration system for schema changes'
-    epic: data-layer
-    feature: sqlite-storage
-    status: done
-  - issue: 29
-    type: us
-    title: '[US] Store and retrieve app settings'
-    epic: data-layer
-    feature: config-manager
-    status: done
-  - issue: 25
-    type: us
-    title: '[US] Single-instance enforcement'
-    epic: electron-shell
-    feature: app-lifecycle
-    status: done
-  - issue: 24
-    type: us
-    title: '[US] Native OS menus with keyboard shortcuts'
-    epic: electron-shell
-    feature: app-lifecycle
-    status: done
-  - issue: 23
-    type: us
-    title: '[US] Secure IPC channels with ping/pong demonstration'
-    epic: electron-shell
-    feature: ipc-bridge
-    status: done
-  - issue: 21
-    type: us
-    title: '[US] Launch app and see main window'
-    epic: electron-shell
-    feature: app-bootstrap
-    status: done
-  - issue: 22
-    type: us
-    title: '[US] Persist window size and position'
-    epic: electron-shell
-    feature: app-bootstrap
-    status: done
-  - issue: 148
-    type: us
-    title: '[US] Delete a credential'
-    epic: credential-vault
-    feature: credential-crud
-    status: done
+- issue: 149
+  type: us
+  title: '[US] Add a release server'
+  epic: release-server
+  feature: server-config-store
+  status: done
+  merged_pr: 179
+  completed_at: '2026-06-07'
+- issue: 147
+  type: us
+  title: '[US] Update credential name or rotate value'
+  epic: credential-vault
+  feature: credential-crud
+  status: done
+  merged_pr: 170
+  completed_at: '2026-06-05'
+- issue: 145
+  type: us
+  title: '[US] Add a credential to the vault'
+  epic: credential-vault
+  feature: credential-crud
+  status: done
+  merged_pr: 160
+  completed_at: '2026-06-05'
+- issue: null
+  type: hotfix
+  title: 'fix(devops): Electron renderer ERR_FILE_NOT_FOUND + e2e scaffold timeouts'
+  merged_pr: 126
+  completed_at: '2026-06-03'
+- issue: 36
+  type: us
+  title: '[US] Progress feedback during scaffolding'
+  epic: project-scaffold
+  feature: pipeline-engine
+  status: done
+  merged_pr: 108
+  completed_at: '2026-06-03'
+- issue: 37
+  type: us
+  title: '[US] Scaffold from Electron Forge with auto-update'
+  epic: project-scaffold
+  feature: template-provider
+  status: done
+  merged_pr: 113
+  completed_at: '2026-06-03'
+- issue: 35
+  type: us
+  title: '[US] Pipeline executes 3 stages sequentially'
+  epic: project-scaffold
+  feature: pipeline-engine
+  status: done
+- issue: 34
+  type: us
+  title: '[US] View project details and status'
+  epic: dashboard-ui
+  feature: project-detail
+  status: done
+- issue: 33
+  type: us
+  title: '[US] Preview project configuration before creating'
+  epic: dashboard-ui
+  feature: create-wizard
+  status: done
+- issue: 31
+  type: us
+  title: '[US] Search and filter projects'
+  epic: dashboard-ui
+  feature: project-list
+  status: done
+- issue: 32
+  type: us
+  title: '[US] Step-by-step wizard to create projects'
+  epic: dashboard-ui
+  feature: create-wizard
+  status: done
+- issue: 28
+  type: us
+  title: '[US] SQLite database stores, retrieves, updates, and soft-deletes project
+    records via IPC'
+  epic: data-layer
+  feature: project-crud
+  status: done
+- issue: 27
+  type: us
+  title: '[US] Migration system for schema changes'
+  epic: data-layer
+  feature: sqlite-storage
+  status: done
+- issue: 29
+  type: us
+  title: '[US] Store and retrieve app settings'
+  epic: data-layer
+  feature: config-manager
+  status: done
+- issue: 25
+  type: us
+  title: '[US] Single-instance enforcement'
+  epic: electron-shell
+  feature: app-lifecycle
+  status: done
+- issue: 24
+  type: us
+  title: '[US] Native OS menus with keyboard shortcuts'
+  epic: electron-shell
+  feature: app-lifecycle
+  status: done
+- issue: 23
+  type: us
+  title: '[US] Secure IPC channels with ping/pong demonstration'
+  epic: electron-shell
+  feature: ipc-bridge
+  status: done
+- issue: 21
+  type: us
+  title: '[US] Launch app and see main window'
+  epic: electron-shell
+  feature: app-bootstrap
+  status: done
+- issue: 22
+  type: us
+  title: '[US] Persist window size and position'
+  epic: electron-shell
+  feature: app-bootstrap
+  status: done
+- issue: 148
+  type: us
+  title: '[US] Delete a credential'
+  epic: credential-vault
+  feature: credential-crud
+  status: done
 labels_created:
   types:
-    - type:epic
-    - type:feature
-    - type:us
-    - type:task
-    - type:bug
+  - type:epic
+  - type:feature
+  - type:us
+  - type:task
+  - type:bug
   priorities:
-    - priority:critical
-    - priority:high
-    - priority:medium
-    - priority:low
+  - priority:critical
+  - priority:high
+  - priority:medium
+  - priority:low
   epics:
-    - epic:electron-shell
-    - epic:data-layer
-    - epic:dashboard-ui
-    - epic:project-scaffold
-    - epic:devops
-    - epic:credential-vault
-    - epic:release-server
+  - epic:electron-shell
+  - epic:data-layer
+  - epic:dashboard-ui
+  - epic:project-scaffold
+  - epic:devops
+  - epic:credential-vault
+  - epic:release-server
   features:
-    - feat:app-bootstrap
-    - feat:ipc-bridge
-    - feat:app-lifecycle
-    - feat:sqlite-storage
-    - feat:project-crud
-    - feat:config-manager
-    - feat:project-list
-    - feat:create-wizard
-    - feat:project-detail
-    - feat:pipeline-engine
-    - feat:forge-provider
-    - feat:release-provider
-    - feat:cicd-provider
-    - feat:cicd-pipeline
-    - feat:secure-storage
-    - feat:credential-crud
-    - feat:server-config-store
-    - feat:provider-registry
-    - feat:project-binding
-    - feat:release-status
-    - feat:ui-standard
+  - feat:app-bootstrap
+  - feat:ipc-bridge
+  - feat:app-lifecycle
+  - feat:sqlite-storage
+  - feat:project-crud
+  - feat:config-manager
+  - feat:project-list
+  - feat:create-wizard
+  - feat:project-detail
+  - feat:pipeline-engine
+  - feat:forge-provider
+  - feat:release-provider
+  - feat:cicd-provider
+  - feat:cicd-pipeline
+  - feat:secure-storage
+  - feat:credential-crud
+  - feat:server-config-store
+  - feat:provider-registry
+  - feat:project-binding
+  - feat:release-status
+  - feat:ui-standard
