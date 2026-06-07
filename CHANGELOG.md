@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.20.0](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.19.0...risotron-studio-v1.20.0) (2026-06-07)
+
+
+### Features
+
+* **release-server:** add release server management (US 149) ([#179](https://github.com/RisoTron/RisoTron-Studio/issues/179)) ([abe6b91](https://github.com/RisoTron/RisoTron-Studio/commit/abe6b91e644b42ce799dd4694cc7b75f8c054147))
+
 ## [1.19.0](https://github.com/RisoTron/RisoTron-Studio/compare/risotron-studio-v1.18.0...risotron-studio-v1.19.0) (2026-06-05)
 
 
