@@ -1,3 +1,5 @@
+// @vitest-environment node
+
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -44,7 +46,7 @@ describe('SqliteAdapter migrations', () => {
       expect.arrayContaining(['project_settings', 'projects', 'settings', 'templates']),
     );
     expect(adapter.queryOne<{ user_version: number }>('PRAGMA user_version')?.user_version).toBe(
-      2,
+      4,
     );
 
     adapter.execute("INSERT INTO settings (key, value) VALUES ('migration-marker', 'present')");
@@ -53,12 +55,38 @@ describe('SqliteAdapter migrations', () => {
 
     expect(() => adapter.initialize()).not.toThrow();
     expect(adapter.queryOne<{ user_version: number }>('PRAGMA user_version')?.user_version).toBe(
-      2,
+      4,
     );
     expect(
       adapter.queryOne<{ value: string }>(
         "SELECT value FROM settings WHERE key = 'migration-marker'",
       )?.value,
     ).toBe('present');
+  });
+
+  it('restricts deleting credentials referenced by release servers', () => {
+    adapter.initialize();
+
+    expect(
+      adapter.queryOne<{ sql: string }>(
+        "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'release_servers'",
+      )?.sql,
+    ).toContain('REFERENCES credentials(id) ON DELETE RESTRICT');
+
+    const credentialId = adapter.execute(
+      `INSERT INTO credentials (name, type, encrypted_payload)
+       VALUES (?, ?, ?)`,
+      ['AWS Production', 'aws', Buffer.from('encrypted')],
+    ).lastInsertRowid;
+
+    adapter.execute(
+      `INSERT INTO release_servers (name, provider_type, credential_id, config)
+       VALUES (?, ?, ?, ?)`,
+      ['S3 Production', 's3', credentialId, '{"bucket":"releases","region":"us-east-1"}'],
+    );
+
+    expect(() => {
+      adapter.execute('DELETE FROM credentials WHERE id = ?', [credentialId]);
+    }).toThrow();
   });
 });

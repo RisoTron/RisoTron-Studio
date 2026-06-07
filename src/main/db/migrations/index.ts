@@ -75,4 +75,20 @@ export const migrations: Migration[] = [
         ON credentials (name COLLATE NOCASE);
     `,
   },
+  {
+    version: 4,
+    name: 'release_servers_table',
+    sql: `
+      CREATE TABLE IF NOT EXISTS release_servers (
+        id              INTEGER PRIMARY KEY AUTOINCREMENT,
+        name            TEXT    NOT NULL,
+        provider_type   TEXT    NOT NULL CHECK(provider_type IN ('github-releases', 's3', 'generic-url')),
+        credential_id   INTEGER NOT NULL REFERENCES credentials(id) ON DELETE RESTRICT,
+        config          TEXT    NOT NULL DEFAULT '{}',
+        created_at      TEXT    NOT NULL DEFAULT (datetime('now', 'utc'))
+      );
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_release_servers_name_ci
+        ON release_servers (name COLLATE NOCASE);
+    `,
+  },
 ];

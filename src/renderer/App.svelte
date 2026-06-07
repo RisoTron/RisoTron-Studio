@@ -6,13 +6,14 @@
   import CreateProjectWizard from './components/wizard/CreateProjectWizard.svelte';
   import ProjectDetail from './components/ProjectDetail.svelte';
   import CredentialVaultView from './components/credential/CredentialVaultView.svelte';
+  import ReleaseServersView from './components/release-server/ReleaseServersView.svelte';
   import type { Project } from '../shared/types/project';
 
   let appInfo: AppInfo | null = $state(null);
-  let currentView: 'home' | 'settings' | 'wizard' | 'project-detail' | 'credentials' = $state('home');
+  let currentView: 'home' | 'settings' | 'wizard' | 'project-detail' | 'credentials' | 'release-servers' = $state('home');
   let selectedProject: Project | null = $state(null);
 
-  function navigateToView(view: 'home' | 'settings' | 'wizard' | 'project-detail' | 'credentials') {
+  function navigateToView(view: 'home' | 'settings' | 'wizard' | 'project-detail' | 'credentials' | 'release-servers') {
     currentView = view;
   }
 
@@ -64,6 +65,9 @@
       <button class="activity-icon {currentView === 'credentials' ? 'active' : ''}" onclick={() => navigateToView('credentials')} title="Credential Vault">
         <i class="codicon codicon-key"></i>
       </button>
+      <button class="activity-icon {currentView === 'release-servers' ? 'active' : ''}" onclick={() => navigateToView('release-servers')} title="Release Servers">
+        <i class="codicon codicon-server-environment"></i>
+      </button>
       <button class="activity-icon {currentView === 'settings' ? 'active' : ''}" onclick={() => navigateToView('settings')} title="Settings">
         <i class="codicon codicon-settings-gear"></i>
       </button>
@@ -75,6 +79,8 @@
         <SettingsView />
       {:else if currentView === 'credentials'}
         <CredentialVaultView />
+      {:else if currentView === 'release-servers'}
+        <ReleaseServersView />
       {:else}
         <ProjectDashboard onNewProject={() => navigateToView('wizard')} onSelectProject={(p) => { selectedProject = p; navigateToView('project-detail'); }} />
       {/if}

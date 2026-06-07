@@ -14,6 +14,9 @@ import type { AppSettings } from '../shared/types/settings';
 import type { CreateProjectPayload, UpdateProjectPayload, Project } from '../shared/types/project';
 import type { PipelineContext, IProvider } from '../shared/types/pipeline';
 import type { AddCredentialArgs, AddCredentialResult, CredentialError, CredentialListItem, CredentialType } from '../shared/types/credential';
+import type { AddReleaseServerArgs, ReleaseServer, ReleaseServerError } from '../shared/types/release-server';
+import { PROVIDER_TYPES, PROVIDER_TYPE_KEYS } from '../shared/constants/providers';
+import type { ProviderTypeKey } from '../shared/constants/providers';
 import { PipelineEngine } from './services/pipeline/PipelineEngine';
 import { BaseProjectProvider } from './services/pipeline/providers/BaseProjectProvider';
 import { ForgeProvider } from './services/pipeline/providers/ForgeProvider';
@@ -450,7 +453,7 @@ if (!gotTheLock) {
         const masked = getMasked(credType);
 
         // Generate timestamp in JS to avoid SELECT-after-INSERT
-        const created_at = new Date().toISOString().replace('T', ' ').split('.')[0] + ' UTC';
+        const created_at = new Date().toISOString().replace('T', ' ').split('.')[0];
 
         // Insert
         let insertId: number;
@@ -480,8 +483,11 @@ if (!gotTheLock) {
     ipcMain.handle('credential:list', async (event) => {
       try {
         validateSender(event);
-        const rows = db.queryAll<{ id: number; name: string; type: string; created_at: string }>(
-          'SELECT id, name, type, created_at FROM credentials ORDER BY created_at DESC'
+        const rows = db.queryAll<{ id: number; name: string; type: string; created_at: string; linked_server_count: number }>(
+          `SELECT c.id, c.name, c.type, c.created_at,
+                  (SELECT COUNT(*) FROM release_servers rs WHERE rs.credential_id = c.id) AS linked_server_count
+           FROM credentials c
+           ORDER BY c.created_at DESC`
         );
 
         const data: CredentialListItem[] = rows.map((row) => ({
@@ -490,7 +496,7 @@ if (!gotTheLock) {
           type: row.type as CredentialType,
           masked: getMasked(row.type as CredentialType),
           created_at: row.created_at,
-          linked_server_count: 0,
+          linked_server_count: row.linked_server_count,
         }));
 
         return { success: true, data };
@@ -682,6 +688,139 @@ if (!gotTheLock) {
       } catch (err: unknown) {
         console.error('[credential:delete] Unexpected error:', err);
         return { success: false, error: { code: 'QUERY_ERROR', message: 'An unexpected error occurred' } as CredentialError };
+      }
+    });
+
+    // ── Release Server IPC ──────────────────────────────────────
+    ipcMain.handle('release-server:add', async (event, args: unknown) => {
+      try {
+        validateSender(event);
+
+        if (
+          !args ||
+          typeof args !== 'object' ||
+          typeof (args as Record<string, unknown>).name !== 'string' ||
+          typeof (args as Record<string, unknown>).provider_type !== 'string' ||
+          typeof (args as Record<string, unknown>).credential_id !== 'number' ||
+          typeof (args as Record<string, unknown>).config !== 'object' ||
+          (args as Record<string, unknown>).config === null
+        ) {
+          return { success: false, error: { code: 'VALIDATION_ERROR', message: 'Malformed request' } as ReleaseServerError };
+        }
+
+        const typedArgs = args as AddReleaseServerArgs;
+
+        // Validate provider_type
+        if (!PROVIDER_TYPE_KEYS.includes(typedArgs.provider_type)) {
+          return { success: false, error: { code: 'VALIDATION_ERROR', field: 'provider_type', message: 'Invalid provider type' } as ReleaseServerError };
+        }
+
+        // Validate name
+        const name = typedArgs.name.trim();
+        if (!name) {
+          return { success: false, error: { code: 'VALIDATION_ERROR', field: 'name', message: 'Name is required' } as ReleaseServerError };
+        }
+        if (name.length > 100) {
+          return { success: false, error: { code: 'VALIDATION_ERROR', field: 'name', message: 'Name must be 100 characters or fewer' } as ReleaseServerError };
+        }
+
+        // Validate credential_id exists and matches the required type
+        if (!Number.isInteger(typedArgs.credential_id) || typedArgs.credential_id <= 0) {
+          return { success: false, error: { code: 'VALIDATION_ERROR', field: 'credential_id', message: 'Invalid credential ID' } as ReleaseServerError };
+        }
+        const credRows = db.queryAll<{ id: number; type: string }>(
+          'SELECT id, type FROM credentials WHERE id = ?',
+          [typedArgs.credential_id]
+        );
+        if (credRows.length === 0) {
+          return { success: false, error: { code: 'CREDENTIAL_NOT_FOUND', field: 'credential_id', message: 'Credential not found' } as ReleaseServerError };
+        }
+        const providerDef = PROVIDER_TYPES[typedArgs.provider_type];
+        if (credRows[0].type !== providerDef.requiredCredential) {
+          return { success: false, error: { code: 'VALIDATION_ERROR', field: 'credential_id', message: `This provider requires a ${providerDef.requiredCredential} credential` } as ReleaseServerError };
+        }
+
+        // Validate config: trim all values, check required fields are non-empty
+        const config: Record<string, string> = {};
+        for (const field of providerDef.configFields) {
+          const val = typeof typedArgs.config[field.key] === 'string' ? typedArgs.config[field.key].trim() : '';
+          if (field.required !== false && !val) {
+            return { success: false, error: { code: 'VALIDATION_ERROR', field: field.key, message: `${field.label} is required` } as ReleaseServerError };
+          }
+          if (val.length > 255) {
+            return { success: false, error: { code: 'VALIDATION_ERROR', field: field.key, message: `${field.label} is too long` } as ReleaseServerError };
+          }
+          config[field.key] = val;
+        }
+
+        const configJson = JSON.stringify(config);
+        const created_at = new Date().toISOString().replace('T', ' ').split('.')[0];
+
+        let insertId: number;
+        try {
+          const result = db.execute(
+            `INSERT INTO release_servers (name, provider_type, credential_id, config, created_at) VALUES (?, ?, ?, ?, ?)`,
+            [name, typedArgs.provider_type, typedArgs.credential_id, configJson, created_at]
+          );
+          insertId = result.lastInsertRowid as number;
+        } catch (sqlErr: unknown) {
+          const msg = sqlErr instanceof Error ? sqlErr.message : String(sqlErr);
+          if (msg.includes('UNIQUE constraint failed')) {
+            return { success: false, error: { code: 'DUPLICATE_NAME', field: 'name', message: 'A release server with this name already exists' } as ReleaseServerError };
+          }
+          return { success: false, error: { code: 'QUERY_ERROR', message: 'Failed to save release server' } as ReleaseServerError };
+        }
+
+        const credName = db.queryAll<{ name: string }>('SELECT name FROM credentials WHERE id = ?', [typedArgs.credential_id]);
+        const data: ReleaseServer = {
+          id: insertId,
+          name,
+          provider_type: typedArgs.provider_type,
+          credential_id: typedArgs.credential_id,
+          credential_name: credName[0]?.name ?? '',
+          config,
+          created_at,
+        };
+        return { success: true, data };
+      } catch (err: unknown) {
+        console.error('[release-server:add] Unexpected error:', err);
+        return { success: false, error: { code: 'QUERY_ERROR', message: 'An unexpected error occurred' } as ReleaseServerError };
+      }
+    });
+
+    ipcMain.handle('release-server:list', async (event) => {
+      try {
+        validateSender(event);
+        const rows = db.queryAll<{
+          id: number; name: string; provider_type: string;
+          credential_id: number; credential_name: string;
+          config: string; created_at: string;
+        }>(
+          `SELECT rs.id, rs.name, rs.provider_type, rs.credential_id,
+                  c.name AS credential_name, rs.config, rs.created_at
+           FROM release_servers rs
+           LEFT JOIN credentials c ON c.id = rs.credential_id
+           ORDER BY rs.created_at DESC`
+        );
+
+        const data: ReleaseServer[] = rows.map((row) => {
+          let config: Record<string, string> = {};
+          try { config = JSON.parse(row.config); } catch { /* keep empty */ }
+          return {
+            id: row.id,
+            name: row.name,
+            provider_type: row.provider_type as ProviderTypeKey,
+            credential_id: row.credential_id,
+            credential_name: row.credential_name ?? '',
+            config,
+            created_at: row.created_at,
+          };
+        });
+
+        return { success: true, data };
+      } catch (err: unknown) {
+        console.error('[release-server:list] Error:', err);
+        return { success: false, error: { code: 'QUERY_ERROR', message: 'Failed to list release servers' } as ReleaseServerError };
       }
     });
 
